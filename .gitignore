@@ -1,0 +1,21 @@
+node_modules/
+dist/
+.env
+.env.local
+.env.*
+!.env.example
+!apps/web/.env.visual
+coverage/
+*.log
+*.err
+*.tsbuildinfo
+.DS_Store
+apps/web/public/sw.js
+apps/web/public/workbox-*.js
+artifacts/
+cookies.txt
+*.pid
+api.pid
+
+# Stale compiled JS copies (API source is TypeScript only)
+apps/api/src/**/*.js

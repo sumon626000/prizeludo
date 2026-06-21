@@ -1,0 +1,168 @@
+/* Site-wide palette — matches admin dashboard (ref image) */
+
+:root {
+  --site-bg: #07100c;
+  --site-bg-soft: #050f0a;
+  --site-card-a: rgba(19, 54, 34, 0.68);
+  --site-card-b: rgba(6, 26, 16, 0.7);
+  --site-card-solid: rgba(8, 29, 18, 0.72);
+  --site-line: rgba(119, 247, 168, 0.11);
+  --site-line-soft: rgba(119, 247, 168, 0.18);
+  --site-text: #e9fff0;
+  --site-text-strong: #ecfff3;
+  --site-muted: #839a8f;
+  --site-muted-deep: #5e806d;
+  --site-accent: #5cdb8b;
+  --site-accent-bright: #81e7a7;
+  --site-active: rgba(41, 160, 86, 0.16);
+  --site-active-line: #35d478;
+
+  --ui-bg: var(--theme-background, var(--site-bg));
+  --ui-bg-soft: var(--site-bg-soft);
+  --ui-neon: var(--theme-accent, var(--site-accent));
+  --ui-neon-soft: rgba(92, 219, 139, 0.28);
+  --ui-neon-line: var(--site-line);
+  --ui-text: var(--site-text);
+  --ui-muted: var(--site-muted);
+  --ui-card-top: var(--site-card-a);
+  --ui-card-bottom: var(--site-card-b);
+  --ui-shell: rgba(5, 17, 11, 0.96);
+  --ui-shadow-glow: 0 0 20px rgba(41, 160, 86, 0.12);
+  --ui-shadow-card: 0 14px 34px rgba(0, 0, 0, 0.38);
+
+  --deep: var(--site-bg);
+  --forest: #050f0a;
+  --ink: var(--site-text);
+  --muted: var(--site-muted);
+  --line: var(--site-line-soft);
+  --glass: var(--site-card-solid);
+  --green-bright: var(--site-accent-bright);
+}
+
+html {
+  color: var(--site-text);
+  background: var(--site-bg);
+}
+
+.app-shell,
+.app-shell--premium,
+.app-loading {
+  background:
+    radial-gradient(circle at 80% 10%, rgba(30, 177, 100, 0.12), transparent 30%),
+    radial-gradient(circle at 12% 88%, rgba(20, 90, 50, 0.08), transparent 36%),
+    var(--ui-bg) !important;
+}
+
+/* Glass / cards — admin panel look */
+.glass,
+.app-shell--premium .glass,
+:is(.app-surface, .admin-page) :is(
+  .glass,
+  .wallet-panel,
+  .wallet-balance,
+  .home-hero-banner,
+  .live-win-board,
+  .game-category,
+  .tournament-list-card,
+  .tournament-card,
+  .profile-panel,
+  .leaderboard-list,
+  .leaderboard-header,
+  .refer-hero,
+  .auth-modal,
+  .bottom-nav.glass,
+  .app-header.glass
+) {
+  border: 1px solid var(--site-line) !important;
+  background: linear-gradient(145deg, var(--site-card-a), var(--site-card-b)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    var(--ui-shadow-card) !important;
+  color: var(--site-text);
+}
+
+.app-header.glass,
+.bottom-nav.glass {
+  background: linear-gradient(180deg, rgba(8, 29, 18, 0.88), rgba(5, 17, 11, 0.94)) !important;
+}
+
+/* Primary buttons — admin green */
+.app-surface:not(.app-surface--game) :is(
+  .primary-button,
+  .wallet-primary-button,
+  .home-play-button,
+  .home-play-cta,
+  .profile-save-button,
+  .refer-share,
+  .header-balance__add
+) {
+  border: 1px solid rgba(92, 219, 139, 0.28) !important;
+  color: var(--site-text-strong) !important;
+  background: linear-gradient(145deg, #2ea866, #1a5c38) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 0 12px rgba(41, 160, 86, 0.18) !important;
+}
+
+/* Tabs / active pills */
+.app-surface:not(.app-surface--game) :is(
+  .wallet-tabs button,
+  .profile-view-tabs button,
+  .history-tabs button,
+  .tournament-tabs button,
+  .leaderboard-periods button
+).active {
+  color: #caffda !important;
+  background: var(--site-active) !important;
+  box-shadow: inset 3px 0 var(--site-active-line) !important;
+}
+
+.bottom-nav a.active {
+  color: #caffda !important;
+  background: var(--site-active) !important;
+}
+
+.bottom-nav a.active::before {
+  display: none !important;
+  content: none !important;
+}
+
+/* Muted labels site-wide */
+.app-surface:not(.app-surface--game) small,
+.app-surface:not(.app-surface--game) .wallet-hint,
+.app-surface:not(.app-surface--game) .empty-state {
+  color: var(--site-muted) !important;
+}
+
+.app-surface:not(.app-surface--game) strong,
+.app-surface:not(.app-surface--game) h1,
+.app-surface:not(.app-surface--game) h2 {
+  color: var(--site-text-strong);
+}
+
+.app-header .header-balance__amount,
+.app-header .identity__name {
+  color: var(--site-text-strong) !important;
+}
+
+.app-header .identity small,
+.app-header .header-balance__copy small {
+  color: var(--site-muted) !important;
+}
+
+/* Live win / stats accent */
+.live-win-board__stats strong,
+.app-shell--premium .live-win-board__rows article.win .live-win-board__legacy small {
+  color: var(--site-accent) !important;
+}
+
+.live-win-board {
+  border-color: var(--site-line-soft) !important;
+}
+
+/* Inputs */
+.app-surface:not(.app-surface--game) :is(input, select, textarea):not(.language-switch *) {
+  border: 1px solid var(--site-line) !important;
+  background: rgba(5, 17, 11, 0.82) !important;
+  color: var(--site-text) !important;
+}

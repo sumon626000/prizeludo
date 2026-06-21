@@ -1,0 +1,1 @@
+ALTER TABLE "promotional_wins" ADD CONSTRAINT "promotional_wins_disclosed_check" CHECK ("promotional_wins"."is_disclosed" = true);

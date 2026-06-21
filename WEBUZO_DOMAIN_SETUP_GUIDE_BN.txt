@@ -1,0 +1,694 @@
+PrizeJito.com Webuzo Domain + Hosting Setup Guide
+=================================================
+
+Project:
+- Main website: https://prizejito.com
+- API server:   https://api.prizejito.com
+- Server user:  nixbazar
+- App folder:   /home/nixbazar/prizeludo
+
+Important security note
+-----------------------
+GitHub account password দিয়ে clone/pull হবে না. GitHub এখন password auth বন্ধ করেছে.
+GitHub Personal Access Token (PAT) ব্যবহার করতে হবে.
+
+DB password command-এ সরাসরি paste করবেন না, কারণ special character থাকলে shell ভুল বুঝতে পারে.
+এই guide-এ password hidden input + URL encode পদ্ধতি দেওয়া আছে.
+
+যেহেতু DB password chat/screenshot-এ এসেছে, production live করার আগে Webuzo থেকে DB password change/rotate করা ভালো.
+
+Very important public security rule
+-----------------------------------
+Project folder কখনও public document root করবেন না.
+
+Correct:
+- App/source folder: /home/nixbazar/prizeludo
+- Public web root:  /home/nixbazar/prizejito.com
+- Web root-এ শুধু apps/web/dist এর ভিতরের files copy হবে.
+
+Wrong/danger:
+- prizejito.com document root = /home/nixbazar/prizeludo (source folder public করা)
+- prizejito.com folder-এ .env, .git, node_modules, apps, src রাখা
+
+Check result:
+- https://prizejito.com should open with HTTP 200.
+- https://prizejito.com/.env should return HTTP 403 or 404.
+- https://prizejito.com/.git/config should return HTTP 403 or 404.
+
+HTTP 403 here is good. এর মানে secret file blocked.
+
+
+1) DNS setup
+------------
+Domain provider/registrar বা Cloudflare যেখানে DNS আছে সেখানে records দিন:
+
+Type    Name    Value
+A       @       161.248.189.80
+A       www     161.248.189.80
+A       api     161.248.189.80
+
+Notes:
+- 161.248.189.80 আপনার screenshot-এর current server IP.
+- যদি Webuzo IP change হয়, নতুন IP ব্যবহার করবেন.
+- Cloudflare ব্যবহার করলে first setup/SSL issue হলে temporarily DNS Only করে test করতে পারেন.
+- DNS propagation সাধারণত কয়েক মিনিট থেকে কয়েক ঘণ্টা লাগতে পারে.
+
+Check:
+https://prizejito.com
+https://api.prizejito.com
+
+
+2) Webuzo domain/subdomain add
+------------------------------
+Webuzo panel এ login করুন.
+
+Main domain:
+1. Domain -> Manage Domains / Add Domain
+2. prizejito.com add করুন.
+3. Document Root note করে রাখুন.
+
+Subdomain:
+1. Domain -> Subdomains
+2. Subdomain: api
+3. Domain: prizejito.com
+4. Full subdomain হবে: api.prizejito.com
+
+Example document roots:
+- prizejito.com document root: /home/nixbazar/prizejito.com
+- primary domain public_html হলে: /home/nixbazar/public_html (আপনার ক্ষেত্রে নয়)
+
+Guide-এর command block-এ WEB_ROOT=/home/nixbazar/prizejito.com ব্যবহার করুন.
+
+
+3) SSL setup
+------------
+Webuzo -> SSL -> Automatic SSL / Let us Encrypt
+
+SSL issue করুন:
+- prizejito.com
+- www.prizejito.com
+- api.prizejito.com
+
+SSL না হওয়া পর্যন্ত production login/cookie ঠিকমতো কাজ নাও করতে পারে.
+
+
+4) Database check
+-----------------
+Webuzo -> Database -> Manage Databases / Manage Database Users
+
+Existing DB information:
+- Database name: nixbazar_prizejito
+- Database user: nixbazar_prizejito_user
+- Password: আপনার Webuzo DB password
+
+Confirm:
+1. DB user database-এর সাথে assigned আছে.
+2. User privilege: ALL PRIVILEGES.
+3. Host সাধারণত localhost.
+
+phpMyAdmin দিয়ে test করতে পারেন user/password ঠিক আছে কিনা.
+
+
+5) GitHub token বানানো
+----------------------
+GitHub -> Settings -> Developer settings -> Personal access tokens
+
+Recommended:
+- Fine-grained token
+- Repository access: only khan-ludo repo
+- Permission: Contents -> Read-only
+
+Token copy করার পর safe জায়গায় রাখুন. GitHub password ব্যবহার করবেন না.
+
+
+6) First clone from Webuzo Terminal
+----------------------------------
+Webuzo -> Server Utilities -> Terminal খুলুন.
+
+Run:
+
+cd /home/nixbazar
+git clone https://github.com/sumon626000/khan-ludo.git prizejito
+cd /home/nixbazar/prizejito
+
+git remote set-url origin https://github.com/sumon626000/khan-ludo.git
+
+If repo is private, terminal will ask username/password:
+- Username = your GitHub username
+- Password = GitHub PAT token, not GitHub account password
+
+
+7) Create production .env
+-------------------------
+Run from project root:
+
+cd /home/nixbazar/prizejito
+
+read -s -p "DB password: " DB_PASS
+echo
+
+DB_PASS_ENC=$(node -e "console.log(encodeURIComponent(process.argv[1]))" "$DB_PASS")
+JWT_SECRET=$(node -e "console.log(require('crypto').randomBytes(48).toString('hex'))")
+ADMIN_CLAIM_SECRET=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
+
+cat > .env <<EOF
+NODE_ENV=production
+PORT=4000
+WEB_ORIGIN=https://prizejito.com
+API_PUBLIC_URL=https://api.prizejito.com
+DATABASE_URL=postgresql://nixbazar_prizejito_user:${DB_PASS_ENC}@localhost:5432/nixbazar_prizejito
+JWT_SECRET=${JWT_SECRET}
+ADMIN_CLAIM_SECRET=${ADMIN_CLAIM_SECRET}
+JWT_EXPIRES_IN_SECONDS=604800
+COOKIE_NAME=prizejito_session
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+GOOGLE_CALLBACK_URL=https://api.prizejito.com/api/auth/google/callback
+TRUST_PROXY=1
+EOF
+
+chmod 600 .env
+
+cat > apps/web/.env.production <<'EOF'
+VITE_API_URL=https://api.prizejito.com
+EOF
+
+Important:
+- WEB_ORIGIN must be exactly https://prizejito.com
+- API_PUBLIC_URL must be exactly https://api.prizejito.com
+- End slash দিবেন না.
+- Google login later configure করলে admin settings বা .env এ credential দিতে পারবেন.
+- OTP/KYC দরকার নেই, project already no OTP/no KYC.
+
+
+8) Install, build, migrate
+--------------------------
+Run:
+
+cd /home/nixbazar/prizejito
+npm install
+npm run build
+npm run db:migrate
+
+Expected:
+- API build creates: apps/api/dist/index.js
+- Web build creates: apps/web/dist
+- Database tables/migrations apply successfully
+
+If migrate fails:
+- DATABASE_URL check করুন.
+- DB password URL encoded হয়েছে কিনা দেখুন.
+- DB user database-এর সাথে assigned কিনা দেখুন.
+
+
+9) Publish main website files
+-----------------------------
+First find your actual prizejito.com document root from:
+Webuzo -> Domain -> Manage Domains -> prizejito.com -> Document Root
+
+Example 1: if main domain document root is /home/nixbazar/public_html
+
+WEB_ROOT=/home/nixbazar/prizejito.com
+
+Example 2: older public_html addon layout (not your setup):
+
+WEB_ROOT=/home/nixbazar/public_html/prizejito.com
+
+Now copy build:
+
+cd /home/nixbazar/prizejito
+mkdir -p "$WEB_ROOT"
+cp -a apps/web/dist/. "$WEB_ROOT"/
+
+Create SPA .htaccess:
+
+cat > "$WEB_ROOT/.htaccess" <<'HTACCESS'
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# Security: never expose secrets or source folders if they are copied by mistake.
+RewriteRule (^|/)\.env($|[./]) - [F,L]
+RewriteRule (^|/)\.git(/|$) - [F,L]
+RewriteRule (^|/)(node_modules|apps|src|docs|scripts|drizzle)(/|$) - [F,L]
+RewriteRule (^|/)(package(-lock)?\.json|tsconfig.*\.json|vite\.config\..*)$ - [F,L]
+
+RewriteCond %{HTTP_HOST} ^www\.prizejito\.com$ [NC]
+RewriteRule ^(.*)$ https://prizejito.com/$1 [L,R=301]
+
+RewriteRule ^index\.html$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.html [L]
+</IfModule>
+HTACCESS
+
+Test:
+https://prizejito.com
+https://prizejito.com/admin
+
+If refresh করলে 404 আসে, .htaccess ঠিক document root-এ আছে কিনা দেখুন.
+
+
+10) Run API on api.prizejito.com
+--------------------------------
+Preferred production way: Webuzo Node.js Application manager.
+
+Go:
+Webuzo -> Applications -> Add Applications / List Applications -> Node.js
+
+If Node.js option exists, create app:
+
+Option A - Root based setup:
+- Domain: api.prizejito.com
+- Application URL: /
+- Application Root: /home/nixbazar/prizejito
+- Startup file: apps/api/dist/index.js
+- Node version: 22 or newer
+- Environment: production
+
+Option B - API-folder based setup:
+- Domain: api.prizejito.com
+- Application URL: /
+- Application Root: /home/nixbazar/prizejito/apps/api
+- Startup file: dist/index.js
+- Node version: 22 or newer
+- Environment: production
+- In this option, copy env to API folder:
+
+cp /home/nixbazar/prizejito/.env /home/nixbazar/prizejito/apps/api/.env
+chmod 600 /home/nixbazar/prizejito/apps/api/.env
+
+Both options are OK. Do not mix them:
+- Root based root হলে startup `apps/api/dist/index.js`
+- API-folder based root হলে startup `dist/index.js`
+
+Important startup-file warning:
+- Correct startup file: apps/api/dist/index.js
+- Wrong startup file: apps/api/dist/db/client.js
+- Wrong startup file: apps/api/dist/app.js
+- Wrong startup file দিলে browser/log এ `import { drizzle } from "drizzle-orm/node-postgres"` টাইপ code দেখা যেতে পারে, কিন্তু API server listen করবে না.
+
+If Webuzo asks for env variables, add these exactly:
+
+NODE_ENV=production
+PORT=4000
+WEB_ORIGIN=https://prizejito.com
+API_PUBLIC_URL=https://api.prizejito.com
+DATABASE_URL=postgresql://nixbazar_prizejito_user:ENCODED_DB_PASSWORD@localhost:5432/nixbazar_prizejito
+JWT_SECRET=YOUR_LONG_RANDOM_JWT_SECRET_FROM_ENV_FILE
+ADMIN_CLAIM_SECRET=YOUR_LONG_RANDOM_ADMIN_CLAIM_SECRET_FROM_ENV_FILE
+JWT_EXPIRES_IN_SECONDS=604800
+COOKIE_NAME=prizejito_session
+GOOGLE_CALLBACK_URL=https://api.prizejito.com/api/auth/google/callback
+TRUST_PROXY=1
+
+Then click:
+- Save/Create
+- Start App / Restart App
+
+If Webuzo only allows application root as API folder:
+- Application Root: /home/nixbazar/prizejito/apps/api
+- Startup file: dist/index.js
+- Copy root env once:
+
+cp /home/nixbazar/prizejito/.env /home/nixbazar/prizejito/apps/api/.env
+chmod 600 /home/nixbazar/prizejito/apps/api/.env
+
+API health test:
+
+curl https://api.prizejito.com/api/health
+
+Expected response:
+{"status":"ok","service":"prizejito-api",...}
+
+If Node.js Application option is not available:
+- Hosting provider/Webuzo admin must enable Node.js Application/Passenger.
+- Static hosting only দিয়ে এই project-এর API, realtime Socket.io, tournament engine চলবে না.
+- PM2/manual terminal process temporary test করা যায়, কিন্তু production reliable করার জন্য Webuzo Node app manager দরকার.
+
+If a helper script says "HTTP 200 health" but shows "Exit code: -1":
+- Usually this means the API process started and the command runner stopped/timeouted while the server kept running.
+- It is not a database error if `/api/health` returns HTTP 200.
+- Do not use `apps/api/dist/db/client.js` as startup. Use `apps/api/dist/index.js`.
+- If your script starts with `cd /home/nixbazar/prizejito/apps/api`, then use `node dist/index.js` and keep `.env` in `/home/nixbazar/prizejito/apps/api/.env`.
+
+If terminal says "This command is blocked for safety reasons" when adding cron:
+- This is a hosting/Webuzo terminal safety restriction, not a PrizeJito code problem.
+- Preferred fix: use Webuzo Node.js Application manager and click Restart/Start there.
+- If Node app manager is not available, add cron from Webuzo UI:
+  Server Utilities -> Cron Job
+- Example cron command:
+
+cd /home/nixbazar/prizejito && /usr/bin/node apps/api/dist/index.js >> /home/nixbazar/prizejito/api.log 2>&1
+
+- Better cron style is a provider-approved process manager. Ask hosting support to enable Node.js Application/Passenger/PM2 for production.
+- Before adding any cron, confirm one manual health check works:
+
+curl https://api.prizejito.com/api/health
+
+
+11) Final website test
+----------------------
+Browser এ test করুন:
+
+1. https://prizejito.com opens
+2. Register works without OTP
+3. Guest login works
+4. Login cookie stays after refresh
+5. Tournament list loads
+6. Wallet page loads
+7. Admin route opens: https://prizejito.com/admin
+8. API health: https://api.prizejito.com/api/health
+
+If frontend opens but data loads না:
+- VITE_API_URL build-time value wrong হতে পারে.
+- In this project web build uses VITE_API_URL. If screen shows "Failed to fetch",
+  first suspect the web build was created with localhost API.
+- Before every production build, run:
+
+cd /home/nixbazar/prizejito
+cat > apps/web/.env.production <<'EOF'
+VITE_API_URL=https://api.prizejito.com
+EOF
+npm run build
+cp -a apps/web/dist/. "$WEB_ROOT"/
+
+Verify live JS does not contain localhost:
+
+ASSET=$(grep -o 'assets/[^"]*\.js' "$WEB_ROOT/index.html" | head -n 1)
+curl -s "https://prizejito.com/$ASSET" | grep -E 'localhost:4000|api.prizejito.com'
+
+Expected:
+- It should show api.prizejito.com.
+- It should not show localhost:4000.
+
+
+12) First admin setup
+---------------------
+1. https://prizejito.com এ নিজের real account register করুন.
+2. https://prizejito.com/admin খুলুন.
+3. First admin claim/setup flow থাকলে complete করুন.
+4. Admin panel থেকে settings, payment provider, tournament, bot showcase configure করুন.
+
+Security:
+- Admin password strong রাখুন.
+- Unknown user কে admin করবেন না.
+- DB/phpMyAdmin access public কাউকে দিবেন না.
+
+
+13) Future git update / redeploy
+--------------------------------
+Domain (prizejito.com / api.prizejito.com), nginx, SSL, server .env —
+এগুলো আবার সেটআপ করতে হবে না। শুধু কোড আপডেট হবে।
+
+Option A — GitHub webhook (recommended):
+1. GitHub repo -> Settings -> Webhooks
+2. Payload URL: https://api.prizejito.com/api/webhook/git-update
+3. Content type: application/json
+4. Secret: strong random value (same as server .env GITHUB_WEBHOOK_SECRET)
+5. Events: Just the push event
+6. Save, then click "Redeliver" on the ping event
+
+Server .env (api.prizejito.com):
+GITHUB_WEBHOOK_SECRET=your_webhook_secret_here
+DEPLOY_REPO_PATH=/home/nixbazar/prizejito
+WEB_ROOT=/home/nixbazar/prizejito.com
+DEPLOY_BRANCH=main
+# smart update — শুধু যা পরিবর্তন হয়েছে তাই build/deploy:
+DEPLOY_SCRIPT=/home/nixbazar/prizeludo/scripts/update-changed.sh
+# Webuzo already runs API on port 30047 — do not start a second node process:
+API_RESTART_MODE=webuzo
+# optional if Webuzo restart needs a custom command:
+# DEPLOY_RESTART_COMMAND=...
+
+Option B — Smart manual update (শুধু পরিবর্তিত অংশ):
+cd /home/nixbazar/prizeludo
+bash scripts/update-changed.sh
+
+Option C — শুধু frontend:
+bash scripts/update-changed.sh --web-only
+
+Option D — শুধু backend:
+bash scripts/update-changed.sh --api-only
+
+Option E — Full update (পুরো build):
+bash scripts/update.sh
+
+Manual deploy (fallback — full):
+প্রতি update এর সময়:
+
+cd /home/nixbazar/prizejito
+git pull
+npm install
+npm run build
+npm run db:migrate
+
+WEB_ROOT=/home/nixbazar/prizejito.com
+cp -a apps/web/dist/. "$WEB_ROOT"/
+
+Then Webuzo Node app restart:
+Applications -> Node.js -> api.prizejito.com -> Restart
+
+If git pull asks:
+- Username: GitHub username
+- Password: GitHub PAT token
+
+
+14) Common error fix
+--------------------
+
+GitHub error:
+"Password authentication is not supported"
+Fix: GitHub password নয়, PAT token ব্যবহার করুন.
+
+Database error:
+"password authentication failed"
+Fix:
+- DB password ঠিক আছে কিনা.
+- DB_PASS_ENC URL encoded হয়েছে কিনা.
+- User assigned to nixbazar_prizejito DB কিনা.
+
+Production startup failed:
+"Set a strong JWT_SECRET"
+Fix:
+- .env এ JWT_SECRET 32+ character strong random value দিন.
+
+CORS/login cookie issue:
+Fix:
+- WEB_ORIGIN=https://prizejito.com
+- API_PUBLIC_URL=https://api.prizejito.com
+- TRUST_PROXY=1
+- Both domains SSL active.
+
+Frontend "Failed to fetch":
+Fix:
+- API health first check করুন:
+
+curl https://api.prizejito.com/api/health
+
+- If health is ok but app still says Failed to fetch, rebuild web with production API URL:
+
+cd /home/nixbazar/prizejito
+cat > apps/web/.env.production <<'EOF'
+VITE_API_URL=https://api.prizejito.com
+EOF
+npm run build
+
+WEB_ROOT=/home/nixbazar/prizejito.com
+cp -a apps/web/dist/. "$WEB_ROOT"/
+
+- Then hard refresh browser / clear PWA cache.
+- Live JS check করুন:
+
+ASSET=$(grep -o 'assets/[^"]*\.js' "$WEB_ROOT/index.html" | head -n 1)
+curl -s "https://prizejito.com/$ASSET" | grep -E 'localhost:4000|api.prizejito.com'
+
+Expected output should include api.prizejito.com, not localhost:4000.
+
+API health 503 / Server Unavailable:
+Meaning:
+- Frontend build may be correct, but API process is stopped or Webuzo Node proxy cannot reach it.
+- Browser/mobile will show "Failed to fetch".
+
+Fast fix:
+1. Webuzo -> Applications -> Node.js / List Applications
+2. Select api.prizejito.com
+3. Confirm:
+   Application Root: /home/nixbazar/prizejito
+   Startup file: apps/api/dist/index.js
+   Node version: 22+
+   Environment: production
+4. Click Restart.
+5. Test:
+
+curl https://api.prizejito.com/api/health
+
+Expected:
+{"status":"ok","service":"prizejito-api",...}
+
+If Webuzo Node app is not available and you must test manually:
+
+cd /home/nixbazar/prizejito
+npm run build
+npm run db:migrate
+nohup node apps/api/dist/index.js > api.log 2>&1 &
+sleep 3
+curl https://api.prizejito.com/api/health
+
+If it still returns 503:
+- Open `api.log`:
+
+tail -n 80 /home/nixbazar/prizejito/api.log
+
+- Common causes:
+  - `.env` missing/wrong in Application Root
+  - `DATABASE_URL` password not URL encoded
+  - DB user not assigned to DB
+  - Startup file set to `apps/api/dist/db/client.js` instead of `apps/api/dist/index.js`
+  - Hosting killed manual terminal process; use Webuzo Node.js Application manager
+
+API health 404:
+Fix:
+- API app must point to api.prizejito.com.
+- Startup file apps/api/dist/index.js.
+- Build completed কিনা দেখুন.
+
+Webuzo Node app shows code or Exit code -1:
+Fix:
+- Node app startup file ভুল হলে এমন হয়.
+- Webuzo -> Applications -> Node.js -> api.prizejito.com edit করুন:
+  Application Root: /home/nixbazar/prizejito
+  Startup file: apps/api/dist/index.js
+- `apps/api/dist/db/client.js` চালাবেন না. এটা শুধু database connection helper.
+- Restart app করুন, তারপর:
+
+curl https://api.prizejito.com/api/health
+
+Expected:
+{"status":"ok","service":"prizejito-api",...}
+
+Website refresh 404:
+Fix:
+- .htaccess file WEB_ROOT এ আছে কিনা.
+- Apache rewrite enabled কিনা.
+
+Socket/realtime not working:
+Fix:
+- Webuzo Node proxy WebSocket support enabled কিনা hosting provider কে জিজ্ঞেস করুন.
+- API app restart করুন.
+
+Old design/cache showing:
+Fix:
+- Browser hard refresh.
+- PWA cache clear.
+- Rebuild and copy apps/web/dist again.
+
+
+15) Quick one-page command summary
+----------------------------------
+
+cd /home/nixbazar
+git clone https://github.com/sumon626000/khan-ludo.git prizejito
+cd /home/nixbazar/prizejito
+
+read -s -p "DB password: " DB_PASS
+echo
+DB_PASS_ENC=$(node -e "console.log(encodeURIComponent(process.argv[1]))" "$DB_PASS")
+JWT_SECRET=$(node -e "console.log(require('crypto').randomBytes(48).toString('hex'))")
+ADMIN_CLAIM_SECRET=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
+
+cat > .env <<EOF
+NODE_ENV=production
+PORT=4000
+WEB_ORIGIN=https://prizejito.com
+API_PUBLIC_URL=https://api.prizejito.com
+DATABASE_URL=postgresql://nixbazar_prizejito_user:${DB_PASS_ENC}@localhost:5432/nixbazar_prizejito
+JWT_SECRET=${JWT_SECRET}
+ADMIN_CLAIM_SECRET=${ADMIN_CLAIM_SECRET}
+JWT_EXPIRES_IN_SECONDS=604800
+COOKIE_NAME=prizejito_session
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+GOOGLE_CALLBACK_URL=https://api.prizejito.com/api/auth/google/callback
+TRUST_PROXY=1
+EOF
+
+cat > apps/web/.env.production <<'EOF'
+VITE_API_URL=https://api.prizejito.com
+EOF
+
+chmod 600 .env
+npm install
+npm run build
+npm run db:migrate
+
+WEB_ROOT=/home/nixbazar/prizejito.com
+mkdir -p "$WEB_ROOT"
+cp -a apps/web/dist/. "$WEB_ROOT"/
+
+cat > "$WEB_ROOT/.htaccess" <<'HTACCESS'
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteRule (^|/)\.env($|[./]) - [F,L]
+RewriteRule (^|/)\.git(/|$) - [F,L]
+RewriteRule (^|/)(node_modules|apps|src|docs|scripts|drizzle)(/|$) - [F,L]
+RewriteRule (^|/)(package(-lock)?\.json|tsconfig.*\.json|vite\.config\..*)$ - [F,L]
+RewriteCond %{HTTP_HOST} ^www\.prizejito\.com$ [NC]
+RewriteRule ^(.*)$ https://prizejito.com/$1 [L,R=301]
+RewriteRule ^index\.html$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.html [L]
+</IfModule>
+HTACCESS
+
+Then create/restart Node.js app in Webuzo:
+- Domain: api.prizejito.com
+- Root: /home/nixbazar/prizejito
+- Startup: apps/api/dist/index.js
+- Node: 22+
+
+Health check:
+curl https://api.prizejito.com/api/health
+
+
+16) Same network mobile test link
+---------------------------------
+Live hosting ছাড়াই same Wi-Fi/LAN থেকে mobile এ local project test করা যায়.
+
+This PC local IP example:
+
+192.168.1.103
+
+Mobile test link:
+
+http://192.168.1.103:5173
+
+API health link:
+
+http://192.168.1.103:4000/api/health
+
+Run API from PowerShell terminal 1:
+
+cd "F:\Khan Ludo"
+$env:NODE_ENV="development"
+$env:PORT="4000"
+$env:WEB_ORIGIN="http://192.168.1.103:5173"
+$env:API_PUBLIC_URL="http://192.168.1.103:4000"
+npm run dev -w @khan-ludo/api
+
+Run web from PowerShell terminal 2:
+
+cd "F:\Khan Ludo"
+$env:VITE_API_URL="http://192.168.1.103:4000"
+npm run dev -w @khan-ludo/web -- --host 0.0.0.0
+
+Then open on mobile:
+
+http://192.168.1.103:5173
+
+Important:
+- Phone and PC must be on the same Wi-Fi/router.
+- Use HTTP for local network test, not HTTPS.
+- If mobile cannot open the link, Windows Firewall may be blocking ports 5173 or 4000. Allow Node.js when Windows asks.
+- If your PC IP changes, run `ipconfig` and replace 192.168.1.103 with the new IPv4 address.

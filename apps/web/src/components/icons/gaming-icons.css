@@ -1,0 +1,120 @@
+.gaming-icon-wrap {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: var(--ui-neon, #a4ff5e);
+  contain: layout style paint;
+}
+
+.gaming-icon {
+  display: block;
+  overflow: visible;
+  filter: drop-shadow(0 0 5px color-mix(in srgb, currentColor 28%, transparent))
+    drop-shadow(0 2px 4px rgba(0, 0, 0, 0.28));
+}
+
+.gaming-icon-wrap--pulse .gaming-icon {
+  animation: gaming-icon-pulse 2.8s ease-in-out infinite;
+}
+
+.gaming-icon-wrap--float .gaming-icon {
+  animation: gaming-icon-float 4.6s ease-in-out infinite alternate;
+}
+
+.gaming-icon-wrap--shine::after {
+  content: "";
+  position: absolute;
+  inset: -12%;
+  border-radius: 50%;
+  background: linear-gradient(
+    108deg,
+    transparent 38%,
+    rgba(255, 255, 255, 0.28) 50%,
+    transparent 62%
+  );
+  opacity: 0;
+  pointer-events: none;
+  animation: gaming-icon-shine 3.8s ease-in-out infinite;
+}
+
+.bottom-nav .gaming-icon-wrap {
+  color: color-mix(in srgb, var(--ui-neon, #a4ff5e) 72%, #d8ffe8);
+}
+
+.bottom-nav a.active .gaming-icon-wrap {
+  color: var(--ui-neon, #a4ff5e);
+  filter: drop-shadow(0 0 8px color-mix(in srgb, var(--ui-neon, #a4ff5e) 42%, transparent));
+}
+
+.game-category__icon .gaming-icon-wrap {
+  width: 100%;
+  height: 100%;
+}
+
+.game-category--featured .gaming-icon-wrap {
+  color: #c9ff8f;
+}
+
+.game-category--featured .gaming-icon-wrap--shine::after {
+  animation-duration: 2.8s;
+}
+
+.header-balance__wallet .gaming-icon-wrap,
+.icon-button .gaming-icon-wrap {
+  color: var(--ui-neon, #a4ff5e);
+}
+
+.bg-game-icons .gaming-icon-wrap {
+  color: rgba(164, 255, 94, 0.72);
+  opacity: 0.92;
+}
+
+@keyframes gaming-icon-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.88;
+  }
+
+  50% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+}
+
+@keyframes gaming-icon-float {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes gaming-icon-shine {
+  0%,
+  72%,
+  100% {
+    opacity: 0;
+    transform: translateX(-120%) rotate(12deg);
+  }
+
+  78% {
+    opacity: 0.55;
+  }
+
+  86% {
+    opacity: 0;
+    transform: translateX(120%) rotate(12deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gaming-icon-wrap--pulse .gaming-icon,
+  .gaming-icon-wrap--float .gaming-icon,
+  .gaming-icon-wrap--shine::after {
+    animation: none !important;
+  }
+}

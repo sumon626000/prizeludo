@@ -1,0 +1,233 @@
+/* Site-wide ambient overlay — transform/opacity only (GPU-friendly) */
+
+.site-ambient {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+  contain: strict;
+}
+
+.app-shell:has(.app-surface--game) .site-ambient {
+  display: none;
+}
+
+.site-ambient__glow {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.07;
+  background: radial-gradient(circle, rgba(92, 219, 139, 0.55), transparent 68%);
+  animation: site-ambient-drift 28s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+.site-ambient__glow--one {
+  top: -12%;
+  left: -8%;
+  width: 52vw;
+  height: 52vw;
+  max-width: 420px;
+  max-height: 420px;
+}
+
+.site-ambient__glow--two {
+  top: 38%;
+  right: -14%;
+  width: 44vw;
+  height: 44vw;
+  max-width: 360px;
+  max-height: 360px;
+  animation-delay: -9s;
+  animation-duration: 34s;
+  opacity: 0.05;
+}
+
+.site-ambient__glow--three {
+  bottom: -16%;
+  left: 18%;
+  width: 48vw;
+  height: 48vw;
+  max-width: 380px;
+  max-height: 380px;
+  animation-delay: -16s;
+  animation-duration: 30s;
+  opacity: 0.06;
+}
+
+.site-ambient__bubble {
+  --bubble-left: 50%;
+  --bubble-top: 50%;
+  --bubble-size: 64px;
+  --bubble-delay: 0s;
+  --bubble-duration: 9s;
+  --bubble-dx: 8px;
+  --bubble-dy: -12px;
+  position: absolute;
+  left: var(--bubble-left);
+  top: var(--bubble-top);
+  width: var(--bubble-size);
+  height: var(--bubble-size);
+  border-radius: 50%;
+  transform: translate3d(-50%, -50%, 0);
+  background:
+    radial-gradient(
+      circle at 32% 28%,
+      rgba(196, 255, 148, 0.2),
+      rgba(92, 219, 139, 0.1) 48%,
+      transparent 72%
+    );
+  border: 1px solid rgba(164, 255, 94, 0.14);
+  box-shadow:
+    0 0 18px rgba(92, 219, 139, 0.16),
+    inset 0 0 12px rgba(164, 255, 94, 0.08);
+  opacity: 0.42;
+  animation:
+    site-bubble-float var(--bubble-duration) var(--bubble-delay) ease-in-out
+      infinite alternate,
+    site-bubble-pulse calc(var(--bubble-duration) * 1.15) var(--bubble-delay)
+      ease-in-out infinite alternate;
+  will-change: transform, opacity;
+}
+
+.site-ambient__bubble--f,
+.site-ambient__bubble--g {
+  opacity: 0.32;
+}
+
+.site-ambient__spark {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(164, 255, 94, 0.65);
+  box-shadow: 0 0 8px rgba(92, 219, 139, 0.35);
+  opacity: 0;
+  animation: site-ambient-spark 7s ease-in-out infinite;
+}
+
+.site-ambient__spark--a {
+  top: 18%;
+  left: 22%;
+  animation-delay: 0s;
+}
+
+.site-ambient__spark--b {
+  top: 62%;
+  left: 78%;
+  animation-delay: -2.4s;
+}
+
+.site-ambient__spark--c {
+  top: 84%;
+  left: 14%;
+  animation-delay: -4.8s;
+}
+
+.site-ambient__shimmer {
+  position: absolute;
+  inset: -40% -20%;
+  opacity: 0.04;
+  background: linear-gradient(
+    105deg,
+    transparent 42%,
+    rgba(164, 255, 94, 0.14) 50%,
+    transparent 58%
+  );
+  animation: site-ambient-shimmer 14s ease-in-out infinite;
+}
+
+@keyframes site-ambient-drift {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  to {
+    transform: translate3d(12px, -18px, 0) scale(1.04);
+  }
+}
+
+@keyframes site-bubble-float {
+  from {
+    transform: translate3d(-50%, -50%, 0);
+  }
+
+  to {
+    transform: translate3d(
+      calc(-50% + var(--bubble-dx)),
+      calc(-50% + var(--bubble-dy)),
+      0
+    );
+  }
+}
+
+@keyframes site-bubble-pulse {
+  from {
+    opacity: 0.28;
+  }
+
+  to {
+    opacity: 0.5;
+  }
+}
+
+@keyframes site-ambient-spark {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(0.6);
+  }
+
+  45% {
+    opacity: 0.55;
+    transform: translate3d(0, -10px, 0) scale(1);
+  }
+}
+
+@keyframes site-ambient-shimmer {
+  0%,
+  100% {
+    transform: translateX(-8%) rotate(0deg);
+    opacity: 0.02;
+  }
+
+  50% {
+    transform: translateX(8%) rotate(0.5deg);
+    opacity: 0.05;
+  }
+}
+
+@media (max-width: 520px) {
+  .site-ambient__bubble--e,
+  .site-ambient__bubble--g {
+    display: none;
+  }
+
+  .site-ambient__bubble {
+    opacity: 0.34;
+  }
+
+  .site-ambient__spark--c {
+    display: none;
+  }
+
+  .site-ambient__glow--three {
+    opacity: 0.04;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-ambient {
+    display: none !important;
+  }
+
+  .bg-game-icons__bubble {
+    animation: none !important;
+    opacity: 0.35 !important;
+  }
+
+  .app-shell--premium .game-category__icon::before,
+  .app-shell--premium .home-hero-banner__logo-wrap::before {
+    animation: none !important;
+  }
+}

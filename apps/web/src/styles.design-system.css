@@ -1,0 +1,733 @@
+/* PrizeJito premium UI — Phase 1 + 2 (loads last) */
+
+/* ── Phase 1: Design tokens (mockup: pure black + neon) ── */
+:root {
+  --ui-bg: var(--theme-background, #07100c);
+  --ui-bg-soft: #050f0a;
+  --ui-neon: var(--theme-accent, #5cdb8b);
+  --ui-neon-soft: rgba(92, 219, 139, 0.28);
+  --ui-neon-line: rgba(119, 247, 168, 0.11);
+  --ui-gold: #ffd54a;
+  --ui-shell: rgba(5, 17, 11, 0.96);
+  --ui-card-top: rgba(19, 54, 34, 0.68);
+  --ui-card-bottom: rgba(6, 26, 16, 0.7);
+  --ui-radius-xl: 22px;
+  --ui-radius-lg: 18px;
+  --ui-radius-md: 14px;
+  --ui-radius-sm: 10px;
+  --ui-gap: 10px;
+  --ui-shadow-glow: 0 0 20px rgba(41, 160, 86, 0.12);
+  --ui-shadow-card: 0 14px 34px rgba(0, 0, 0, 0.38);
+  --ui-text: #e9fff0;
+  --ui-muted: #839a8f;
+
+  /* Map legacy theme vars → admin palette */
+  --deep: #07100c;
+  --forest: #050f0a;
+  --green-bright: var(--ui-neon);
+  --theme-primary: #29a056;
+  --theme-secondary: #0b3d24;
+  --theme-button: #1d6b3f;
+  --theme-card: #081d12;
+  --theme-background: #07100c;
+  --theme-accent: #5cdb8b;
+  --line: rgba(119, 247, 168, 0.11);
+  --glass: rgba(8, 29, 18, 0.72);
+  --ink: var(--ui-text);
+  --muted: var(--ui-muted);
+}
+
+/* Pure black shell — no forest animation on main routes */
+.app-shell--premium {
+  background:
+    radial-gradient(circle at 80% 10%, rgba(30, 177, 100, 0.12), transparent 30%),
+    radial-gradient(circle at 12% 88%, rgba(20, 90, 50, 0.08), transparent 36%),
+    var(--ui-bg) !important;
+}
+
+.app-shell--premium.app-shell--loading {
+  display: grid;
+  place-items: center;
+  background: var(--ui-bg) !important;
+}
+
+.app-shell--premium.app-shell--loading img {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  animation: ui-pulse 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes ui-pulse {
+  from {
+    opacity: 0.72;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.app-shell--premium .app-surface:not(.app-surface--game):not(.app-surface--admin) {
+  padding-bottom: max(96px, calc(88px + env(safe-area-inset-bottom))) !important;
+}
+
+.app-shell--premium .app-surface:not(.app-surface--game) .page {
+  color: var(--ui-text);
+}
+
+/* ── Phase 2: Header premium shell ── */
+.app-shell--premium .app-header.glass {
+  border: 1px solid var(--ui-neon-soft) !important;
+  border-radius: var(--ui-radius-xl) !important;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(164, 255, 94, 0.12), transparent 50%),
+    linear-gradient(112deg, rgba(6, 22, 12, 0.98), rgba(2, 8, 4, 0.99)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(196, 255, 214, 0.1),
+    var(--ui-shadow-glow),
+    var(--ui-shadow-card) !important;
+}
+
+.app-shell--premium .identity__name {
+  color: var(--ui-text) !important;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+.app-shell--premium .identity__copy {
+  border: 1px solid var(--ui-neon-line) !important;
+  background: rgba(4, 16, 8, 0.85) !important;
+}
+
+.app-shell--premium .header-balance__amount {
+  color: var(--ui-neon) !important;
+  text-shadow: 0 0 14px rgba(164, 255, 94, 0.38);
+}
+
+.app-shell--premium .notification-count {
+  background: #ff3b3b !important;
+  box-shadow: 0 0 8px rgba(255, 59, 59, 0.55);
+}
+
+/* ── Phase 2: Bottom nav (original 5 tabs, premium look) ── */
+.app-shell--premium .bottom-nav.glass {
+  border: 1px solid var(--ui-neon-line) !important;
+  border-radius: var(--ui-radius-xl) !important;
+  background:
+    linear-gradient(180deg, rgba(6, 18, 10, 0.97), rgba(2, 6, 3, 0.99)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(164, 255, 94, 0.08),
+    0 10px 28px rgba(0, 0, 0, 0.62) !important;
+}
+
+.app-shell--premium .bottom-nav a {
+  color: var(--ui-muted) !important;
+  font-weight: 700;
+}
+
+.app-shell--premium .bottom-nav a.active {
+  color: var(--ui-neon) !important;
+  background: linear-gradient(
+    180deg,
+    rgba(164, 255, 94, 0.16),
+    rgba(9, 65, 35, 0.1)
+  ) !important;
+  text-shadow: 0 0 10px rgba(164, 255, 94, 0.35);
+}
+
+.app-shell--premium .bottom-nav a.active::before {
+  display: none;
+  content: none;
+}
+
+@media (max-width: 520px) {
+  .app-shell--premium .bottom-nav {
+    height: 64px !important;
+    padding: 4px !important;
+  }
+
+  .app-shell--premium .bottom-nav a {
+    font-size: 7.5px !important;
+  }
+
+  .app-shell--premium .bottom-nav a svg {
+    width: 17px !important;
+    height: 17px !important;
+  }
+}
+
+/* ── Legacy design-system (cards, forms, pages) ── */
+
+/* ── Glass / cards (all pages) ── */
+.app-surface:not(.app-surface--game) .glass,
+.app-surface:not(.app-surface--game) .wallet-panel,
+.app-surface:not(.app-surface--game) .wallet-balance,
+.app-surface:not(.app-surface--game) .refer-hero,
+.app-surface:not(.app-surface--game) .refer-history,
+.app-surface:not(.app-surface--game) .refer-metrics > article,
+.app-surface:not(.app-surface--game) .profile-panel,
+.app-surface:not(.app-surface--game) .stat-card,
+.app-surface:not(.app-surface--game) .history-item,
+.app-surface:not(.app-surface--game) .support-ticket,
+.app-surface:not(.app-surface--game) .support-compose,
+.app-surface:not(.app-surface--game) .best-finish,
+.app-surface:not(.app-surface--game) .win-rate-ring,
+.app-surface:not(.app-surface--game) .leaderboard-header,
+.app-surface:not(.app-surface--game) .leaderboard-list,
+.app-surface:not(.app-surface--game) .leaderboard-own-rank,
+.app-surface:not(.app-surface--game) .leaderboard-periods,
+.app-surface:not(.app-surface--game) .tournament-filter,
+.app-surface:not(.app-surface--game) .tournament-list-card,
+.app-surface:not(.app-surface--game) .tournament-card,
+.app-surface:not(.app-surface--game) .tournament-empty,
+.app-surface:not(.app-surface--game) .bracket-toolbar,
+.app-surface:not(.app-surface--game) .bracket-match,
+.app-surface:not(.app-surface--game) .placeholder-card,
+.app-surface:not(.app-surface--game) .home-play-card,
+.app-surface:not(.app-surface--game) .live-win-board,
+.app-surface:not(.app-surface--game) .home-hero {
+  border: 1px solid var(--ui-neon-line) !important;
+  border-radius: var(--ui-radius-lg) !important;
+  background:
+    linear-gradient(155deg, var(--ui-card-top), var(--ui-card-bottom)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(196, 255, 214, 0.08),
+    var(--ui-shadow-card) !important;
+  backdrop-filter: blur(16px) saturate(120%);
+  -webkit-backdrop-filter: blur(16px) saturate(120%);
+}
+
+.notification-center.glass {
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.app-surface:not(.app-surface--game) .page {
+  display: grid;
+  gap: var(--ui-gap);
+  padding-bottom: 6px;
+}
+
+/* ── Primary actions ── */
+.app-surface:not(.app-surface--game) :is(
+  .primary-button,
+  .wallet-primary-button,
+  .home-play-button,
+  .profile-save-button,
+  .refer-share
+) {
+  border: 1px solid rgba(168, 255, 120, 0.42) !important;
+  border-radius: var(--ui-radius-md) !important;
+  color: #f4fff7 !important;
+  background: linear-gradient(145deg, #43ee7b, #079c45) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 0 14px rgba(46, 255, 116, 0.26) !important;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.app-surface:not(.app-surface--game) :is(
+  .primary-button,
+  .wallet-primary-button,
+  .home-play-button
+):active {
+  transform: scale(0.98);
+}
+
+/* ── Tabs / pills ── */
+.app-surface:not(.app-surface--game) :is(
+  .wallet-tabs,
+  .profile-view-tabs,
+  .history-tabs,
+  .tournament-tabs,
+  .leaderboard-periods
+) {
+  border-radius: var(--ui-radius-md) !important;
+  padding: 4px !important;
+  gap: 4px !important;
+}
+
+.app-surface:not(.app-surface--game) :is(
+  .wallet-tabs button,
+  .profile-view-tabs button,
+  .history-tabs button,
+  .tournament-tabs button,
+  .leaderboard-periods button
+).active {
+  color: #031108 !important;
+  background: linear-gradient(135deg, #9dffb8, #25cb6c) !important;
+  box-shadow: 0 0 10px rgba(55, 255, 122, 0.28) !important;
+}
+
+/* ── Inputs ── */
+.app-surface:not(.app-surface--game) :is(input, select, textarea):not(.language-switch *) {
+  border: 1px solid var(--ui-neon-line) !important;
+  border-radius: var(--ui-radius-sm) !important;
+  background: rgba(2, 22, 13, 0.88) !important;
+  color: #eafff2 !important;
+}
+
+.app-surface:not(.app-surface--game) :is(input, select, textarea):focus {
+  outline: none;
+  border-color: var(--ui-neon-soft) !important;
+  box-shadow: 0 0 0 2px rgba(168, 255, 120, 0.12);
+}
+
+/* ── Header shell (mockup style) ── */
+.app-header.glass {
+  position: relative;
+  isolation: isolate;
+  border: 1px solid var(--ui-neon-soft) !important;
+  border-radius: var(--ui-radius-xl) !important;
+  background:
+    radial-gradient(circle at 40% 0%, rgba(34, 201, 107, 0.16), transparent 48%),
+    linear-gradient(112deg, rgba(2, 38, 22, 0.98), rgba(1, 20, 12, 0.99)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(196, 255, 214, 0.1),
+    var(--ui-shadow-glow),
+    var(--ui-shadow-card) !important;
+}
+
+.app-header.has-balance .identity--user,
+.app-header.has-balance .header-balance {
+  position: relative;
+}
+
+.app-header.has-balance .identity--user::after,
+.app-header.has-balance .header-balance::before {
+  content: "";
+  position: absolute;
+  top: 14%;
+  bottom: 14%;
+  width: 1px;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(168, 255, 120, 0.35),
+    transparent
+  );
+  pointer-events: none;
+}
+
+.app-header.has-balance .identity--user::after {
+  right: -3px;
+}
+
+.app-header.has-balance .header-balance::before {
+  left: -3px;
+}
+
+.app-header.has-balance .header-balance {
+  border: 1px solid rgba(119, 247, 168, 0.2);
+  border-radius: var(--ui-radius-md);
+  background:
+    radial-gradient(circle at 80% 0%, rgba(50, 255, 120, 0.1), transparent 42%),
+    rgba(2, 40, 22, 0.82);
+  box-shadow: inset 0 0 14px rgba(29, 219, 91, 0.05);
+}
+
+.app-header.has-balance .header-balance__amount {
+  color: var(--ui-neon) !important;
+  text-shadow: 0 0 12px rgba(168, 255, 120, 0.35);
+}
+
+/* ── Bottom navigation (mockup style) ── */
+.bottom-nav.glass {
+  border: 1px solid var(--ui-neon-line) !important;
+  border-radius: var(--ui-radius-xl) !important;
+  background:
+    linear-gradient(180deg, rgba(4, 32, 19, 0.96), rgba(2, 16, 10, 0.98)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(168, 255, 120, 0.08),
+    0 8px 26px rgba(0, 5, 2, 0.45) !important;
+}
+
+.bottom-nav a {
+  color: #6a9178 !important;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.bottom-nav a.active {
+  color: var(--ui-neon) !important;
+  background: linear-gradient(
+    180deg,
+    rgba(47, 204, 105, 0.18),
+    rgba(9, 65, 35, 0.12)
+  ) !important;
+  text-shadow: 0 0 10px rgba(168, 255, 120, 0.35);
+}
+
+.bottom-nav a.active::before {
+  display: none;
+  content: none;
+}
+
+/* ── Section titles ── */
+.app-surface:not(.app-surface--game) :is(
+  .wallet-section-title,
+  .tournament-list-section > h2,
+  .leaderboard-header h1,
+  .profile-panel h2
+) {
+  color: #eafff2;
+  letter-spacing: 0.02em;
+}
+
+.app-surface:not(.app-surface--game) :is(
+  .wallet-section-title small,
+  .empty-state,
+  .wallet-hint
+) {
+  color: var(--muted);
+}
+
+/* ── Mobile: compact clean header (matches mockup) ── */
+@media (max-width: 520px) {
+  .app-surface:not(.app-surface--game):not(.app-surface--admin) {
+    grid-template-rows: minmax(44px, auto) minmax(0, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  .app-header.has-balance {
+    min-height: 44px !important;
+    height: auto !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto !important;
+    gap: 0 !important;
+    padding: 4px 5px !important;
+    overflow: hidden !important;
+    align-items: center !important;
+  }
+
+  .app-header.has-balance::after {
+    display: none;
+  }
+
+  .app-header.has-balance .identity__avatar-shell {
+    width: 34px !important;
+    height: 34px !important;
+    border-width: 1px !important;
+    box-shadow: none !important;
+  }
+
+  .app-header.has-balance .identity__avatar-shell > img {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  .app-header.has-balance .identity__profile {
+    grid-template-columns: 34px minmax(0, 1fr) !important;
+  }
+
+  .app-header.has-balance .identity--user::after,
+  .app-header.has-balance .header-balance::before {
+    opacity: 0.55;
+  }
+
+  .bottom-nav {
+    height: 66px !important;
+    padding: 5px !important;
+  }
+
+  .bottom-nav a {
+    font-size: 8.5px !important;
+    gap: 2px !important;
+  }
+
+  .bottom-nav a svg {
+    width: 17px !important;
+    height: 17px !important;
+  }
+}
+
+/* ── Desktop: balanced header, no overlap ── */
+@media (min-width: 521px) {
+  .app-surface:not(.app-surface--game):not(.app-surface--admin) {
+    grid-template-rows: minmax(68px, auto) minmax(0, 1fr) !important;
+  }
+
+  .app-header.has-balance {
+    min-height: 68px !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr) auto !important;
+    gap: 10px !important;
+    padding: 8px 10px !important;
+  }
+
+  .app-header.has-balance > * {
+    min-width: 0;
+  }
+
+  .app-header.has-balance .identity__avatar-shell {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  .app-header.has-balance .identity__avatar-shell > img {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  .app-header.has-balance .identity__profile {
+    grid-template-columns: 44px minmax(0, 1fr) !important;
+  }
+
+  .app-header.has-balance .header-balance {
+    min-width: 0 !important;
+    height: 50px !important;
+  }
+
+  .app-header.has-balance .header-actions {
+    flex-shrink: 0;
+  }
+}
+
+/* ── Extended surfaces (all routes) ── */
+.app-surface:not(.app-surface--game) :is(
+  .game-category,
+  .home-empty,
+  .home-coming-soon,
+  .referral-code-card,
+  .legal-card,
+  .auth-modal,
+  .offline-card,
+  .pwa-install-prompt,
+  .notification-center,
+  .notification-item,
+  .wallet-transaction,
+  .wallet-history-item,
+  .deposit-offer-grid button,
+  .wallet-mode-switch button,
+  .wallet-method-checkboxes button,
+  .bracket-guest-hint,
+  .own-match-callout,
+  .round-waiting,
+  .spectator-room,
+  .bracket-empty-state,
+  .tournament-joined-strip,
+  .tournament-game-settings,
+  .tournament-showcase-settings,
+  .tournament-admin-form,
+  .tournament-detail-actions,
+  .bot-settings,
+  .bot-editor,
+  .bot-list,
+  .bot-admin-loading,
+  .history-empty,
+  .refer-player,
+  .profile-summary,
+  .claim-button,
+  .logout-button,
+  .guest-button,
+  .google-button
+) {
+  border: 1px solid var(--ui-neon-line);
+  border-radius: var(--ui-radius-md);
+  background: linear-gradient(155deg, var(--ui-card-top), var(--ui-card-bottom));
+  box-shadow:
+    inset 0 1px 0 rgba(196, 255, 214, 0.06),
+    var(--ui-shadow-card);
+}
+
+/* Game category tiles */
+.app-surface:not(.app-surface--game) .game-category {
+  border-radius: var(--ui-radius-lg) !important;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.app-surface:not(.app-surface--game) .game-category--ludo {
+  border-color: rgba(168, 255, 120, 0.32) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(196, 255, 214, 0.1),
+    0 0 14px rgba(46, 255, 116, 0.12) !important;
+}
+
+.app-surface:not(.app-surface--game) .game-category:hover,
+.app-surface:not(.app-surface--game) .game-category:focus-visible {
+  border-color: var(--ui-neon-soft) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(196, 255, 214, 0.12),
+    var(--ui-shadow-glow) !important;
+}
+
+/* Home hero play CTA */
+.app-surface:not(.app-surface--game) .home-play-button {
+  min-height: 46px;
+  font-size: clamp(14px, 3.6vw, 16px);
+}
+
+/* Wallet / deposit chips */
+.app-surface:not(.app-surface--game) :is(
+  .deposit-offer-grid button.active,
+  .wallet-mode-switch button.active,
+  .wallet-method-checkboxes button.active
+) {
+  color: #031108 !important;
+  border-color: rgba(168, 255, 120, 0.5) !important;
+  background: linear-gradient(135deg, #9dffb8, #25cb6c) !important;
+  box-shadow: 0 0 10px rgba(55, 255, 122, 0.24) !important;
+}
+
+/* Secondary / outline buttons */
+.app-surface:not(.app-surface--game) :is(
+  .text-button,
+  .back-button,
+  .profile-edit-button,
+  .logout-button,
+  .guest-button,
+  .google-button,
+  .tournament-leave-button
+) {
+  border: 1px solid var(--ui-neon-line) !important;
+  border-radius: var(--ui-radius-sm) !important;
+  color: #d8ffe6 !important;
+  background: rgba(2, 28, 16, 0.72) !important;
+}
+
+/* Auth modal */
+.auth-modal.glass {
+  border: 1px solid var(--ui-neon-soft) !important;
+  border-radius: var(--ui-radius-xl) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(196, 255, 214, 0.1),
+    var(--ui-shadow-glow),
+    0 18px 40px rgba(0, 8, 4, 0.55) !important;
+}
+
+.auth-modal .auth-tabs {
+  border-radius: var(--ui-radius-md);
+  padding: 3px;
+  gap: 3px;
+  background: rgba(2, 18, 11, 0.85);
+  border: 1px solid var(--ui-neon-line);
+}
+
+.auth-modal .auth-tabs button.active {
+  color: #031108;
+  background: linear-gradient(135deg, #9dffb8, #25cb6c);
+}
+
+/* Live wins / leaderboard rows */
+.app-surface:not(.app-surface--game) .live-win-board__rows :is(.win, .loss),
+.app-surface:not(.app-surface--game) .leaderboard-list article {
+  border: 1px solid rgba(119, 247, 168, 0.12);
+  border-radius: var(--ui-radius-sm);
+  background: rgba(2, 22, 13, 0.55);
+}
+
+.app-surface:not(.app-surface--game) .live-win-board__stats strong,
+.app-surface:not(.app-surface--game) .refer-metrics strong,
+.app-surface:not(.app-surface--game) .wallet-balance strong {
+  color: var(--ui-neon);
+  text-shadow: 0 0 10px rgba(168, 255, 120, 0.28);
+}
+
+/* Tournament bracket match highlight */
+.app-surface:not(.app-surface--game) .bracket-match.live,
+.app-surface:not(.app-surface--game) .bracket-match.own {
+  border-color: rgba(168, 255, 120, 0.42) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(168, 255, 120, 0.08),
+    0 0 16px rgba(46, 255, 116, 0.18) !important;
+}
+
+/* Toasts */
+.app-surface:not(.app-surface--game) :is(
+  .wallet-toast,
+  .profile-toast,
+  .tournament-toast
+) {
+  border: 1px solid var(--ui-neon-line);
+  border-radius: var(--ui-radius-sm);
+  background: rgba(2, 28, 16, 0.92);
+  color: #eafff2;
+}
+
+.app-surface:not(.app-surface--game) :is(
+  .wallet-toast.error,
+  .profile-toast.error,
+  .tournament-toast.error
+) {
+  border-color: rgba(255, 96, 96, 0.45);
+  color: #ffd6d6;
+}
+
+/* Language toggle — mockup pill */
+.language-switch {
+  border: 1px solid rgba(168, 255, 120, 0.22) !important;
+  background: rgba(1, 14, 8, 0.78) !important;
+}
+
+.language-switch button.active {
+  color: #031108 !important;
+  background: linear-gradient(135deg, #9dffb8, #25cb6c) !important;
+}
+
+/* Bell / add-funds buttons */
+.app-header .header-actions .icon-button,
+.app-header .header-balance__add {
+  border: 1px solid rgba(168, 255, 120, 0.28) !important;
+  background: rgba(2, 40, 22, 0.82) !important;
+  box-shadow: 0 0 8px rgba(46, 255, 116, 0.12);
+}
+
+.app-header .header-balance__add {
+  background: linear-gradient(145deg, #43ee7b, #079c45) !important;
+  border-color: rgba(168, 255, 120, 0.42) !important;
+}
+
+.app-header .notification-badge {
+  background: #ff3b3b !important;
+  box-shadow: 0 0 8px rgba(255, 59, 59, 0.55);
+}
+
+/* Override legacy premium header sizing (styles.css duplicates) */
+.app-surface:not(.app-surface--game):not(.app-surface--admin) {
+  grid-template-rows: minmax(54px, auto) minmax(0, 1fr) !important;
+}
+
+@media (min-width: 521px) {
+  .app-surface:not(.app-surface--game):not(.app-surface--admin) {
+    grid-template-rows: minmax(68px, auto) minmax(0, 1fr) !important;
+  }
+}
+
+.app-header.has-balance .identity__profile {
+  grid-template-columns: 34px minmax(0, 1fr) !important;
+}
+
+@media (min-width: 521px) {
+  .app-header.has-balance .identity__profile {
+    grid-template-columns: 44px minmax(0, 1fr) !important;
+  }
+}
+
+.app-header.has-balance .identity--user {
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  padding-right: 0 !important;
+}
+
+/* Home page — show all sections (hero, games, live board, tournaments) */
+.app-surface:not(.app-surface--game) .page.home-dashboard {
+  display: grid !important;
+  grid-template-rows: auto auto auto minmax(240px, 1fr) !important;
+  align-content: start !important;
+  gap: 10px !important;
+  min-height: 0 !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.app-surface:not(.app-surface--game) .live-win-board {
+  min-height: 180px;
+}
+
+.app-surface:not(.app-surface--game) .home-dashboard .tournament-section {
+  min-height: 260px;
+}

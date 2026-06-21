@@ -1,0 +1,1848 @@
+/* Phase 3 — Home, Wallet, Tournament premium pages (no backend changes) */
+
+/* ═══════════════════════════════════════
+   HOME
+   ═══════════════════════════════════════ */
+.app-shell--premium .home-page--premium {
+  display: grid !important;
+  grid-template-rows: auto auto auto minmax(220px, 1fr) auto !important;
+  gap: 14px !important;
+  min-height: 0 !important;
+  padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)) !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  scroll-padding-bottom: 12px;
+}
+
+.app-shell--premium .home-hero-banner {
+  position: relative;
+  min-height: 148px;
+  padding: 16px 16px 16px 18px;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 76px;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid rgba(164, 255, 94, 0.32) !important;
+  border-radius: 22px !important;
+  background:
+    radial-gradient(circle at 92% 12%, rgba(164, 255, 94, 0.2), transparent 44%),
+    radial-gradient(circle at 6% 92%, rgba(255, 213, 74, 0.1), transparent 40%),
+    linear-gradient(145deg, rgba(12, 34, 20, 0.98), rgba(2, 8, 4, 0.99)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(196, 255, 214, 0.12),
+    0 12px 32px rgba(0, 0, 0, 0.28),
+    0 0 28px rgba(164, 255, 94, 0.1) !important;
+}
+
+.app-shell--premium .home-hero-banner__mesh {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(164, 255, 94, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(164, 255, 94, 0.04) 1px, transparent 1px);
+  background-size: 18px 18px;
+  mask-image: radial-gradient(circle at 30% 40%, black 20%, transparent 78%);
+  pointer-events: none;
+}
+
+.app-shell--premium .home-hero-banner__visual {
+  position: absolute;
+  right: 72px;
+  bottom: -10px;
+  width: 96px;
+  height: 96px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: rgba(164, 255, 94, 0.12);
+  background: radial-gradient(circle, rgba(164, 255, 94, 0.08), transparent 68%);
+  filter: drop-shadow(0 0 10px rgba(164, 255, 94, 0.12));
+  pointer-events: none;
+  animation: hero-float 7s ease-in-out infinite alternate;
+}
+
+.app-shell--premium .home-hero-banner__content {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.app-shell--premium .home-hero-banner__topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+
+.app-shell--premium .home-hero-banner__brand {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ui-neon);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-shadow: 0 0 8px rgba(164, 255, 94, 0.18);
+}
+
+.app-shell--premium .home-hero-banner__live {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(164, 255, 94, 0.22);
+  background: rgba(164, 255, 94, 0.08);
+  color: #c8ffd8;
+  font-size: 9px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.app-shell--premium .home-hero-banner__live i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ui-neon, #a4ff5e);
+  box-shadow: 0 0 5px rgba(164, 255, 94, 0.45);
+  animation: live-pulse 2.4s ease-in-out infinite;
+}
+
+.app-shell--premium .home-hero-banner__copy {
+  min-width: 0;
+}
+
+.app-shell--premium .home-hero-banner__copy h1 {
+  margin: 0;
+  color: #f4fff7;
+  font-size: clamp(16px, 4.6vw, 20px);
+  font-weight: 900;
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+}
+
+.app-shell--premium .home-hero-banner__copy p {
+  margin: 6px 0 0;
+  color: var(--ui-muted);
+  font-size: clamp(10px, 2.8vw, 11px);
+  line-height: 1.4;
+  max-width: 28ch;
+}
+
+.app-shell--premium .home-hero-banner__logo-wrap {
+  position: relative;
+  z-index: 1;
+  width: 72px;
+  height: 72px;
+  display: grid;
+  place-items: center;
+}
+
+.app-shell--premium .home-hero-banner__logo-wrap::before {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 30%,
+    rgba(196, 255, 148, 0.2),
+    rgba(92, 219, 139, 0.08) 55%,
+    transparent 72%
+  );
+  animation: bg-icon-bubble-pulse 5s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app-shell--premium .home-hero-banner__ring {
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 1px solid rgba(164, 255, 94, 0.35);
+  border-top-color: rgba(255, 213, 74, 0.55);
+  animation: orbit-spin 9s linear infinite;
+}
+
+.app-shell--premium .home-hero-banner__logo {
+  position: relative;
+  z-index: 1;
+  width: 58px;
+  height: 58px;
+  object-fit: cover;
+  border-radius: 50%;
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.48));
+  animation: logo-float 4.4s ease-in-out infinite;
+}
+
+.app-shell--premium .home-quick-actions {
+  width: 100%;
+}
+
+.app-shell--premium .home-play-cta {
+  position: relative;
+  width: 100%;
+  min-height: 54px;
+  display: grid !important;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px 0 12px !important;
+  border-radius: 16px !important;
+  border: 1px solid rgba(196, 255, 214, 0.45) !important;
+  font-size: clamp(14px, 3.8vw, 16px) !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.02em;
+  overflow: hidden;
+  box-shadow:
+    0 10px 28px rgba(25, 187, 87, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
+}
+
+.app-shell--premium .home-play-cta::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 38%,
+    rgba(255, 255, 255, 0.22) 50%,
+    transparent 62%
+  );
+  transform: translateX(-120%);
+  animation: cta-shimmer 3.2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.app-shell--premium .home-play-cta__icon,
+.app-shell--premium .home-play-cta__arrow {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+}
+
+.app-shell--premium .home-play-cta__icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  background: rgba(2, 16, 8, 0.18);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+.app-shell--premium .home-play-cta__label {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.app-shell--premium .home-play-cta__arrow {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(2, 16, 8, 0.2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+.app-shell--premium .home-game-hub {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.app-shell--premium .home-game-hub__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 2px;
+}
+
+.app-shell--premium .home-game-hub__header > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #eefef3;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.app-shell--premium .home-game-hub__header > span svg {
+  color: var(--ui-neon, #a4ff5e);
+}
+
+.app-shell--premium .home-game-hub__header > small {
+  color: var(--ui-muted, #9bc8aa);
+  font-size: 9px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.app-shell--premium .game-category--featured {
+  min-height: 76px;
+  grid-template-columns: 52px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-width: 1.5px;
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(164, 255, 94, 0.28), transparent 52%),
+    radial-gradient(circle at 88% 82%, rgba(255, 213, 74, 0.12), transparent 48%),
+    linear-gradient(145deg, rgba(14, 58, 30, 0.96), rgba(4, 18, 10, 0.98));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 10px 24px rgba(0, 0, 0, 0.24),
+    0 0 20px rgba(164, 255, 94, 0.12);
+}
+
+.app-shell--premium .game-category--featured .game-category__icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  background: rgba(164, 255, 94, 0.12);
+  border: 1px solid rgba(164, 255, 94, 0.28);
+  position: relative;
+  overflow: visible;
+}
+
+.app-shell--premium .game-category--featured .game-category__icon::before {
+  content: "";
+  position: absolute;
+  inset: -18%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 30%,
+    rgba(196, 255, 148, 0.22),
+    rgba(92, 219, 139, 0.08) 55%,
+    transparent 72%
+  );
+  animation: bg-icon-bubble-pulse 4.6s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app-shell--premium .game-category--featured .game-category__icon .gaming-icon-wrap {
+  position: relative;
+  z-index: 1;
+}
+
+.app-shell--premium .game-category--featured .game-category__icon svg {
+  width: 28px !important;
+  height: 28px !important;
+}
+
+.app-shell--premium .game-category--featured .game-category__copy strong {
+  font-size: 15px;
+}
+
+.app-shell--premium .game-category--featured .game-category__copy small {
+  font-size: 10px;
+  color: #a4ff5e;
+}
+
+.app-shell--premium .game-category__badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(164, 255, 94, 0.45);
+  background: rgba(164, 255, 94, 0.14);
+  color: #d8ffe6;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  box-shadow: 0 0 12px rgba(164, 255, 94, 0.2);
+}
+
+.app-shell--premium .home-game-categories--soon {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.app-shell--premium .game-category--soon {
+  min-height: 88px;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto;
+  justify-items: center;
+  align-content: center;
+  gap: 8px;
+  padding: 10px 8px;
+  border-radius: 16px;
+  text-align: center;
+  opacity: 0.92;
+}
+
+.app-shell--premium .game-category--soon .game-category__icon {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+  overflow: visible;
+}
+
+.app-shell--premium .game-category--soon .game-category__icon::before {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 30%,
+    color-mix(in srgb, var(--category-glow, #a4ff5e) 24%, transparent),
+    transparent 70%
+  );
+  animation: bg-icon-bubble-pulse 5.2s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app-shell--premium .game-category--soon .game-category__icon .gaming-icon-wrap {
+  position: relative;
+  z-index: 1;
+}
+
+.app-shell--premium .game-category--soon .game-category__icon svg {
+  width: 22px !important;
+  height: 22px !important;
+}
+
+.app-shell--premium .game-category--soon .game-category__copy {
+  text-align: center;
+}
+
+.app-shell--premium .game-category--soon .game-category__copy strong {
+  font-size: 10px;
+}
+
+.app-shell--premium .game-category--soon .game-category__copy small {
+  font-size: 8px;
+  color: rgba(155, 200, 170, 0.88);
+}
+
+@keyframes hero-float {
+  from { transform: translateY(0); }
+  to { transform: translateY(-6px); }
+}
+
+@keyframes cta-shimmer {
+  0%, 72%, 100% { transform: translateX(-120%); }
+  38% { transform: translateX(120%); }
+}
+
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.55; transform: scale(0.88); }
+}
+
+/* Live win board — mockup list */
+.app-shell--premium .live-win-board {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+.app-shell--premium .live-win-board__header--premium {
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  border-bottom: 1px solid rgba(164, 255, 94, 0.14);
+  background: rgba(4, 14, 8, 0.72);
+}
+
+.app-shell--premium .live-win-board__header--premium > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #f4fff7;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.app-shell--premium .live-win-board__header--premium > span i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ui-neon, #a4ff5e);
+  box-shadow: 0 0 10px rgba(164, 255, 94, 0.75);
+}
+
+.app-shell--premium .live-win-board__header--premium > strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--ui-neon, #a4ff5e);
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.app-shell--premium .live-win-board__header--premium > strong small {
+  color: var(--ui-muted, #9bc8aa);
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.app-shell--premium .live-win-board__stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(164, 255, 94, 0.08);
+}
+
+.app-shell--premium .live-win-board__stats span {
+  text-align: center;
+  padding: 6px 4px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.app-shell--premium .live-win-board__stats small {
+  display: block;
+  color: var(--ui-muted);
+  font-size: 8px;
+}
+
+.app-shell--premium .live-win-board__stats strong {
+  color: var(--ui-neon);
+  font-size: 11px;
+}
+
+.app-shell--premium .live-win-board__rows {
+  min-height: 0;
+  max-height: 42vh;
+  overflow: hidden;
+}
+
+.app-shell--premium .live-win-board__scroller {
+  max-height: 42vh;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.app-shell--premium .live-win-board__rows article {
+  display: grid !important;
+  grid-template-columns: 34px minmax(0, 1fr) auto auto !important;
+  align-items: center;
+  gap: 8px !important;
+  min-height: 52px !important;
+  padding: 8px 12px !important;
+  border-bottom: 1px solid rgba(164, 255, 94, 0.06) !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+}
+
+.app-shell--premium .live-win-board__avatar {
+  grid-column: 1;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(164, 255, 94, 0.28);
+  background: linear-gradient(145deg, rgba(164, 255, 94, 0.18), rgba(8, 32, 18, 0.9));
+  color: var(--ui-neon);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.app-shell--premium .live-win-board__rows .live-dot {
+  display: none;
+}
+
+.app-shell--premium .live-win-board__legacy {
+  display: grid !important;
+  grid-column: 2;
+  gap: 1px;
+  min-width: 0;
+}
+
+.app-shell--premium .live-win-board__legacy strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #f4fff7;
+  font-size: 11px;
+}
+
+.app-shell--premium .live-win-board__legacy small {
+  color: var(--ui-muted);
+  font-size: 9px;
+}
+
+.app-shell--premium .live-win-board__rows em {
+  grid-column: 3;
+  padding: 3px 7px;
+  border-radius: 999px;
+  border: 1px solid rgba(164, 255, 94, 0.16);
+  background: rgba(164, 255, 94, 0.06);
+  color: #b8e8c8;
+  font-size: 8px;
+  font-style: normal;
+  white-space: nowrap;
+}
+
+.app-shell--premium .live-win-board__rows article > small {
+  grid-column: 4;
+  color: var(--ui-muted);
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+.app-shell--premium .live-win-board__rows article > strong:first-of-type,
+.app-shell--premium .live-win-board__rows article > b {
+  display: none !important;
+}
+
+.app-shell--premium .live-win-board__rows article.win .live-win-board__legacy small {
+  color: var(--ui-neon);
+}
+
+.app-shell--premium .home-section__title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: #f4fff7;
+  font-weight: 900;
+}
+
+.app-shell--premium .home-section__title button {
+  border: none;
+  background: transparent;
+  color: var(--ui-neon);
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.app-shell--premium .home-dashboard .tournament-section {
+  min-height: 0;
+  padding-bottom: 4px;
+}
+
+.app-shell--premium .home-dashboard .tournament-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+}
+
+.app-shell--premium .home-dashboard .tournament-card {
+  min-height: 148px;
+  border-radius: var(--ui-radius-md) !important;
+}
+
+/* ═══════════════════════════════════════
+   WALLET
+   ═══════════════════════════════════════ */
+.app-shell--premium .wallet-page,
+.app-shell--premium .wallet-page--premium {
+  display: grid !important;
+  grid-template-rows: auto auto minmax(0, 1fr) !important;
+  gap: 8px !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+.app-shell--premium .wallet-page-head {
+  min-height: 0;
+}
+
+.app-shell--premium .wallet-page-head h1 {
+  margin: 0;
+  color: #f4fff7;
+  font-size: clamp(16px, 4.2vw, 19px);
+  font-weight: 900;
+  letter-spacing: 0.01em;
+}
+
+.app-shell--premium .wallet-tabs {
+  display: grid !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  gap: 3px !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  align-self: start !important;
+  overflow: hidden !important;
+  padding: 4px !important;
+  border: 1px solid var(--ui-neon-line) !important;
+  border-radius: var(--ui-radius-md) !important;
+  background: rgba(4, 12, 7, 0.92) !important;
+}
+
+.app-shell--premium .wallet-tabs.wallet-tabs-admin {
+  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+}
+
+.app-shell--premium .wallet-tabs button {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 2px !important;
+  min-width: 0 !important;
+  min-height: 38px !important;
+  max-height: 42px !important;
+  height: auto !important;
+  border: none !important;
+  border-radius: 10px !important;
+  color: var(--ui-muted) !important;
+  background: transparent !important;
+  font-size: 7.5px !important;
+  font-weight: 800 !important;
+  line-height: 1.1 !important;
+  padding: 2px 1px !important;
+}
+
+.app-shell--premium .wallet-tabs button svg {
+  width: 13px !important;
+  height: 13px !important;
+  flex-shrink: 0;
+}
+
+.app-shell--premium .wallet-tabs button span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.app-shell--premium .wallet-tabs button.active {
+  color: #031108 !important;
+  background: linear-gradient(135deg, #b8ff7a, #2ecc71) !important;
+  box-shadow: 0 0 10px rgba(164, 255, 94, 0.24) !important;
+}
+
+.app-shell--premium .wallet-panel {
+  min-height: 0 !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  border: 1px solid var(--ui-neon-line) !important;
+  border-radius: var(--ui-radius-lg) !important;
+  background: linear-gradient(155deg, rgba(8, 22, 12, 0.94), rgba(2, 8, 4, 0.98)) !important;
+  padding: 10px !important;
+}
+
+.app-shell--premium .wallet-overview {
+  display: grid !important;
+  grid-template-rows: auto auto auto auto !important;
+  gap: 8px !important;
+  align-content: start !important;
+  height: auto !important;
+}
+
+.app-shell--premium .wallet-balance-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+}
+
+.app-shell--premium .wallet-balance {
+  min-height: 72px !important;
+  max-height: none !important;
+  padding: 10px !important;
+  display: grid !important;
+  gap: 3px !important;
+  align-content: start !important;
+  border: 1px solid var(--ui-neon-line) !important;
+  border-radius: var(--ui-radius-md) !important;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(164, 255, 94, 0.08), transparent 45%),
+    linear-gradient(155deg, rgba(12, 32, 18, 0.92), rgba(3, 10, 6, 0.96)) !important;
+}
+
+.app-shell--premium .wallet-balance::after {
+  width: 36px !important;
+  height: 36px !important;
+  right: 4px !important;
+  bottom: 4px !important;
+  opacity: 0.45;
+}
+
+.app-shell--premium .wallet-balance > span {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  color: var(--ui-muted) !important;
+  font-size: 8px !important;
+  font-weight: 700 !important;
+}
+
+.app-shell--premium .wallet-balance > span svg {
+  width: 12px !important;
+  height: 12px !important;
+}
+
+.app-shell--premium .wallet-balance strong {
+  color: var(--ui-neon) !important;
+  font-size: 16px !important;
+  font-weight: 900 !important;
+  line-height: 1.05 !important;
+  text-shadow: 0 0 10px rgba(164, 255, 94, 0.22) !important;
+  margin-top: 0 !important;
+}
+
+.app-shell--premium .wallet-balance small {
+  color: var(--ui-muted) !important;
+  font-size: 7px !important;
+  line-height: 1.25 !important;
+  white-space: normal !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.app-shell--premium .wallet-quick-actions {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 6px !important;
+}
+
+.app-shell--premium .wallet-quick-actions button {
+  min-height: 44px !important;
+  padding: 6px 4px !important;
+  border: 1px solid rgba(164, 255, 94, 0.14) !important;
+  border-radius: 12px !important;
+  color: var(--ui-neon) !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  font-size: 8px !important;
+  font-weight: 800 !important;
+}
+
+.app-shell--premium .wallet-quick-actions button svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+.app-shell--premium .wallet-referral-card,
+.app-shell--premium .referral-code-card {
+  min-height: 40px !important;
+  padding: 8px 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  border: 1px solid rgba(164, 255, 94, 0.16) !important;
+  border-radius: 12px !important;
+  font-size: 9px !important;
+}
+
+.app-shell--premium .wallet-section-title {
+  min-height: 28px !important;
+  color: #eafff2 !important;
+  font-size: 9px !important;
+  font-weight: 800 !important;
+}
+
+.app-shell--premium .wallet-section-title button {
+  color: var(--ui-neon) !important;
+  font-size: 8px !important;
+  font-weight: 800 !important;
+}
+
+.app-shell--premium .wallet-empty {
+  padding: 16px 8px !important;
+  color: var(--ui-muted) !important;
+  font-size: 10px !important;
+  text-align: center !important;
+}
+
+.app-shell--premium .wallet-deposit {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: 10px;
+  min-height: 0;
+}
+
+.app-shell--premium .deposit-offer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: none;
+  grid-auto-rows: minmax(72px, auto);
+  gap: 8px;
+  align-content: start;
+}
+
+.app-shell--premium .deposit-offer-grid button {
+  min-height: 72px;
+  min-width: 0;
+  padding: 8px 6px;
+  border-radius: 12px;
+  display: grid;
+  grid-template-rows: auto auto auto;
+  align-content: center;
+  justify-items: center;
+  gap: 3px;
+  color: #eafff2;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(164, 255, 94, 0.14);
+  font-size: 10px;
+}
+
+.app-shell--premium .deposit-offer-grid button.active {
+  color: #031108 !important;
+  border-color: rgba(164, 255, 94, 0.5) !important;
+  background: linear-gradient(135deg, #b8ff7a, #2ecc71) !important;
+}
+
+.app-shell--premium .deposit-offer-grid button span,
+.app-shell--premium .deposit-offer-grid button strong,
+.app-shell--premium .deposit-offer-grid button small {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  text-align: center;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.app-shell--premium .deposit-offer-grid button span {
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.app-shell--premium .deposit-offer-grid button strong {
+  color: inherit;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.app-shell--premium .deposit-offer-grid button small {
+  font-size: 8px;
+  font-weight: 700;
+  opacity: 0.92;
+}
+
+.app-shell--premium .deposit-offer-grid button.active small {
+  color: rgba(3, 17, 8, 0.78);
+  opacity: 1;
+}
+
+.app-shell--premium .wallet-form {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  min-height: 0;
+}
+
+.app-shell--premium .wallet-mode-switch {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.app-shell--premium .wallet-mode-switch button {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 8px;
+  border-radius: 10px;
+  color: #9ddcaf;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(164, 255, 94, 0.14);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.app-shell--premium .wallet-mode-switch button svg {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+}
+
+.app-shell--premium .wallet-mode-switch button.active {
+  color: #031108 !important;
+  border-color: rgba(164, 255, 94, 0.5) !important;
+  background: linear-gradient(135deg, #b8ff7a, #2ecc71) !important;
+}
+
+.app-shell--premium .wallet-payment-brands {
+  display: grid;
+  gap: 8px;
+}
+
+.app-shell--premium .wallet-payment-brands__label {
+  color: #f4fff7;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.app-shell--premium .wallet-payment-brands__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.app-shell--premium .wallet-payment-brands__grid button {
+  min-height: 38px;
+  border-radius: 10px;
+  border: 1px solid rgba(164, 255, 94, 0.16);
+  background: rgba(255, 255, 255, 0.03);
+  color: #dcefe2;
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.app-shell--premium .wallet-payment-brands__grid button.active {
+  color: #031108;
+  border-color: rgba(164, 255, 94, 0.45);
+  background: linear-gradient(135deg, #b8ff7a, #2ecc71);
+}
+
+.app-shell--premium .wallet-primary-button {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 8px;
+  font-size: 14px !important;
+  font-weight: 900 !important;
+}
+
+.app-shell--premium .wallet-transaction-list,
+.app-shell--premium .wallet-history-list {
+  display: grid;
+  gap: 8px;
+}
+
+.app-shell--premium .wallet-transaction,
+.app-shell--premium .wallet-history-item {
+  border-radius: 12px !important;
+  padding: 10px !important;
+}
+
+/* ═══════════════════════════════════════
+   TOURNAMENT
+   ═══════════════════════════════════════ */
+.app-shell--premium .tournament-page--premium {
+  display: grid;
+  gap: 10px;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.app-shell--premium .tournament-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  padding: 4px !important;
+  border: 1px solid var(--ui-neon-line) !important;
+  background: rgba(4, 12, 7, 0.92) !important;
+}
+
+.app-shell--premium .tournament-tabs.has-admin {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.app-shell--premium .tournament-tabs button {
+  min-height: 38px;
+  border: none;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: var(--ui-muted);
+  background: transparent;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.app-shell--premium .tournament-tabs button.active {
+  color: #031108 !important;
+  background: linear-gradient(135deg, #b8ff7a, #2ecc71) !important;
+}
+
+.app-shell--premium .tournament-filter {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 10px !important;
+}
+
+.app-shell--premium .tournament-filter > span {
+  grid-column: 1 / -1;
+  color: #f4fff7;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.app-shell--premium .tournament-list-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.app-shell--premium .tournament-list-card {
+  border: 1px solid var(--ui-neon-line) !important;
+  border-radius: var(--ui-radius-lg) !important;
+  overflow: hidden;
+  background: linear-gradient(155deg, rgba(10, 28, 16, 0.94), rgba(2, 8, 4, 0.98)) !important;
+}
+
+.app-shell--premium .tournament-list-card__head {
+  padding: 10px 12px 8px;
+}
+
+.app-shell--premium .tournament-list-card__title {
+  color: #f4fff7;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.app-shell--premium .tournament-prize-glow {
+  color: var(--ui-gold, #ffd54a) !important;
+  text-shadow: 0 0 12px rgba(255, 213, 74, 0.35);
+}
+
+.app-shell--premium .bracket-toolbar {
+  padding: 12px !important;
+  border: 1px solid rgba(164, 255, 94, 0.24) !important;
+}
+
+.app-shell--premium .bracket-toolbar__title h1 {
+  color: #f4fff7;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.app-shell--premium .bracket-toolbar__title .tournament-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.app-shell--premium .bracket-toolbar__title .tournament-badges i {
+  padding: 3px 7px;
+  border-radius: 999px;
+  font-size: 8px;
+  font-weight: 800;
+  font-style: normal;
+  color: rgba(226, 255, 234, 0.92);
+  border: 1px solid rgba(164, 255, 94, 0.22);
+  background: rgba(4, 18, 10, 0.72);
+}
+
+.app-shell--premium .bracket-toolbar__title .tournament-badges i.waiting {
+  color: #031108;
+  border-color: rgba(164, 255, 94, 0.55);
+  background: linear-gradient(135deg, #b8ff7a, #2ecc71);
+}
+
+.app-shell--premium .bracket-toolbar__prize {
+  color: var(--ui-gold, #ffd54a) !important;
+}
+
+.app-shell--premium .tournament-page--premium:has(> .tournament-detail--bracket) {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+  min-height: 0;
+}
+
+.app-shell--premium .tournament-detail--bracket {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.app-shell--premium .bracket-toolbar__stats {
+  gap: 6px;
+}
+
+.app-shell--premium .bracket-toolbar__stats > span {
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 6px;
+  border-radius: 10px;
+}
+
+.app-shell--premium .bracket-toolbar__stats > span svg {
+  color: var(--ui-neon, #a4ff5e);
+}
+
+.app-shell--premium .bracket-toolbar__stats strong {
+  color: #f4fff7;
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.app-shell--premium .bracket-toolbar__stats small {
+  color: rgba(164, 255, 94, 0.62);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.app-shell--premium .bracket-join-bar {
+  min-height: unset !important;
+  padding: 8px 10px !important;
+  border-radius: 14px !important;
+  border: 1px solid rgba(164, 255, 94, 0.18) !important;
+}
+
+.app-shell--premium .bracket-join-bar .primary {
+  min-height: 44px !important;
+  font-size: 12px !important;
+}
+
+.app-shell--premium .tournament-detail--bracket .bracket-stage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px;
+  border-color: rgba(164, 255, 94, 0.16);
+}
+
+.app-shell--premium .tournament-detail--bracket .bracket-scroll--filled,
+.app-shell--premium .tournament-detail--bracket .bracket-scroll--empty {
+  flex: 1;
+  min-height: 0;
+}
+
+.app-shell--premium .tournament-detail--bracket .bracket-scroll--empty {
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+}
+
+.app-shell--premium .tournament-detail--bracket .bracket-empty-state {
+  flex: 1;
+  min-height: 0;
+  justify-content: flex-start;
+  gap: 10px;
+  padding: 14px 12px 12px;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.app-shell--premium .bracket-waiting-room {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  text-align: center;
+}
+
+.app-shell--premium .bracket-waiting-room__status {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.app-shell--premium .bracket-waiting-room__head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: rgba(226, 255, 234, 0.88);
+}
+
+.app-shell--premium .bracket-waiting-room__head svg {
+  color: var(--ui-neon, #a4ff5e);
+  filter: drop-shadow(0 0 8px rgba(164, 255, 94, 0.28));
+}
+
+.app-shell--premium .bracket-waiting-room__head strong {
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+}
+
+.app-shell--premium .bracket-waiting-room__timer {
+  font-size: clamp(22px, 7vw, 28px);
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: 0.05em;
+  color: var(--ui-neon, #a4ff5e);
+  text-shadow: 0 0 16px rgba(164, 255, 94, 0.28);
+}
+
+.app-shell--premium .bracket-waiting-room__slots {
+  color: rgba(164, 255, 94, 0.72);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.app-shell--premium .bracket-waiting-room__players {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  max-width: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 2px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(164, 255, 94, 0.35) transparent;
+  padding: 4px 8px 12px;
+  scroll-padding: 8px 6px;
+}
+
+.app-shell--premium .bracket-waiting-room__players article {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 7px;
+  border: 1px solid rgba(164, 255, 94, 0.18);
+  border-radius: 10px;
+  background: rgba(4, 18, 10, 0.82);
+}
+
+.app-shell--premium .bracket-waiting-room__players img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(164, 255, 94, 0.45);
+}
+
+.app-shell--premium .bracket-waiting-room__players span {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+  text-align: left;
+}
+
+.app-shell--premium .bracket-waiting-room__players strong {
+  overflow: hidden;
+  color: #f4fff7;
+  font-size: 11px;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-shell--premium .bracket-waiting-room__players small {
+  overflow: hidden;
+  color: rgba(164, 255, 94, 0.62);
+  font-size: 9px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-shell--premium .bracket-empty-state__message {
+  margin: 0;
+  color: rgba(164, 255, 94, 0.72);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.app-shell--premium .bracket-empty-state .tournament-leave-button--compact {
+  width: min(100%, 320px);
+  min-height: 46px;
+  margin-top: auto;
+  font-size: 12px;
+}
+
+.app-shell--premium .bracket-joined-footer {
+  width: 100%;
+  max-width: 420px;
+  margin-inline: auto;
+  margin-top: auto;
+}
+
+.app-shell--premium .bracket-joined-footer .tournament-joined-status {
+  min-height: 44px;
+  font-size: 12px;
+}
+
+.app-shell--premium .bracket-joined-footer .tournament-countdown-lock {
+  width: 100%;
+  max-width: none;
+  margin-top: 0;
+  min-height: 44px;
+  font-size: 11px;
+}
+
+.app-shell--premium .tournament-card-actions--joined-locked {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+}
+
+.app-shell--premium .bracket-scroll {
+  scrollbar-width: thin;
+}
+
+.app-shell--premium .bracket-scroll--filled {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  grid-auto-flow: unset;
+  grid-auto-columns: unset;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 12px 14px 16px;
+  gap: 14px;
+}
+
+.app-shell--premium .bracket-scroll--filled.bracket-scroll--tree {
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 12px 12px 16px;
+  scroll-padding: 12px 10px;
+}
+
+.app-shell--premium .bracket-scroll--filled.bracket-scroll--tree .bracket-tree-shell {
+  min-height: 0;
+  overflow: visible;
+  border: none;
+  box-shadow: none;
+  background: transparent;
+  padding: 0;
+}
+
+.app-shell--premium .bracket-scroll--filled .bracket-round {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+}
+
+.app-shell--premium .bracket-scroll--filled .bracket-round:not(:last-child)::after {
+  display: none;
+}
+
+.app-shell--premium .bracket-scroll--filled .bracket-round h2 {
+  height: auto;
+  margin: 0 0 10px;
+  justify-content: flex-start;
+  gap: 6px;
+}
+
+.app-shell--premium .bracket-scroll--filled .bracket-round__track {
+  display: grid;
+  gap: 10px;
+  min-height: auto;
+}
+
+.app-shell--premium .bracket-scroll--filled .bracket-match {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  margin-top: 0 !important;
+  padding: 10px 12px;
+  gap: 8px;
+}
+
+.app-shell--premium .bracket-round h2 {
+  color: var(--ui-neon);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.app-shell--premium .bracket-match {
+  min-width: 0;
+  border: 1px solid rgba(164, 255, 94, 0.18) !important;
+  border-radius: 14px !important;
+  background: rgba(4, 14, 8, 0.92) !important;
+  overflow: hidden;
+}
+
+.app-shell--premium .bracket-match > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: rgba(164, 255, 94, 0.72);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: none;
+}
+
+.app-shell--premium .bracket-match > header i {
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(164, 255, 94, 0.22);
+  background: rgba(164, 255, 94, 0.1);
+  color: #d8ffe6;
+  font-size: 10px;
+  font-weight: 800;
+  font-style: normal;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+.app-shell--premium .bracket-match > header i.active,
+.app-shell--premium .bracket-match > header i.live {
+  color: #031108;
+  border-color: rgba(164, 255, 94, 0.55);
+  background: linear-gradient(135deg, #b8ff7a, #2ecc71);
+}
+
+.app-shell--premium .bracket-match > div {
+  min-height: 46px;
+  padding: 7px 9px;
+  gap: 8px;
+  border-radius: 11px;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+}
+
+.app-shell--premium .bracket-match > div span {
+  gap: 2px;
+}
+
+.app-shell--premium .bracket-match > div strong {
+  color: #f4fff7;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.3;
+  overflow: visible;
+  text-overflow: unset;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.app-shell--premium .bracket-match > div small {
+  color: rgba(164, 255, 94, 0.68);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.app-shell--premium .bracket-match footer {
+  display: flex;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.app-shell--premium .bracket-match footer button {
+  flex: 1;
+  min-height: 38px;
+  padding: 0 10px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.25;
+  white-space: normal;
+  text-align: center;
+}
+
+.app-shell--premium .bracket-match.active,
+.app-shell--premium .bracket-match.live {
+  border-color: rgba(164, 255, 94, 0.42) !important;
+  box-shadow: 0 0 16px rgba(164, 255, 94, 0.16);
+}
+
+.app-shell--premium .bracket-match > div > div.winner {
+  background: rgba(164, 255, 94, 0.08);
+  border-left: 2px solid var(--ui-neon);
+}
+
+.app-shell--premium .bracket-match > div > div.winner strong {
+  color: var(--ui-neon);
+}
+
+.app-shell--premium .bracket-match > div > div.winner svg {
+  color: var(--ui-gold, #ffd54a);
+  filter: drop-shadow(0 0 6px rgba(255, 213, 74, 0.55));
+}
+
+.app-shell--premium .bracket-match img {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid rgba(164, 255, 94, 0.28);
+}
+
+.app-shell--premium .bracket-alerts {
+  gap: 8px;
+}
+
+.app-shell--premium .own-match-callout,
+.app-shell--premium .round-waiting {
+  min-height: 48px;
+  padding: 10px 12px;
+  gap: 10px;
+  border: 1px solid rgba(164, 255, 94, 0.22) !important;
+  border-radius: 14px !important;
+}
+
+.app-shell--premium .own-match-callout__text {
+  min-width: 0;
+}
+
+.app-shell--premium .own-match-callout strong,
+.app-shell--premium .round-waiting strong {
+  color: #f4fff7;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.app-shell--premium .round-waiting small {
+  font-size: 12px;
+}
+
+.app-shell--premium .own-match-callout button {
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(164, 255, 94, 0.45);
+  color: #031108;
+  background: linear-gradient(135deg, #b8ff7a, #2ecc71);
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1.25;
+  white-space: normal;
+  text-align: center;
+  box-shadow: 0 0 14px rgba(164, 255, 94, 0.22);
+}
+
+.app-shell--premium .tournament-toast {
+  position: fixed;
+  z-index: 40;
+  left: 12px;
+  right: 12px;
+  bottom: calc(72px + env(safe-area-inset-bottom));
+  min-height: 46px;
+  padding: 11px 14px;
+  border-radius: 14px !important;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.4;
+  text-align: center;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.app-shell--premium .tournament-list-card.joined {
+  border-color: rgba(214, 255, 228, 0.42) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 28px rgba(180, 255, 200, 0.1),
+    0 0 0 1px rgba(164, 255, 94, 0.14),
+    0 0 24px rgba(164, 255, 94, 0.12) !important;
+}
+
+.app-shell--premium .tournament-joined-ribbon {
+  padding: 6px 12px;
+  border-radius: 0 0 14px 0;
+  color: #fff8f8;
+  border: 2px solid rgba(255, 138, 138, 0.92);
+  border-top: none;
+  border-left: none;
+  background: linear-gradient(145deg, #ff5a5a 0%, #e02020 52%, #b91c1c 100%);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 0 0 1px rgba(127, 29, 29, 0.45),
+    0 6px 18px rgba(220, 38, 38, 0.32);
+}
+
+.app-shell--premium .tournament-joined-status {
+  min-height: 44px;
+  font-size: 11px;
+  border-radius: 14px !important;
+  color: #fff8f8 !important;
+  border: 2px solid rgba(255, 138, 138, 0.92) !important;
+  background: linear-gradient(145deg, #ff5a5a 0%, #e02020 52%, #b91c1c 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 0 0 1px rgba(127, 29, 29, 0.45),
+    0 6px 18px rgba(220, 38, 38, 0.28) !important;
+}
+
+.app-shell--premium .tournament-detail.joined .bracket-toolbar,
+.app-shell--premium .tournament-detail.joined .bracket-scroll {
+  border-color: rgba(214, 255, 228, 0.42) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 28px rgba(180, 255, 200, 0.1),
+    0 0 0 1px rgba(164, 255, 94, 0.14),
+    0 0 24px rgba(164, 255, 94, 0.12) !important;
+}
+
+.app-shell--premium .tournament-join-button,
+.app-shell--premium .tournament-list-card .tournament-join-button {
+  min-height: 36px !important;
+  border-radius: 12px !important;
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  color: #fff8f8 !important;
+  border: 2px solid rgba(255, 138, 138, 0.92) !important;
+  background: linear-gradient(145deg, #ff5a5a 0%, #e02020 52%, #b91c1c 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 0 0 1px rgba(127, 29, 29, 0.45),
+    0 8px 22px rgba(220, 38, 38, 0.38) !important;
+}
+
+.app-shell--premium .tournament-list-card.joined .tournament-card-actions {
+  display: grid !important;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr) !important;
+  gap: 8px !important;
+  align-items: stretch !important;
+}
+
+.app-shell--premium .tournament-list-card.joined .tournament-card-actions--joined-locked {
+  display: flex !important;
+  flex-direction: column !important;
+  grid-template-columns: unset !important;
+}
+
+.app-shell--premium .tournament-list-card.joined .tournament-card-actions button,
+.app-shell--premium .tournament-list-card.joined .tournament-leave-locked {
+  min-height: 38px !important;
+  font-size: 10px !important;
+}
+
+.app-shell--premium .tournament-leave-button--list {
+  min-height: 38px !important;
+  font-size: 11px !important;
+}
+
+.app-shell--premium .tournament-leave-locked,
+.app-shell--premium .tournament-countdown-lock {
+  padding: 8px 10px !important;
+  border-radius: 12px !important;
+}
+
+.app-shell--premium .tournament-list-card .primary:not(.tournament-join-button) {
+  border-radius: 12px !important;
+  font-weight: 900 !important;
+}
+
+@media (max-width: 520px) {
+  .app-shell--premium .home-hero-banner {
+    min-height: 128px;
+    padding: 14px;
+    grid-template-columns: minmax(0, 1fr) 64px;
+    border-radius: 18px !important;
+  }
+
+  .app-shell--premium .home-hero-banner__logo-wrap {
+    width: 64px;
+    height: 64px;
+  }
+
+  .app-shell--premium .home-hero-banner__logo {
+    width: 50px;
+    height: 50px;
+  }
+
+  .app-shell--premium .home-hero-banner__visual {
+    right: 58px;
+    width: 76px;
+    height: 76px;
+  }
+
+  .app-shell--premium .home-hero-banner__live {
+    font-size: 8px;
+    padding: 2px 6px;
+  }
+
+  .app-shell--premium .home-play-cta {
+    min-height: 50px;
+    border-radius: 14px !important;
+  }
+
+  .app-shell--premium .game-category--featured {
+    min-height: 70px;
+    grid-template-columns: 46px minmax(0, 1fr) auto;
+    padding: 10px 12px;
+  }
+
+  .app-shell--premium .game-category--featured .game-category__icon {
+    width: 46px;
+    height: 46px;
+  }
+
+  .app-shell--premium .game-category--soon {
+    min-height: 82px;
+    padding: 8px 6px;
+  }
+
+  .app-shell--premium .game-category--soon .game-category__copy strong {
+    font-size: 9px;
+  }
+
+  .app-shell--premium .wallet-payment-brands__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .app-shell--premium .tournament-filter {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .app-shell--premium .home-dashboard .tournament-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+@media (min-width: 640px) {
+  .app-shell--premium .home-game-hub {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  .app-shell--premium .home-game-hub__header {
+    grid-column: 1 / -1;
+  }
+
+  .app-shell--premium .game-category--featured {
+    grid-column: 1;
+    min-height: 100%;
+  }
+
+  .app-shell--premium .home-game-categories--soon {
+    grid-column: 2;
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(3, minmax(0, 1fr));
+  }
+
+  .app-shell--premium .game-category--soon {
+    min-height: 0;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: none;
+    justify-items: start;
+    text-align: left;
+    padding: 10px 12px;
+  }
+
+  .app-shell--premium .game-category--soon .game-category__copy {
+    text-align: left;
+  }
+}

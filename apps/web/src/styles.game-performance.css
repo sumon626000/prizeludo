@@ -1,0 +1,96 @@
+/* Game page — mobile-first performance (no heavy blur / decor) */
+
+.app-surface--game,
+.app-surface--game .game-page {
+  contain: layout style;
+}
+
+.app-surface--game .glass,
+.app-surface--game :is(
+  .game-topbar,
+  .game-player-pod,
+  .game-controls,
+  .game-prize-badge,
+  .game-roll-streak,
+  .game-action-status,
+  .game-communication.glass,
+  .game-communication.glass button,
+  .spectating-badge,
+  .player-dice
+) {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: linear-gradient(
+    155deg,
+    rgba(10, 28, 16, 0.94),
+    rgba(2, 8, 4, 0.97)
+  ) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 6px 16px rgba(0, 0, 0, 0.38) !important;
+}
+
+.app-surface--game .game-communication.glass button {
+  background: rgba(6, 20, 11, 0.88) !important;
+}
+
+.app-surface--game .game-popover.glass {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: rgba(6, 18, 10, 0.97) !important;
+}
+
+/* Static backdrop — no SVG icons, no filter blur */
+.game-scene-backdrop__glow {
+  filter: none !important;
+  opacity: 0.55;
+}
+
+.game-scene-backdrop__icon {
+  display: none !important;
+}
+
+.game-scene-backdrop__grid {
+  opacity: 0.03;
+}
+
+.game-board-wrap::before {
+  box-shadow:
+    0 0 0 1px rgba(255, 214, 74, 0.22),
+    0 10px 24px rgba(0, 0, 0, 0.42);
+}
+
+.game-board-wrap .ludo-board {
+  outline-width: 2px;
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 249, 185, 0.72),
+    0 10px 22px rgba(0, 0, 0, 0.5);
+}
+
+.app-surface--game .game-player-pod.active {
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--pod-color) 20%, transparent),
+    0 0 12px color-mix(in srgb, var(--pod-color) 22%, transparent),
+    0 6px 14px rgba(0, 0, 0, 0.4) !important;
+}
+
+.app-surface--game .player-dice.can-roll {
+  box-shadow:
+    inset 0 1px 0 rgba(220, 255, 230, 0.1),
+    0 0 10px rgba(164, 255, 94, 0.18),
+    0 3px 8px rgba(0, 0, 0, 0.4) !important;
+}
+
+.ludo-board {
+  contain: layout paint;
+}
+
+.game-arena {
+  contain: layout style;
+}
+
+@media (max-width: 520px) {
+  .game-scene-backdrop__glow--board {
+    display: none;
+  }
+}

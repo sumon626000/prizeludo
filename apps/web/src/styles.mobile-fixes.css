@@ -1,0 +1,1899 @@
+/* Consolidated mobile responsive fixes — loaded after main styles */
+
+/* Safe scrolling on all main routes */
+.app-surface:not(.app-surface--game) .page {
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.wallet-page,
+.profile-dashboard,
+.tournament-page,
+.leaderboard-page {
+  overflow-x: hidden;
+}
+
+.wallet-panel,
+.profile-panel,
+.stats-panel,
+.activity-panel,
+.tournament-list,
+.tournament-browse,
+.bracket-scroll,
+.wallet-history-list {
+  overflow-x: hidden;
+}
+
+/* Compact BN/EN language pill + header actions cluster */
+.header-actions {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  flex-shrink: 0 !important;
+  align-self: center !important;
+}
+
+.language-switch {
+  display: inline-flex !important;
+  align-items: center !important;
+  align-self: center !important;
+  flex-shrink: 0 !important;
+  gap: 1px !important;
+  padding: 2px !important;
+  border-radius: 999px !important;
+  border: 1px solid rgba(103, 220, 142, 0.18) !important;
+  background: rgba(0, 11, 5, 0.52) !important;
+}
+
+.language-switch button {
+  min-width: 20px !important;
+  width: auto !important;
+  min-height: 0 !important;
+  max-height: 18px !important;
+  height: 18px !important;
+  padding: 0 4px !important;
+  border-radius: 999px !important;
+  font-size: 7px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.03em !important;
+  line-height: 1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.language-switch button.active {
+  transform: none !important;
+  box-shadow: 0 1px 4px rgba(64, 220, 112, 0.24) !important;
+}
+
+.app-header {
+  grid-template-columns: minmax(0, 1fr) auto !important;
+}
+
+.app-header.has-balance {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr) auto !important;
+}
+
+.app-header.has-balance .language-switch {
+  width: auto !important;
+  min-width: 0 !important;
+}
+
+.app-header .header-actions .icon-button {
+  width: 32px !important;
+  height: 32px !important;
+  flex-shrink: 0 !important;
+}
+
+/* Premium header — keep polished sizes (mobile-fixes must not shrink) */
+.app-shell--premium .language-switch button {
+  max-height: none !important;
+}
+
+.app-shell--premium .app-header .header-actions .icon-button {
+  max-height: none !important;
+}
+
+@media (max-width: 520px) {
+  .app-shell:not(.app-shell--premium) .language-switch button {
+    min-width: 19px !important;
+    max-height: 17px !important;
+    height: 17px !important;
+    padding: 0 3px !important;
+    font-size: 6.5px !important;
+  }
+
+  .app-shell:not(.app-shell--premium) .app-header .header-actions .icon-button {
+    width: 30px !important;
+    height: 30px !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .app-shell:not(.app-shell--premium) .language-switch button {
+    min-width: 18px !important;
+    max-height: 16px !important;
+    height: 16px !important;
+    padding: 0 3px !important;
+    font-size: 6px !important;
+  }
+
+  .header-actions {
+    gap: 3px !important;
+  }
+
+  .app-shell:not(.app-shell--premium) .app-header .header-actions .icon-button {
+    width: 28px !important;
+    height: 28px !important;
+  }
+}
+
+/* Header — identity + balance never clip */
+@media (max-width: 520px) {
+  .app-shell:not(.app-shell--premium) .app-header.has-balance {
+    grid-template-columns: minmax(0, 1fr) minmax(108px, 1.4fr) auto !important;
+    gap: 4px !important;
+    padding: 6px 8px !important;
+  }
+
+  .app-header.has-balance .identity__profile > span,
+  .app-header.has-balance .identity__game-id {
+    display: grid !important;
+  }
+
+  .identity__game-id strong {
+    font-size: 10px;
+    max-width: 100%;
+    overflow: visible;
+    text-overflow: unset;
+  }
+
+  .header-balance {
+    max-width: 100% !important;
+    min-width: 0 !important;
+    width: 100%;
+  }
+
+  .header-balance__summary strong {
+    overflow: visible;
+    text-overflow: unset;
+  }
+
+  .bottom-nav a {
+    font-size: clamp(8px, 2.4vw, 10px);
+    gap: 2px;
+  }
+
+  .bottom-nav a span {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 360px) {
+  .app-header.has-balance {
+    grid-template-columns: minmax(0, 1fr) minmax(100px, 1.35fr) auto !important;
+  }
+
+  .identity img,
+  .app-header.has-balance .identity__profile > img {
+    width: 34px !important;
+    height: 34px !important;
+    flex-basis: 34px !important;
+  }
+}
+
+.home-dashboard {
+  overflow-x: hidden;
+  overflow-y: visible;
+}
+
+/* Home — live win rows compact mobile layout */
+@media (max-width: 480px) {
+  .live-win-board__rows article {
+    grid-template-columns: 34px minmax(0, 1fr) auto auto !important;
+    gap: 6px 8px !important;
+    padding: 10px 10px !important;
+    min-height: 58px !important;
+    align-items: center;
+    overflow: visible !important;
+  }
+
+  .live-win-board__avatar {
+    grid-column: 1;
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+  }
+
+  .live-win-board__rows .live-dot {
+    display: none !important;
+  }
+
+  .live-win-board__legacy {
+    display: grid !important;
+    grid-column: 2;
+    gap: 2px;
+    min-width: 0;
+    overflow: visible !important;
+  }
+
+  .live-win-board__legacy strong,
+  .live-win-board__legacy small {
+    overflow: visible !important;
+    text-overflow: unset;
+    line-height: 1.15;
+    white-space: nowrap;
+  }
+
+  .live-win-board__rows article > strong:first-of-type,
+  .live-win-board__rows article > b {
+    display: none !important;
+  }
+
+  .live-win-board__rows em {
+    grid-column: 3;
+    min-width: 0;
+    max-width: none;
+    overflow: visible;
+    white-space: nowrap;
+    font-size: 8px;
+    padding: 3px 7px;
+  }
+
+  .live-win-board__rows article > small {
+    grid-column: 4;
+    white-space: nowrap;
+  }
+
+  .home-game-categories:not(.home-game-categories--soon) {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .home-dashboard .tournament-grid,
+  .home-dashboard .tournament-grid--2,
+  .home-dashboard .tournament-grid--3,
+  .home-dashboard .tournament-grid--4 {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+/* Wallet — legacy mobile (premium uses styles.phase3.css) */
+@media (max-width: 520px) {
+  .app-shell:not(.app-shell--premium) .wallet-tabs,
+  .app-shell:not(.app-shell--premium) .wallet-tabs.wallet-tabs-admin {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .app-shell:not(.app-shell--premium) .wallet-tabs button {
+    flex: 0 0 auto;
+    min-width: 62px;
+    min-height: 40px;
+    padding: 0 8px;
+    font-size: clamp(8px, 2.5vw, 10px) !important;
+  }
+
+  .app-shell:not(.app-shell--premium) .wallet-overview {
+    display: grid;
+    grid-template-rows: none;
+    grid-auto-rows: auto;
+    gap: 10px;
+    align-content: start;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .app-shell:not(.app-shell--premium) .wallet-balance-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px;
+  }
+
+  .app-shell:not(.app-shell--premium) .wallet-balance {
+    min-height: 92px;
+    padding: 12px 10px;
+    align-content: start;
+  }
+
+  .app-shell:not(.app-shell--premium) .wallet-balance::after {
+    right: 6px;
+    bottom: 6px;
+    width: 42px;
+    height: 42px;
+    opacity: 0.35;
+  }
+
+  .app-shell:not(.app-shell--premium) .wallet-balance > span {
+    font-size: 10px !important;
+    line-height: 1.2;
+  }
+
+  .app-shell:not(.app-shell--premium) .wallet-balance strong {
+    font-size: clamp(20px, 5.8vw, 24px) !important;
+    margin-top: 6px;
+    overflow: visible;
+    text-overflow: unset;
+    white-space: normal;
+    word-break: break-word;
+    line-height: 1.05;
+  }
+
+  .app-shell:not(.app-shell--premium) .wallet-balance small {
+    font-size: 9px !important;
+    white-space: normal;
+    line-height: 1.25;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .app-shell:not(.app-shell--premium) .wallet-quick-actions {
+    gap: 8px;
+  }
+
+  .app-shell:not(.app-shell--premium) .wallet-quick-actions button {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-height: 54px;
+    padding: 8px 6px;
+    font-size: 10px !important;
+    line-height: 1.15;
+  }
+
+  .app-shell:not(.app-shell--premium) .wallet-quick-actions button svg {
+    flex-shrink: 0;
+  }
+
+  .app-shell:not(.app-shell--premium) .wallet-referral-card {
+    margin: 0 !important;
+  }
+
+  .app-shell:not(.app-shell--premium) .referral-code-card {
+    min-height: 48px;
+    padding: 10px 12px;
+  }
+
+  .app-shell:not(.app-shell--premium) .referral-code-card small {
+    font-size: 10px;
+  }
+
+  .app-shell:not(.app-shell--premium) .referral-code-card strong {
+    font-size: 13px;
+  }
+
+  .app-shell:not(.app-shell--premium) .wallet-recent {
+    grid-template-rows: auto auto;
+    min-height: 0;
+    flex: 0 0 auto;
+  }
+
+  .app-shell:not(.app-shell--premium) .wallet-section-title {
+    font-size: 11px !important;
+    min-height: 28px;
+  }
+
+  .app-shell:not(.app-shell--premium) .wallet-section-title button {
+    font-size: 10px !important;
+    padding: 4px 0;
+  }
+
+  .app-shell:not(.app-shell--premium) .wallet-transaction-list {
+    gap: 8px;
+    align-content: start;
+  }
+
+  .app-shell:not(.app-shell--premium) .wallet-transaction {
+    min-height: 52px;
+    padding: 8px 10px;
+    gap: 8px;
+  }
+
+  .app-shell:not(.app-shell--premium) .wallet-transaction strong,
+  .app-shell:not(.app-shell--premium) .wallet-history-item strong {
+    font-size: 11px !important;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    line-height: 1.25;
+  }
+
+  .app-shell:not(.app-shell--premium) .wallet-transaction small,
+  .app-shell:not(.app-shell--premium) .wallet-history-item small {
+    font-size: 9px !important;
+  }
+
+  .app-shell:not(.app-shell--premium) .wallet-panel.wallet-overview {
+    overflow: visible;
+    min-height: auto;
+  }
+
+  .app-shell:not(.app-shell--premium) .wallet-page {
+    grid-template-rows: auto minmax(0, 1fr);
+    overflow: auto;
+  }
+
+  .app-shell:not(.app-shell--premium) .deposit-offer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .app-shell:not(.app-shell--premium) .wallet-history-filters {
+    grid-template-columns: 1fr !important;
+  }
+
+  .app-shell:not(.app-shell--premium) .wallet-deposit {
+    grid-template-rows: auto auto minmax(0, 1fr) !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .app-shell:not(.app-shell--premium) .wallet-balance-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .app-shell:not(.app-shell--premium) .wallet-balance {
+    min-height: 78px;
+  }
+}
+
+@media (max-width: 340px) {
+  .app-shell:not(.app-shell--premium) .deposit-offer-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Profile */
+@media (max-width: 520px) {
+  .profile-view-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 5px;
+  }
+
+  .profile-view-tabs button {
+    min-height: 38px;
+    font-size: clamp(10px, 2.8vw, 12px) !important;
+  }
+
+  .profile-balances {
+    grid-template-columns: 1fr !important;
+  }
+
+  .profile-contact-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .profile-contact-card strong,
+  .profile-summary-copy h2 {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    line-height: 1.25;
+  }
+
+  .history-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .history-tabs button {
+    flex: 1 1 calc(50% - 4px);
+    min-height: 34px;
+    font-size: clamp(9px, 2.5vw, 11px);
+  }
+}
+
+/* Leaderboard — compact rows, more players per screen (legacy shell only) */
+.app-shell:not(.app-shell--premium) .leaderboard-page {
+  display: grid !important;
+  grid-template-rows: auto auto auto minmax(0, 1fr) !important;
+  gap: 4px !important;
+  min-height: 0;
+}
+
+.app-shell:not(.app-shell--premium) .leaderboard-header {
+  min-height: 38px !important;
+  padding: 4px 8px !important;
+}
+
+.app-shell:not(.app-shell--premium) .leaderboard-header strong {
+  font-size: 11px !important;
+}
+
+.app-shell:not(.app-shell--premium) .leaderboard-header small {
+  font-size: 6.5px !important;
+  line-height: 1.2;
+}
+
+.app-shell:not(.app-shell--premium) .leaderboard-periods {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: stretch !important;
+  gap: 3px !important;
+  padding: 3px !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+.app-shell:not(.app-shell--premium) .leaderboard-periods button {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  min-height: 28px !important;
+  max-height: 32px !important;
+  padding: 4px 2px !important;
+  font-size: clamp(7px, 2.15vw, 9px) !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.app-shell:not(.app-shell--premium) .leaderboard-own-rank {
+  min-height: 22px !important;
+  padding: 2px 7px !important;
+  font-size: 7px !important;
+}
+
+.app-shell:not(.app-shell--premium) .leaderboard-own-rank strong {
+  font-size: 9px !important;
+}
+
+.app-shell:not(.app-shell--premium) .leaderboard-list {
+  gap: 2px !important;
+  padding: 4px !important;
+}
+
+.app-shell:not(.app-shell--premium) .leaderboard-list__header {
+  min-height: 24px !important;
+  padding: 3px 2px !important;
+}
+
+.app-shell:not(.app-shell--premium) .leaderboard-list__header span {
+  font-size: 8px !important;
+  gap: 3px !important;
+}
+
+.app-shell:not(.app-shell--premium) .leaderboard-list__header small {
+  font-size: 6.5px !important;
+}
+
+.app-shell:not(.app-shell--premium) .leaderboard-list article {
+  min-height: 34px !important;
+  grid-template-columns: 20px 26px minmax(0, 1fr) auto !important;
+  gap: 4px !important;
+  padding: 2px 5px !important;
+  border-radius: 9px !important;
+}
+
+.app-shell:not(.app-shell--premium) .leaderboard-list article > img {
+  width: 24px !important;
+  height: 24px !important;
+  border-radius: 7px !important;
+}
+
+.app-shell:not(.app-shell--premium) .leaderboard-list article > b {
+  font-size: 7.5px !important;
+}
+
+.app-shell:not(.app-shell--premium) .leaderboard-list article strong {
+  font-size: 7.5px !important;
+  line-height: 1.1 !important;
+}
+
+.app-shell:not(.app-shell--premium) .leaderboard-list article small {
+  font-size: 6px !important;
+  line-height: 1.1 !important;
+}
+
+.app-shell:not(.app-shell--premium) .leaderboard-list article > i {
+  font-size: 7.5px !important;
+}
+
+.app-shell:not(.app-shell--premium) .leaderboard-list article > em {
+  font-size: 4.5px !important;
+  right: 4px;
+  bottom: 1px;
+}
+
+.app-shell:not(.app-shell--premium) .leaderboard-list article.top-five {
+  min-height: 38px !important;
+  grid-template-columns: 22px 28px minmax(0, 1fr) auto !important;
+  gap: 5px !important;
+}
+
+.app-shell:not(.app-shell--premium) .leaderboard-list article.top-five > img {
+  width: 26px !important;
+  height: 26px !important;
+  border-radius: 8px !important;
+}
+
+.app-shell:not(.app-shell--premium) .leaderboard-list article.top-five > b,
+.app-shell:not(.app-shell--premium) .leaderboard-list article.top-five > i {
+  font-size: 8px !important;
+}
+
+.app-shell:not(.app-shell--premium) .leaderboard-list article.top-five strong {
+  font-size: 7.5px !important;
+}
+
+.app-shell:not(.app-shell--premium) .leaderboard-list article.top-five small {
+  font-size: 6px !important;
+}
+
+@media (max-width: 520px) {
+  .app-shell:not(.app-shell--premium) .leaderboard-periods button {
+    min-height: 28px !important;
+    max-height: 30px !important;
+    font-size: clamp(7px, 2.1vw, 8.5px) !important;
+  }
+
+  .app-shell:not(.app-shell--premium) .leaderboard-header small {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .app-shell:not(.app-shell--premium) .leaderboard-list article strong {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.1;
+    display: block;
+    -webkit-line-clamp: unset;
+    -webkit-box-orient: unset;
+  }
+}
+
+/* Tournament browse: single-line filters + 2-column card grid */
+@media (max-width: 520px) {
+  .tournament-filter {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    overflow-x: auto !important;
+    gap: 5px !important;
+    padding: 5px 8px !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .tournament-filter::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tournament-filter > span {
+    flex: 0 0 auto;
+    grid-column: unset !important;
+    white-space: nowrap;
+  }
+
+  .tournament-filter select {
+    flex: 0 0 auto;
+    min-width: 76px !important;
+    max-width: 98px !important;
+    font-size: 8px !important;
+  }
+
+  .tournament-filter button {
+    width: 30px !important;
+    flex: 0 0 30px !important;
+  }
+
+  .tournament-list-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+  }
+
+  .tournament-list-grid .tournament-list-card {
+    min-height: 0 !important;
+    grid-template-rows: 66px minmax(0, 1fr) auto auto !important;
+    padding: 5px !important;
+    border-radius: 12px !important;
+  }
+
+  .tournament-list-grid .tournament-list-card .tournament-artwork {
+    height: 66px !important;
+  }
+
+  .tournament-list-grid .tournament-prize-glow {
+    font-size: 10px !important;
+  }
+
+  .tournament-list-grid .tournament-card-actions button {
+    min-height: 28px !important;
+    font-size: 7px !important;
+  }
+
+  .tournament-list-grid .tournament-card-actions button.tournament-join-button {
+    border-width: 2px !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      0 0 0 1px rgba(127, 29, 29, 0.45),
+      0 0 14px rgba(239, 68, 68, 0.42) !important;
+  }
+
+  .tournament-list-card__title,
+  .tournament-list-card h2 {
+    white-space: normal !important;
+    overflow: visible;
+    text-overflow: unset;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .tournament-detail-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Admin mobile cards */
+@media (max-width: 720px) {
+  .admin-tx-row,
+  .admin-table-head.admin-tx-row {
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-rows: auto auto auto;
+    gap: 6px 10px;
+    padding: 10px 12px;
+    min-height: auto;
+  }
+
+  .admin-tx-row .admin-person.compact {
+    grid-column: 1 / -1;
+  }
+
+  .admin-tx-row > strong:nth-of-type(1) {
+    grid-column: 1;
+  }
+
+  .admin-tx-row .admin-status:nth-of-type(1) {
+    grid-column: 2;
+    justify-self: end;
+  }
+
+  .admin-tx-row > strong:nth-of-type(2) {
+    grid-column: 1;
+  }
+
+  .admin-tx-row > small {
+    grid-column: 2;
+    justify-self: end;
+  }
+
+  .admin-user-row {
+    grid-template-columns: 1fr !important;
+    gap: 8px;
+    min-height: auto;
+    padding: 10px 12px;
+  }
+
+  .admin-user-row > span {
+    min-width: 0;
+  }
+
+  .admin-user-row > span strong,
+  .admin-user-row > span small {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+  }
+
+  .admin-stat-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .admin-stat-grid strong {
+    overflow: visible;
+    text-overflow: unset;
+    white-space: normal;
+  }
+
+  .admin-inline-form,
+  .admin-team-form {
+    grid-template-columns: 1fr !important;
+  }
+
+  .admin-filter-bar {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Game pods — clean compact mobile layout (loads last) */
+@media (max-width: 720px), (max-height: 650px) {
+  .app-surface--game .game-arena,
+  .game-arena {
+    grid-template-rows: auto minmax(0, 1fr) auto !important;
+    gap: 5px 8px;
+  }
+
+  .app-surface--game .game-player-pod,
+  .game-player-pod {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto auto !important;
+    grid-template-areas:
+      "top"
+      "identity" !important;
+    align-items: center;
+    align-content: start;
+    gap: 0 !important;
+    padding: 6px 10px 5px !important;
+    border-radius: 14px !important;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  .game-player-pod__top,
+  .app-surface--game .game-player-pod__top {
+    grid-area: top;
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr) 36px;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .app-surface--game .game-player-pod.seat-1 .game-player-pod__top,
+  .app-surface--game .game-player-pod.seat-2 .game-player-pod__top,
+  .game-player-pod.seat-1 .game-player-pod__top,
+  .game-player-pod.seat-2 .game-player-pod__top {
+    grid-template-columns: 36px minmax(0, 1fr) 36px;
+  }
+
+  .app-surface--game .game-player-pod.seat-1,
+  .app-surface--game .game-player-pod.seat-2,
+  .game-player-pod.seat-1,
+  .game-player-pod.seat-2 {
+    justify-self: stretch;
+  }
+
+  .game-player-pod .player-dice,
+  .app-surface--game .game-player-pod .player-dice {
+    width: 36px !important;
+    min-height: 36px !important;
+    justify-self: start;
+    align-self: center;
+    border-radius: 10px !important;
+    flex-shrink: 0;
+  }
+
+  .game-player-pod.seat-1 .player-dice,
+  .game-player-pod.seat-2 .player-dice {
+    justify-self: end;
+  }
+
+  .game-player-pod__turn-meter,
+  .app-surface--game .game-player-pod__turn-meter {
+    min-width: 0;
+    padding: 0 2px;
+  }
+
+  .game-player-pod__turn-meter-track,
+  .app-surface--game .game-player-pod__turn-meter-track {
+    height: 5px;
+  }
+
+  .game-player-pod__turn-meter-track > b,
+  .app-surface--game .game-player-pod__turn-meter-track > b {
+    height: 12px;
+  }
+
+  .game-player-pod__turn-meter-value,
+  .app-surface--game .game-player-pod__turn-meter-value {
+    font-size: 8px;
+  }
+
+  .game-player-pod__avatar,
+  .app-surface--game .game-player-pod__avatar {
+    width: 36px !important;
+    height: 36px !important;
+    justify-self: end;
+    align-self: center;
+    border-width: 2px;
+    flex-shrink: 0;
+  }
+
+  .game-player-pod.seat-1 .game-player-pod__avatar,
+  .game-player-pod.seat-2 .game-player-pod__avatar {
+    justify-self: start;
+  }
+
+  .game-player-pod__identity,
+  .app-surface--game .game-player-pod__identity {
+    grid-area: identity;
+    width: 100%;
+    min-width: 0;
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px !important;
+    margin-top: 4px;
+    padding: 4px 2px 2px;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    text-align: center;
+    line-height: 1.2;
+  }
+
+  .game-player-pod.seat-1 .game-player-pod__identity,
+  .game-player-pod.seat-2 .game-player-pod__identity,
+  .app-surface--game .game-player-pod.seat-1 .game-player-pod__identity,
+  .app-surface--game .game-player-pod.seat-2 .game-player-pod__identity {
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  .game-player-pod__meta,
+  .app-surface--game .game-player-pod__meta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .game-player-pod__identity .miss-dots,
+  .app-surface--game .game-player-pod__identity .miss-dots {
+    gap: 2px;
+    flex-shrink: 0;
+  }
+
+  .game-player-pod__identity .miss-dots i,
+  .app-surface--game .game-player-pod .miss-dots i {
+    width: 5px !important;
+    height: 5px !important;
+  }
+
+  .app-surface--game .game-player-pod__identity strong,
+  .game-player-pod__identity strong {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 10.5px !important;
+    line-height: 1.2 !important;
+    letter-spacing: 0.01em;
+  }
+
+  .app-surface--game .game-player-pod__identity small,
+  .game-player-pod__identity small {
+    font-size: 8px !important;
+    line-height: 1 !important;
+    opacity: 0.92;
+  }
+
+  .game-player-pod__identity .player-bot-badge {
+    font-size: 6px;
+    margin-left: 3px;
+  }
+
+  .player-dice .dice-face {
+    width: 28px;
+    padding: 4px;
+  }
+
+  .player-dice .dice-face i {
+    width: 4px;
+    height: 4px;
+  }
+
+  .player-dice.can-roll::after {
+    right: -2px;
+    bottom: -3px;
+    font-size: 5px;
+  }
+
+  .game-comms-overlay .game-popover {
+    left: 8px !important;
+    right: 8px !important;
+    bottom: 102px !important;
+  }
+
+  .app-surface--game .chat-panel {
+    height: min(260px, 48vh) !important;
+  }
+
+  .chat-panel__composer input {
+    font-size: 16px !important;
+  }
+}
+
+@media (max-width: 400px) {
+  .app-surface--game .game-player-pod,
+  .game-player-pod {
+    padding: 5px 8px 4px !important;
+  }
+
+  .game-player-pod .player-dice,
+  .app-surface--game .game-player-pod .player-dice {
+    width: 34px !important;
+    min-height: 34px !important;
+  }
+
+  .game-player-pod__avatar,
+  .app-surface--game .game-player-pod__avatar {
+    width: 34px !important;
+    height: 34px !important;
+  }
+
+  .app-surface--game .game-player-pod__identity strong,
+  .game-player-pod__identity strong {
+    font-size: 10px !important;
+  }
+}
+
+/* Refer page — keep compact 3-column stats + horizontal link row */
+@media (max-width: 520px) {
+  .refer-page {
+    gap: 7px;
+  }
+
+  .refer-hero {
+    padding: 10px;
+  }
+
+  .refer-code-row__code {
+    font-size: 1.15rem;
+  }
+
+  .refer-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 5px !important;
+  }
+
+  .refer-metrics article {
+    padding: 7px 4px !important;
+    border-radius: 12px;
+  }
+
+  .refer-metrics span {
+    font-size: 0.52rem !important;
+  }
+
+  .refer-metrics strong {
+    font-size: 0.68rem !important;
+  }
+
+  .refer-link {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 34px !important;
+    min-height: 34px;
+  }
+
+  .refer-share {
+    min-height: 36px;
+    margin-top: 6px;
+    font-size: 0.7rem;
+  }
+
+  .refer-history {
+    padding: 9px;
+  }
+}
+
+/* Joined tournament — red badge button + light card highlight */
+.tournament-list-card.joined,
+.tournament-detail.joined .bracket-toolbar,
+.tournament-detail.joined .bracket-scroll {
+  border: 2px solid rgba(214, 255, 228, 0.42) !important;
+  background:
+    linear-gradient(
+      160deg,
+      rgba(210, 255, 225, 0.14) 0%,
+      rgba(12, 58, 32, 0.5) 40%,
+      rgba(4, 28, 16, 0.94) 100%
+    ) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 28px rgba(180, 255, 200, 0.1),
+    0 0 0 1px rgba(164, 255, 94, 0.14),
+    0 0 24px rgba(164, 255, 94, 0.12) !important;
+  animation: tournament-joined-light-glow 3s ease-in-out infinite;
+}
+
+.tournament-list-card.current:not(.joined) {
+  border-color: rgba(111, 250, 159, 0.55) !important;
+  box-shadow:
+    inset 0 0 20px rgba(52, 209, 105, 0.08),
+    0 0 22px rgba(54, 220, 112, 0.1) !important;
+  animation: none;
+}
+
+@keyframes tournament-joined-light-glow {
+  0%,
+  100% {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      inset 0 0 24px rgba(180, 255, 200, 0.08),
+      0 0 0 1px rgba(164, 255, 94, 0.12),
+      0 0 20px rgba(164, 255, 94, 0.1);
+  }
+
+  50% {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.12),
+      inset 0 0 32px rgba(180, 255, 200, 0.14),
+      0 0 0 1px rgba(196, 255, 214, 0.26),
+      0 0 32px rgba(164, 255, 94, 0.18);
+  }
+}
+
+.tournament-joined-ribbon {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  border: 2px solid rgba(255, 138, 138, 0.92);
+  border-top: none;
+  border-left: none;
+  border-radius: 0 0 12px 0;
+  color: #fff8f8;
+  background: linear-gradient(145deg, #ff5a5a 0%, #e02020 52%, #b91c1c 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 0 0 1px rgba(127, 29, 29, 0.45),
+    0 6px 18px rgba(220, 38, 38, 0.32);
+  font: inherit;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  cursor: default;
+}
+
+.tournament-leave-locked,
+.tournament-countdown-lock {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  width: 100%;
+  min-height: 34px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  color: #ffd89a;
+  background: rgba(255, 140, 40, 0.1);
+  border: 1px solid rgba(255, 170, 60, 0.32);
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.tournament-joined-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 38px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  color: #fff8f8;
+  border: 2px solid rgba(255, 138, 138, 0.92);
+  background: linear-gradient(145deg, #ff5a5a 0%, #e02020 52%, #b91c1c 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 0 0 1px rgba(127, 29, 29, 0.45),
+    0 6px 18px rgba(220, 38, 38, 0.28);
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1.35;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.tournament-joined-status svg {
+  flex-shrink: 0;
+}
+
+.tournament-card-actions--joined-locked {
+  display: flex !important;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.tournament-card-actions--joined-locked .tournament-joined-status {
+  order: 1;
+}
+
+.tournament-card-actions--joined-locked .tournament-leave-locked {
+  order: 2;
+}
+
+.tournament-card-actions--joined-locked > button:first-of-type {
+  order: 3;
+}
+
+.bracket-joined-footer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 4px;
+  box-sizing: border-box;
+}
+
+.bracket-joined-footer .tournament-joined-status,
+.bracket-joined-footer .tournament-countdown-lock {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+.bracket-joined-footer .tournament-countdown-lock {
+  color: #ffd89a;
+}
+
+.tournament-leave-locked > span:last-child,
+.tournament-countdown-lock > span:last-child {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.tournament-leave-locked strong,
+.tournament-countdown-lock strong {
+  display: block;
+  color: #ffe4b8;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.tournament-leave-locked small,
+.tournament-countdown-lock small {
+  display: block;
+  color: rgba(255, 216, 154, 0.88);
+  font-size: 8px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.tournament-leave-locked svg,
+.tournament-countdown-lock svg {
+  flex-shrink: 0;
+}
+
+.bracket-empty-state .tournament-countdown-lock {
+  margin-top: 0;
+  font-size: 13px;
+}
+
+.payment-gateway-settings {
+  display: grid;
+  gap: 12px;
+}
+
+.payment-gateway-settings__head {
+  display: grid;
+  gap: 4px;
+}
+
+.payment-gateway-settings__head strong {
+  font-size: 14px;
+}
+
+.payment-gateway-settings__head small {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 11px;
+}
+
+.payment-gateway-card {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.payment-gateway-card__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.payment-gateway-card input {
+  width: 100%;
+}
+
+.payment-gateway-card--zini {
+  border-color: rgba(92, 219, 139, 0.28);
+  background: linear-gradient(
+    180deg,
+    rgba(92, 219, 139, 0.08),
+    rgba(255, 255, 255, 0.03)
+  );
+}
+
+.payment-gateway-card__badge {
+  margin-left: auto;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #8ef0b0;
+  background: rgba(92, 219, 139, 0.14);
+}
+
+.payment-gateway-card__hint {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.payment-gateway-card__urls {
+  font-size: 10px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.48);
+  word-break: break-all;
+}
+
+.payment-gateway-admin {
+  margin-bottom: 14px;
+}
+
+.payment-gateway-admin .payment-gateway-settings {
+  margin-top: 8px;
+}
+
+.payment-gateway-admin .admin-inline-message {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #8ef0b0;
+}
+
+/* Tournaments route: always mobile layout on desktop/PC */
+.app-surface--tournaments {
+  width: min(100%, 520px) !important;
+  max-width: 520px !important;
+  margin-inline: auto;
+  grid-template-rows: 54px minmax(0, 1fr) !important;
+  gap: 7px !important;
+  padding:
+    max(7px, env(safe-area-inset-top))
+    8px
+    max(72px, calc(64px + env(safe-area-inset-bottom))) !important;
+}
+
+.app-surface--tournaments .app-header {
+  min-height: 54px !important;
+  border-radius: 16px !important;
+  gap: 4px !important;
+  padding: 6px 8px !important;
+}
+
+.app-surface--tournaments .app-header.has-balance {
+  grid-template-columns: minmax(0, 1fr) minmax(108px, 1.4fr) auto 34px !important;
+}
+
+.app-surface--tournaments .app-header.has-balance .identity__profile > img {
+  width: 34px !important;
+  height: 34px !important;
+  flex-basis: 34px !important;
+}
+
+.app-surface--tournaments .header-balance {
+  max-width: none !important;
+  min-width: 108px !important;
+  width: 100%;
+}
+
+.app-surface--tournaments .bottom-nav {
+  left: 6px;
+  right: 6px;
+  height: 64px;
+  border-radius: 19px;
+  padding: 5px;
+}
+
+.app-surface--tournaments .bottom-nav a {
+  min-height: 52px;
+  border-radius: 14px;
+  font-size: clamp(8px, 2.4vw, 10px);
+  gap: 2px;
+}
+
+.app-surface--tournaments .tournament-page {
+  grid-template-rows: 42px minmax(0, 1fr) !important;
+  gap: 7px !important;
+  align-content: stretch !important;
+}
+
+.app-surface--tournaments .tournament-tabs {
+  padding: 4px !important;
+  border-radius: 15px !important;
+}
+
+.app-surface--tournaments .tournament-tabs button {
+  min-height: 0 !important;
+  font-size: 7px !important;
+  border-radius: 10px !important;
+}
+
+.app-surface--tournaments .tournament-browse {
+  grid-template-rows: auto minmax(0, 1fr) !important;
+  gap: 6px !important;
+}
+
+.app-surface--tournaments .tournament-filter {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  overflow-x: auto !important;
+  gap: 5px !important;
+  padding: 5px 8px !important;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.app-surface--tournaments .tournament-filter::-webkit-scrollbar {
+  display: none;
+}
+
+.app-surface--tournaments .tournament-filter > span {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  font-size: 8px !important;
+}
+
+.app-surface--tournaments .tournament-filter select {
+  flex: 0 0 auto;
+  min-width: 76px !important;
+  max-width: 98px !important;
+  height: 30px !important;
+  font-size: 8px !important;
+}
+
+.app-surface--tournaments .tournament-filter button {
+  width: 30px !important;
+  flex: 0 0 30px !important;
+  height: 30px !important;
+}
+
+.app-surface--tournaments .tournament-list-section > h2 {
+  font-size: 0.7rem !important;
+}
+
+.app-surface--tournaments .tournament-list-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 6px !important;
+}
+
+.app-surface--tournaments .tournament-grid,
+.app-surface--tournaments .tournament-grid--2,
+.app-surface--tournaments .tournament-grid--3,
+.app-surface--tournaments .tournament-grid--4 {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 6px !important;
+}
+
+.app-surface--tournaments .tournament-list-card,
+.app-surface--tournaments .tournament-card {
+  min-height: 0 !important;
+  padding: 5px !important;
+  border-radius: 12px !important;
+  grid-template-rows: 66px minmax(0, 1fr) auto auto !important;
+  gap: 5px !important;
+}
+
+.app-surface--tournaments .tournament-list-card .tournament-artwork,
+.app-surface--tournaments .tournament-card .tournament-artwork {
+  height: 66px !important;
+}
+
+.app-surface--tournaments .tournament-list-card__title,
+.app-surface--tournaments .tournament-card > strong,
+.app-surface--tournaments .tournament-detail-header h1 {
+  font-size: 10px !important;
+  line-height: 1.25 !important;
+  white-space: normal !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.app-surface--tournaments .tournament-prize-glow,
+.app-surface--tournaments .tournament-card__prize,
+.app-surface--tournaments .tournament-detail-header > strong {
+  font-size: 10px !important;
+}
+
+.app-surface--tournaments .tournament-badges i,
+.app-surface--tournaments .tournament-card__badges i,
+.app-surface--tournaments .tournament-card-stats small,
+.app-surface--tournaments .tournament-card__meta small,
+.app-surface--tournaments .tournament-card__fee {
+  font-size: 6px !important;
+}
+
+.app-surface--tournaments .tournament-card-actions {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 4px !important;
+}
+
+.app-surface--tournaments .tournament-card-actions button,
+.app-surface--tournaments .tournament-list-card button,
+.app-surface--tournaments .tournament-detail-actions button {
+  min-height: 28px !important;
+  padding: 0 4px !important;
+  font-size: 7px !important;
+  border-radius: 8px !important;
+}
+
+.app-surface--tournaments .tournament-card-actions button.tournament-join-button {
+  border-width: 2px !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 0 0 1px rgba(127, 29, 29, 0.45),
+    0 0 16px rgba(239, 68, 68, 0.42) !important;
+}
+
+.app-shell:not(.app-shell--premium) .app-surface--tournaments .bracket-toolbar__title h1 {
+  font-size: 9px !important;
+}
+
+.app-shell:not(.app-shell--premium) .app-surface--tournaments .bracket-toolbar__stats strong {
+  font-size: 6.5px !important;
+}
+
+.app-shell:not(.app-shell--premium) .app-surface--tournaments .bracket-scroll {
+  grid-auto-columns: minmax(104px, 118px) !important;
+  padding: 4px 2px 6px !important;
+}
+
+.app-shell:not(.app-shell--premium) .app-surface--tournaments .bracket-match {
+  padding: 3px !important;
+  border-radius: 9px !important;
+}
+
+.app-shell:not(.app-shell--premium) .app-surface--tournaments .bracket-match > div {
+  min-height: 22px !important;
+}
+
+.app-shell:not(.app-shell--premium) .app-surface--tournaments .bracket-round h2 {
+  font-size: 6px !important;
+}
+
+.app-shell:not(.app-shell--premium) .app-surface--tournaments .bracket-guest-hint {
+  font-size: 6.5px !important;
+  min-height: 24px !important;
+}
+
+.app-surface--tournaments .tournament-detail-summary {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+.app-surface--tournaments .bracket-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.app-surface--tournaments .tournament-admin-form {
+  gap: 6px !important;
+}
+
+.app-surface--tournaments .tournament-form-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+/* Mobile header layout — loaded last to beat readability/theme overrides */
+.app-header.has-balance :is(
+  button,
+  a,
+  .header-balance__add,
+  .icon-button,
+  .identity__copy
+) {
+  min-height: 0 !important;
+}
+
+@media (max-width: 520px) {
+  .app-surface:not(.app-surface--game):not(.app-surface--admin) {
+    grid-template-rows: minmax(58px, auto) minmax(0, 1fr) !important;
+  }
+
+  .app-shell--premium .app-surface:not(.app-surface--game):not(.app-surface--admin) {
+    grid-template-rows: minmax(56px, auto) minmax(0, 1fr) !important;
+  }
+
+  /* Legacy header — skip when premium shell active (see styles.phase5.css) */
+  .app-shell:not(.app-shell--premium) .app-header.has-balance {
+    grid-template-columns: minmax(0, 34%) minmax(0, 1fr) auto !important;
+    gap: 6px !important;
+    min-height: 54px !important;
+    height: auto !important;
+    padding: 5px 7px !important;
+    overflow: hidden !important;
+    align-items: center !important;
+  }
+
+  .app-shell:not(.app-shell--premium) .app-header.has-balance > * {
+    min-width: 0 !important;
+  }
+
+  .app-shell:not(.app-shell--premium) .app-header.has-balance .identity--user {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 22px !important;
+    align-items: center !important;
+    height: auto !important;
+    gap: 2px !important;
+    padding-right: 0 !important;
+    border-right: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .app-shell:not(.app-shell--premium) .app-header.has-balance .identity__profile {
+    grid-template-columns: 34px minmax(0, 1fr) !important;
+    gap: 3px !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .app-shell:not(.app-shell--premium) .app-header.has-balance .identity__avatar-shell {
+    width: 34px !important;
+    height: 34px !important;
+    box-shadow: none !important;
+    border-width: 1px !important;
+  }
+
+  .app-shell:not(.app-shell--premium) .app-header.has-balance .identity__avatar-shell > img {
+    width: 28px !important;
+    height: 28px !important;
+    flex-basis: 28px !important;
+  }
+
+  .app-shell:not(.app-shell--premium) .app-header.has-balance .identity__details {
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .app-shell:not(.app-shell--premium) .app-header.has-balance .identity__name {
+    font-size: 10.5px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .app-shell:not(.app-shell--premium) .app-header.has-balance .identity__game-id {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .app-shell:not(.app-shell--premium) .app-header.has-balance .identity__game-id strong {
+    font-size: 8.5px !important;
+  }
+
+  .app-shell:not(.app-shell--premium) .app-header.has-balance .identity__copy {
+    width: 22px !important;
+    height: 24px !important;
+    flex: 0 0 22px !important;
+  }
+
+  .app-shell:not(.app-shell--premium) .app-header.has-balance .header-balance {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    height: 42px !important;
+    grid-template-columns: minmax(0, 1fr) 32px !important;
+    padding: 3px !important;
+    overflow: hidden !important;
+    box-shadow: inset 0 0 10px rgba(52, 220, 111, 0.06) !important;
+  }
+
+  .app-shell:not(.app-shell--premium) .app-header.has-balance .header-balance__summary {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 1px !important;
+    padding: 0 4px !important;
+  }
+
+  .app-shell:not(.app-shell--premium) .header-balance__wallet {
+    display: none !important;
+  }
+
+  .app-shell:not(.app-shell--premium) .app-header.has-balance .header-balance__copy small {
+    font-size: 6.5px !important;
+    line-height: 1 !important;
+  }
+
+  .app-shell:not(.app-shell--premium) .app-header.has-balance .header-balance__copy strong,
+  .app-shell:not(.app-shell--premium) .app-header.has-balance .header-balance__copy strong.balance-medium {
+    font-size: 11px !important;
+    line-height: 1.05 !important;
+  }
+
+  .app-shell:not(.app-shell--premium) .app-header.has-balance .header-balance__copy strong.balance-long {
+    font-size: 9px !important;
+  }
+
+  .app-shell:not(.app-shell--premium) .app-header.has-balance .header-balance__add {
+    width: 32px !important;
+    height: 32px !important;
+    align-self: center !important;
+    border-radius: 9px !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.22),
+      0 0 8px rgba(38, 214, 105, 0.22) !important;
+  }
+
+  .app-shell:not(.app-shell--premium) .app-header.has-balance .header-balance__add svg {
+    width: 15px !important;
+    height: 15px !important;
+  }
+
+  .app-shell:not(.app-shell--premium) .app-header.has-balance .header-balance__add small {
+    display: none !important;
+  }
+
+  .app-shell:not(.app-shell--premium) .language-switch__globe {
+    width: 10px !important;
+    height: 10px !important;
+  }
+
+  .app-shell:not(.app-shell--premium) .app-header.has-balance .language-switch button {
+    width: auto !important;
+    min-width: 19px !important;
+    height: 18px !important;
+    min-height: 0 !important;
+    font-size: 7px !important;
+  }
+
+  .app-shell:not(.app-shell--premium) .app-header.has-balance .header-actions {
+    display: inline-flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    height: auto !important;
+    gap: 3px !important;
+    padding: 0 !important;
+    flex-shrink: 0 !important;
+    min-width: 0 !important;
+  }
+
+  .app-shell:not(.app-shell--premium) .app-header.has-balance .language-switch {
+    display: inline-flex !important;
+    width: auto !important;
+    height: auto !important;
+    grid-template-columns: unset !important;
+    flex-shrink: 0 !important;
+  }
+
+  .app-shell:not(.app-shell--premium) .app-header .header-actions .icon-button {
+    width: 28px !important;
+    height: 34px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .app-shell:not(.app-shell--premium) .app-header .header-actions .icon-button svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .bottom-nav {
+    height: 68px !important;
+    padding: 6px !important;
+    gap: 4px !important;
+  }
+
+  .bottom-nav a {
+    min-height: 0 !important;
+    font-size: 9px !important;
+    gap: 3px !important;
+  }
+
+  .bottom-nav a svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .app-shell:not(.app-shell--premium) .app-header.has-balance {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr) auto !important;
+    gap: 4px !important;
+  }
+
+  .app-shell:not(.app-shell--premium) .language-switch__globe {
+    display: none !important;
+  }
+}
+
+/* ── Scroll insets: rounded cards stay fully visible inside scroll areas ── */
+:is(
+  .bracket-scroll--filled,
+  .bracket-scroll:not(.bracket-scroll--empty):not(.bracket-scroll--tree),
+  .tournament-grid,
+  .wallet-history-list,
+  .chat-panel__messages,
+  .emoji-picker__grid,
+  .profile-panel,
+  .activity-panel,
+  .stats-panel,
+  .wallet-panel
+) {
+  scroll-padding: 10px 8px;
+}
+
+.bracket-stage {
+  isolation: isolate;
+}
+
+.bracket-stage > .bracket-scroll--filled {
+  min-height: 0;
+  height: 100%;
+}
+
+.bracket-mobile-list {
+  padding: 2px 1px 4px;
+}
+
+.bracket-mobile-round__matches {
+  padding-inline: 1px;
+}
+
+.bracket-waiting-room__players {
+  padding: 4px 6px 12px !important;
+  scroll-padding: 8px 6px;
+}
+
+.tournament-grid {
+  padding: 4px 6px 12px !important;
+}
+
+.bracket-scroll--filled:not(.bracket-scroll--tree) {
+  padding-bottom: 16px !important;
+}
+
+:is(.wallet-panel, .profile-panel, .stats-panel, .activity-panel):is(
+  [style*="overflow"],
+  .scrollable
+) {
+  padding-bottom: 10px;
+}
+
+@media (max-width: 520px) {
+  .tournament-detail--bracket .bracket-stage {
+    margin-bottom: 2px;
+  }
+
+  .bracket-scroll--filled.bracket-scroll--tree {
+    padding: 10px 10px 18px !important;
+  }
+
+  .bracket-mobile-list {
+    padding: 3px 2px 8px;
+  }
+}
+

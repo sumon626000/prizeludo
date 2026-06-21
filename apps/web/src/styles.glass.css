@@ -1,0 +1,279 @@
+/* Site-wide frosted glass panels — all pages + game scene */
+
+:root {
+  --frost-bg: rgba(8, 29, 18, 0.72);
+  --frost-bg-soft: rgba(6, 26, 16, 0.55);
+  --frost-border: rgba(119, 247, 168, 0.11);
+  --frost-border-soft: rgba(119, 247, 168, 0.08);
+  --frost-border-gold: rgba(255, 214, 74, 0.28);
+  --frost-blur: blur(22px) saturate(140%);
+  --frost-fill: linear-gradient(145deg, rgba(19, 54, 34, 0.68), rgba(6, 26, 16, 0.7));
+  --frost-fill-gold: linear-gradient(145deg, rgba(22, 48, 28, 0.72), rgba(8, 26, 16, 0.68));
+  --frost-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --frost-shadow: 0 14px 34px rgba(0, 0, 0, 0.38);
+  --ui-card-top: rgba(19, 54, 34, 0.68);
+  --ui-card-bottom: rgba(6, 26, 16, 0.7);
+  --glass: rgba(8, 29, 18, 0.72);
+}
+
+/* ── Base glass utility ── */
+.glass {
+  border: 1px solid var(--frost-border) !important;
+  background: var(--frost-fill) !important;
+  box-shadow: var(--frost-highlight), var(--frost-shadow) !important;
+  backdrop-filter: var(--frost-blur);
+  -webkit-backdrop-filter: var(--frost-blur);
+}
+
+/* ── Shared frosted panel mixin (all routes) ── */
+:is(
+  .app-surface,
+  .admin-page,
+  .admin-login-page
+) :is(
+  .glass,
+  .wallet-panel,
+  .wallet-balance,
+  .refer-hero,
+  .refer-history,
+  .refer-metrics > article,
+  .profile-panel,
+  .stat-card,
+  .history-item,
+  .support-ticket,
+  .support-compose,
+  .best-finish,
+  .win-rate-ring,
+  .leaderboard-header,
+  .leaderboard-list,
+  .leaderboard-own-rank,
+  .leaderboard-periods,
+  .tournament-filter,
+  .tournament-list-card,
+  .tournament-card,
+  .tournament-empty,
+  .bracket-toolbar,
+  .bracket-match,
+  .placeholder-card,
+  .home-play-card,
+  .live-win-board,
+  .home-hero,
+  .home-hero-banner,
+  .game-category,
+  .home-empty,
+  .home-coming-soon,
+  .referral-code-card,
+  .legal-card,
+  .auth-modal,
+  .offline-card,
+  .pwa-install-prompt,
+  .notification-item,
+  .wallet-transaction,
+  .wallet-history-item,
+  .bracket-guest-hint,
+  .own-match-callout,
+  .round-waiting,
+  .spectator-room,
+  .bracket-empty-state,
+  .tournament-joined-strip,
+  .tournament-game-settings,
+  .tournament-showcase-settings,
+  .tournament-admin-form,
+  .tournament-detail-actions,
+  .bot-settings,
+  .bot-editor,
+  .bot-list,
+  .bot-admin-loading,
+  .history-empty,
+  .refer-player,
+  .profile-summary,
+  .admin-login-card,
+  .admin-panel,
+  .admin-stat-card,
+  .admin-table-wrap,
+  .settings-editor,
+  .theme-preset-card
+) {
+  border: 1px solid var(--frost-border) !important;
+  border-radius: var(--ui-radius-lg, 18px) !important;
+  background: var(--frost-fill) !important;
+  box-shadow: var(--frost-highlight), var(--frost-shadow) !important;
+  backdrop-filter: var(--frost-blur);
+  -webkit-backdrop-filter: var(--frost-blur);
+}
+
+/* ── Game scene panels ── */
+.app-surface--game :is(
+  .game-topbar,
+  .game-player-pod,
+  .game-controls,
+  .game-prize-badge,
+  .game-roll-streak,
+  .game-action-status,
+  .game-settlement,
+  .game-settlement__self-card,
+  .game-settlement__podium-slot,
+  .game-result-overlay .game-settlement,
+  .game-error,
+  .spectating-badge,
+  .game-communication.glass
+) {
+  border-color: var(--frost-border-gold) !important;
+  background: var(--frost-fill-gold) !important;
+  box-shadow: var(--frost-highlight), var(--frost-shadow) !important;
+  backdrop-filter: var(--frost-blur);
+  -webkit-backdrop-filter: var(--frost-blur);
+}
+
+.app-surface--game .game-communication.glass button {
+  border: 1px solid rgba(255, 214, 74, 0.22) !important;
+  background: rgba(8, 24, 14, 0.28) !important;
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+}
+
+.app-surface--game .game-popover.glass {
+  background:
+    linear-gradient(
+      155deg,
+      rgba(14, 40, 22, 0.52),
+      rgba(2, 10, 5, 0.38)
+    ) !important;
+  backdrop-filter: blur(26px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(26px) saturate(160%) !important;
+}
+
+/* ── Header + bottom nav ── */
+.app-header.glass,
+.bottom-nav.glass,
+.app-shell--premium .app-header.glass,
+.app-shell--premium .bottom-nav.glass {
+  background:
+    linear-gradient(
+      155deg,
+      rgba(12, 36, 20, 0.48),
+      rgba(2, 8, 4, 0.38)
+    ) !important;
+  backdrop-filter: var(--frost-blur);
+  -webkit-backdrop-filter: var(--frost-blur);
+}
+
+/* ── Home hero + game tiles (phase3 overrides) ── */
+.app-shell--premium .home-hero-banner {
+  background:
+    radial-gradient(circle at 92% 12%, rgba(164, 255, 94, 0.14), transparent 44%),
+    radial-gradient(circle at 6% 92%, rgba(255, 213, 74, 0.08), transparent 40%),
+    var(--frost-fill) !important;
+  backdrop-filter: var(--frost-blur);
+  -webkit-backdrop-filter: var(--frost-blur);
+}
+
+.app-shell--premium .game-category--featured {
+  background:
+    radial-gradient(circle at 12% 18%, rgba(164, 255, 94, 0.16), transparent 52%),
+    radial-gradient(circle at 88% 82%, rgba(255, 213, 74, 0.08), transparent 48%),
+    var(--frost-fill) !important;
+  backdrop-filter: var(--frost-blur);
+  -webkit-backdrop-filter: var(--frost-blur);
+}
+
+.app-shell--premium .game-category--soon {
+  background: var(--frost-fill) !important;
+  backdrop-filter: var(--frost-blur);
+  -webkit-backdrop-filter: var(--frost-blur);
+}
+
+/* ── Live win / leaderboard inner chips ── */
+.app-shell--premium .live-win-board__header--premium {
+  background: rgba(8, 24, 14, 0.22) !important;
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+}
+
+.app-shell--premium .live-win-board__stats span,
+.live-win-board__stats span {
+  border: 1px solid var(--frost-border-soft) !important;
+  border-radius: var(--ui-radius-sm, 10px) !important;
+  background: var(--frost-bg-soft) !important;
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+}
+
+.app-surface:not(.app-surface--game) .live-win-board__rows :is(.win, .loss),
+.app-surface:not(.app-surface--game) .leaderboard-list article,
+.app-shell--premium .live-win-board__rows article {
+  border: 1px solid var(--frost-border-soft) !important;
+  border-radius: var(--ui-radius-sm, 10px) !important;
+  background: var(--frost-bg-soft) !important;
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+}
+
+/* ── Tabs / pill bars ── */
+.app-surface :is(
+  .wallet-tabs,
+  .profile-view-tabs,
+  .history-tabs,
+  .tournament-tabs,
+  .leaderboard-periods
+).glass,
+.app-surface :is(
+  .wallet-tabs,
+  .profile-view-tabs,
+  .history-tabs,
+  .tournament-tabs,
+  .leaderboard-periods
+) {
+  background: rgba(6, 20, 12, 0.32) !important;
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+}
+
+/* ── Game scene: soften opaque overrides from game-scene.css ── */
+.app-surface--game .game-player-pod {
+  background: var(--frost-fill-gold) !important;
+  backdrop-filter: var(--frost-blur);
+  -webkit-backdrop-filter: var(--frost-blur);
+}
+
+.app-surface--game .game-topbar {
+  background: var(--frost-fill-gold) !important;
+  backdrop-filter: var(--frost-blur);
+  -webkit-backdrop-filter: var(--frost-blur);
+}
+
+.app-surface--game .game-controls {
+  background: var(--frost-fill-gold) !important;
+  backdrop-filter: var(--frost-blur);
+  -webkit-backdrop-filter: var(--frost-blur);
+}
+
+.app-surface--game .player-dice {
+  background:
+    linear-gradient(
+      155deg,
+      rgba(12, 32, 18, 0.55),
+      rgba(2, 8, 4, 0.42)
+    ) !important;
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+}
+
+/* ── Fallback when blur unsupported ── */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass,
+  .app-surface--game .game-topbar,
+  .app-surface--game .game-player-pod,
+  .app-surface--game .game-controls {
+    background: rgba(8, 28, 16, 0.88) !important;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass,
+  :is(.app-surface, .admin-page) :is(.glass, .game-category, .live-win-board) {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(8, 28, 16, 0.92) !important;
+  }
+}

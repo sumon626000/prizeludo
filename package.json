@@ -1,0 +1,31 @@
+{
+  "name": "khan-ludo",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -n api,web -c green,cyan \"npm run dev -w @khan-ludo/api\" \"npm run dev -w @khan-ludo/web\"",
+    "local:light": "npm run build && concurrently -n api,web -c green,cyan \"npm run start -w @khan-ludo/api\" \"npm run preview -w @khan-ludo/web\"",
+    "build": "npm run build -w @khan-ludo/api && npm run build -w @khan-ludo/web",
+    "typecheck": "npm run typecheck -w @khan-ludo/api && npm run typecheck -w @khan-ludo/web",
+    "test": "npm run test -w @khan-ludo/api && npm run test -w @khan-ludo/web",
+    "qa:visual": "node scripts/visual-check.mjs",
+    "db:generate": "npm run db:generate -w @khan-ludo/api",
+    "db:migrate": "npm run db:migrate -w @khan-ludo/api",
+    "db:studio": "npm run db:studio -w @khan-ludo/api",
+    "seed:test-tournaments": "tsx scripts/seed-test-tournaments.mts",
+    "avatars:generate": "node scripts/generate-avatars.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "@dicebear/collection": "^9.4.2",
+    "@dicebear/core": "^9.4.2",
+    "concurrently": "^10.0.3",
+    "playwright-core": "^1.60.0",
+    "typescript": "^6.0.3"
+  }
+}

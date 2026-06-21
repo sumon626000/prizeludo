@@ -1,0 +1,316 @@
+/* Site-wide lightweight motion — low opacity decor, softer loops, less GPU work */
+
+:root {
+  --motion-decor-opacity: 0.28;
+  --motion-glow-opacity: 0.34;
+  --motion-shimmer-opacity: 0.22;
+}
+
+/* ── Background layers ── */
+.forest {
+  opacity: var(--motion-decor-opacity);
+}
+
+.forest::before,
+.forest::after {
+  opacity: 0.38;
+  filter: blur(1px);
+}
+
+.forest__leaf,
+.forest__particles {
+  display: none !important;
+}
+
+.forest__light {
+  opacity: 0.28;
+  filter: blur(8px);
+  animation-duration: 14s !important;
+}
+
+.forest__cloud,
+.forest__cloud--one,
+.forest__cloud--two {
+  opacity: 0.22;
+  animation-duration: 42s !important;
+}
+
+.forest__branch,
+.forest__branch--left,
+.forest__branch--right {
+  opacity: 0.42;
+  animation-duration: 10s !important;
+}
+
+.forest::after {
+  animation-duration: 12s !important;
+}
+
+.bg-game-icons__item {
+  opacity: 0.03 !important;
+  animation-duration: calc(var(--bgi-duration) * 2.2) !important;
+  will-change: auto !important;
+}
+
+.app-shell:has(.app-surface--game) .bg-game-icons__item,
+.app-shell:has(.app-surface--admin) .bg-game-icons__item {
+  opacity: 0.02 !important;
+}
+
+@media (max-width: 520px) {
+  .bg-game-icons__item:nth-child(n + 7) {
+    display: none !important;
+  }
+}
+
+/* ── Premium home / hero decor ── */
+.app-shell--premium .home-hero-banner__art,
+.app-shell--premium .home-hero-banner__visual,
+.app-shell--premium .home-hero-logo-ring,
+.app-shell--premium .home-hero-banner::before {
+  opacity: var(--motion-decor-opacity) !important;
+}
+
+.app-shell--premium .home-hero-banner__live i {
+  animation-duration: 2.4s !important;
+  opacity: 0.55;
+  box-shadow: 0 0 4px color-mix(in srgb, var(--ui-neon) 45%, transparent);
+}
+
+.app-shell--premium .home-hero-cta__shimmer,
+.app-shell--premium .home-hero-cta::after {
+  opacity: var(--motion-shimmer-opacity) !important;
+  animation-duration: 5.5s !important;
+}
+
+/* ── Softer infinite UI pulses ── */
+.logo-orbit,
+[class*="orbit-spin"],
+.home-hero-logo-ring {
+  animation-duration: 16s !important;
+  opacity: 0.55;
+}
+
+.spark-pulse,
+.cta-glow,
+.button-shine,
+.prize-pulse,
+.ring-breathe,
+.hero-ambient,
+.hero-float,
+.forest-drift,
+.dot-pulse,
+.loading-pulse,
+.live-pulse,
+.wallet-spin {
+  animation-duration: 2.8s !important;
+}
+
+.cta-glow,
+.button-shine {
+  opacity: var(--motion-glow-opacity);
+}
+
+/* ── Game page: keep UX, soften chrome ── */
+.legal-token {
+  animation-duration: 1.1s !important;
+  opacity: 0.82;
+}
+
+.active-dice-pulse:not(.rolling) {
+  animation-duration: 1.4s !important;
+}
+
+.game-player-pod__turn-meter-track i,
+.game-player-pod.timer-running .game-player-pod__turn-meter-track i {
+  animation-duration: 2s !important;
+  opacity: 0.45;
+}
+
+.game-player-pod__turn-meter.is-urgent .game-player-pod__turn-meter-track i {
+  animation-duration: 1.1s !important;
+  opacity: 0.55;
+}
+
+/* ── Result / celebration overlays ── */
+.game-result__rays,
+.game-result__sparkles,
+.game-result__fireworks,
+.game-result__confetti,
+.winner-confetti,
+.game-result__crown,
+.game-result__trophy {
+  opacity: var(--motion-decor-opacity) !important;
+}
+
+.game-result__rays {
+  animation-duration: 12s !important;
+}
+
+.game-result__sparkles,
+.game-result__fireworks i,
+.game-result__confetti i,
+.winner-confetti {
+  animation-duration: 4.5s !important;
+}
+
+.game-result__crown,
+.winner-crown {
+  animation-duration: 1.8s !important;
+}
+
+/* ── Page transitions — quick, subtle ── */
+.page,
+.app-surface .page {
+  animation-duration: 220ms !important;
+}
+
+/* ── Lighter keyframes (override heavier motion) ── */
+@keyframes bg-icon-float {
+  from {
+    transform: translate3d(-50%, -50%, 0) rotate(var(--bgi-rotate));
+  }
+
+  to {
+    transform: translate3d(calc(-50% + 4px), calc(-50% - 5px), 0)
+      rotate(calc(var(--bgi-rotate) + 2deg));
+  }
+}
+
+@keyframes logo-float {
+  50% {
+    transform: translateY(-3px) rotate(0.5deg);
+  }
+}
+
+@keyframes spark-pulse {
+  to {
+    transform: scale(1.06) rotate(4deg);
+    opacity: 0.32;
+  }
+}
+
+@keyframes cta-glow {
+  50% {
+    box-shadow: 0 8px 18px color-mix(in srgb, var(--theme-primary, #27e071) 20%, transparent);
+  }
+}
+
+@keyframes hero-ambient {
+  to {
+    transform: translate(10px, -3px) scale(1.04);
+  }
+}
+
+@keyframes hero-float {
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes prize-pulse {
+  to {
+    transform: scale(1.05);
+    opacity: 0.28;
+  }
+}
+
+@keyframes ring-breathe {
+  to {
+    transform: scale(1.012);
+    box-shadow:
+      inset 0 0 14px color-mix(in srgb, var(--theme-primary, #39dc71) 10%, transparent),
+      0 8px 16px rgba(0, 8, 3, 0.22);
+  }
+}
+
+@keyframes live-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes cta-shimmer {
+  0% {
+    opacity: 0;
+    transform: translateX(-120%) skewX(-12deg);
+  }
+
+  45% {
+    opacity: 0.18;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(220%) skewX(-12deg);
+  }
+}
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+}
+
+@keyframes canopy-breathe {
+  to {
+    transform: scaleX(-1) translateY(-4px) scale(1.01);
+  }
+}
+
+@keyframes sun-pulse {
+  50% {
+    opacity: 0.34;
+  }
+}
+
+@keyframes turn-meter-shimmer {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+
+  50% {
+    opacity: 0.42;
+  }
+}
+
+@keyframes ui-pulse {
+  from {
+    opacity: 0.55;
+    transform: scale(0.98);
+  }
+
+  to {
+    opacity: 0.82;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .forest,
+  .bg-game-icons,
+  .site-ambient,
+  .game-result__rays,
+  .game-result__sparkles,
+  .game-result__fireworks,
+  .game-result__confetti,
+  .winner-confetti {
+    display: none !important;
+  }
+}
