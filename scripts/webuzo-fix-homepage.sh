@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# Fix prizejito.com showing JSON NOT_FOUND instead of the React app.
-# Run on Webuzo SSH as the site user.
+# One-shot: pull, build, deploy static web, fix runtime-config + .htaccess
 set -euo pipefail
 
 REPO_DIR="${DEPLOY_REPO_PATH:-/home/nixbazar/prizejito.com}"
@@ -9,11 +8,15 @@ NODE_PORT="${NODE_PORT:-30047}"
 PUBLIC_API_URL="${PUBLIC_API_URL:-https://prizejito.com}"
 PUBLIC_WEB_ORIGIN="${PUBLIC_WEB_ORIGIN:-https://prizejito.com}"
 
-echo "=== Fix homepage: $REPO_DIR → $WEB_ROOT (Node port $NODE_PORT) ==="
-
+echo "=== PrizeJito deploy: $REPO_DIR → $WEB_ROOT (port $NODE_PORT) ==="
 cd "$REPO_DIR"
 
-git pull origin main || true
+git pull origin main
+
+grep -q '^WEB_ROOT=' .env || echo "WEB_ROOT=$WEB_ROOT" >> .env
+grep -q '^DEPLOY_REPO_PATH=' .env || echo "DEPLOY_REPO_PATH=$REPO_DIR" >> .env
+cp .env apps/api/.env
+chmod 600 .env apps/api/.env
 
 cat > apps/web/.env.production <<EOF
 VITE_API_URL=$PUBLIC_API_URL
@@ -30,14 +33,10 @@ if [[ -f "$WEB_ROOT/.htaccess" ]]; then
 fi
 
 cat > "$WEB_ROOT/runtime-config.json" <<EOF
-{
-  "apiUrl": "$PUBLIC_API_URL",
-  "webOrigin": "$PUBLIC_WEB_ORIGIN",
-  "updatedAt": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
-}
+{"apiUrl":"$PUBLIC_API_URL","webOrigin":"$PUBLIC_WEB_ORIGIN"}
 EOF
 
+ls -la "$WEB_ROOT/index.html"
 echo ""
-echo "Static files deployed. Restart Node.js app in Webuzo panel now."
-echo "Then check: curl -sI https://prizejito.com/ | head -1"
-echo "Expected: HTTP/1.1 200 OK (HTML, not JSON)"
+echo "=== DONE — Restart Node.js in Webuzo panel ==="
+echo "Check: curl -sI https://prizejito.com/ | head -1  (expect 200 OK)"
