@@ -11,7 +11,8 @@ PUBLIC_WEB_ORIGIN="${PUBLIC_WEB_ORIGIN:-https://prizejito.com}"
 echo "=== PrizeJito deploy: $REPO_DIR → $WEB_ROOT (port $NODE_PORT) ==="
 cd "$REPO_DIR"
 
-git pull origin main
+git fetch origin main
+git reset --hard origin/main
 
 grep -q '^WEB_ROOT=' .env || echo "WEB_ROOT=$WEB_ROOT" >> .env
 grep -q '^DEPLOY_REPO_PATH=' .env || echo "DEPLOY_REPO_PATH=$REPO_DIR" >> .env
