@@ -411,6 +411,11 @@ export interface HomeSnapshot {
     logoUrl: string;
     maxWinAmount: number;
     marqueeSpeedSeconds: number;
+    games: {
+      carrom: boolean;
+      hockey: boolean;
+      pool: boolean;
+    };
     social: {
       telegram: string;
       whatsapp: string;

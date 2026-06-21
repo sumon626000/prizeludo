@@ -7,9 +7,14 @@ dotenv.config({
   path: resolve(dirname(fileURLToPath(import.meta.url)), "../../../.env"),
 });
 
-const optionalUrl = z.preprocess(
-  (value) => (value === "" ? undefined : value),
-  z.url().optional(),
+const emptyToUndefined = (value: unknown) =>
+  value === "" || value === undefined ? undefined : value;
+
+const optionalUrl = z.preprocess(emptyToUndefined, z.url().optional());
+
+const optionalNonemptyString = z.preprocess(
+  emptyToUndefined,
+  z.string().min(1).optional(),
 );
 
 const envSchema = z.object({
@@ -40,8 +45,14 @@ const envSchema = z.object({
     .default("development-only-secret-change-before-deploy"),
   JWT_EXPIRES_IN_SECONDS: z.coerce.number().int().positive().default(604800),
   COOKIE_NAME: z.string().min(1).default("khan_ludo_session"),
-  ADMIN_CLAIM_SECRET: z.string().min(24).optional(),
-  GITHUB_WEBHOOK_SECRET: z.string().min(16).optional(),
+  ADMIN_CLAIM_SECRET: z.preprocess(
+    emptyToUndefined,
+    z.string().min(24).optional(),
+  ),
+  GITHUB_WEBHOOK_SECRET: z.preprocess(
+    emptyToUndefined,
+    z.string().min(16).optional(),
+  ),
   DEPLOY_REPO_PATH: z
     .string()
     .min(1)
@@ -50,10 +61,10 @@ const envSchema = z.object({
   DEPLOY_BRANCH: z.string().min(1).default("main"),
   DEPLOY_SCRIPT: z.string().min(1).optional(),
   DEPLOY_RESTART_COMMAND: z.string().min(1).optional(),
-  GOOGLE_CLIENT_ID: z.string().optional(),
-  GOOGLE_CLIENT_SECRET: z.string().optional(),
+  GOOGLE_CLIENT_ID: optionalNonemptyString,
+  GOOGLE_CLIENT_SECRET: optionalNonemptyString,
   GOOGLE_CALLBACK_URL: optionalUrl,
-  ZINI_PAY_API_KEY: z.string().min(1).optional(),
+  ZINI_PAY_API_KEY: optionalNonemptyString,
   ZINI_PAY_BRAND_ORIGIN: optionalUrl,
   ZINI_PAY_WEBHOOK_URL: optionalUrl,
   TRUST_PROXY: z.coerce.number().int().min(0).max(10).default(0),

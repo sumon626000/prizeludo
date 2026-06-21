@@ -30,6 +30,11 @@ npm run db:migrate
 mkdir -p "$WEB_ROOT"
 cp -a apps/web/dist/. "$WEB_ROOT"/
 
+NODE_PORT="${NODE_PORT:-4000}"
+if [[ -f "$WEB_ROOT/.htaccess" ]]; then
+  sed -i "s/__NODE_PORT__/$NODE_PORT/g" "$WEB_ROOT/.htaccess"
+fi
+
 cat > "$WEB_ROOT/runtime-config.json" <<EOF
 {
   "apiUrl": "$PUBLIC_API_URL",

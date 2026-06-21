@@ -1,0 +1,337 @@
+PrizeJito — Webuzo Single Domain Setup (No Subdomain)
+=====================================================
+
+Goal: Everything on ONE domain only.
+
+  Website + API + Socket.io  →  https://prizejito.com
+  NO api.prizejito.com subdomain needed.
+
+Architecture
+------------
+  Browser
+    → https://prizejito.com/              (React SPA — static files)
+    → https://prizejito.com/api/*         (Express API — proxied to Node)
+    → wss://prizejito.com/socket.io/*     (Socket.io — proxied to Node)
+
+Folders (example user: nixbazar)
+--------------------------------
+  Source (private, never public):
+    /home/nixbazar/prizeludo
+
+  Public web root (only dist files):
+    /home/nixbazar/prizejito.com
+
+Security rule
+-------------
+  NEVER set document root to the source folder.
+  Source folder must NOT be web-accessible.
+
+  Good:  https://prizejito.com/.env  → 403 or 404
+  Bad:   https://prizejito.com/.env  → file contents visible
+
+
+1) DNS (no subdomain)
+---------------------
+Add only these records at your domain registrar / Cloudflare:
+
+  Type    Name    Value
+  A       @       YOUR_SERVER_IP
+  A       www     YOUR_SERVER_IP
+
+Do NOT add:
+  A  api  ...
+
+Wait for DNS (minutes to a few hours).
+
+Check:
+  ping prizejito.com
+  ping www.prizejito.com
+
+
+2) Webuzo — add main domain only
+--------------------------------
+Webuzo → Domain → Add Domain
+
+  Domain: prizejito.com
+  Document Root: /home/nixbazar/prizejito.com
+
+Do NOT create api.prizejito.com subdomain.
+
+
+3) SSL
+------
+Webuzo → SSL → Let's Encrypt
+
+Issue SSL for:
+  prizejito.com
+  www.prizejito.com
+
+Wait until both show active HTTPS.
+
+
+4) Database (Webuzo)
+--------------------
+Webuzo → Database
+
+Example (adjust to your panel):
+  Database:  nixbazar_prizejito
+  User:      nixbazar_prizejito_user
+  Password:  (your strong password)
+  Host:      localhost
+
+User must have ALL PRIVILEGES on that database.
+
+
+5) Clone project
+----------------
+Webuzo → Server Utilities → Terminal
+
+  cd /home/nixbazar
+  git clone https://github.com/sumon626000/prizeludo.git prizeludo
+  cd /home/nixbazar/prizeludo
+
+GitHub auth: use Personal Access Token (PAT), not account password.
+
+
+6) Production .env (single domain URLs)
+---------------------------------------
+Run from project root:
+
+  cd /home/nixbazar/prizeludo
+
+  read -s -p "DB password: " DB_PASS
+  echo
+  DB_PASS_ENC=$(node -e "console.log(encodeURIComponent(process.argv[1]))" "$DB_PASS")
+  JWT_SECRET=$(node -e "console.log(require('crypto').randomBytes(48).toString('hex'))")
+  ADMIN_CLAIM_SECRET=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
+
+  cat > .env <<EOF
+  NODE_ENV=production
+  PORT=4000
+  WEB_ORIGIN=https://prizejito.com
+  API_PUBLIC_URL=https://prizejito.com
+  DATABASE_URL=postgresql://nixbazar_prizejito_user:${DB_PASS_ENC}@localhost:5432/nixbazar_prizejito
+  JWT_SECRET=${JWT_SECRET}
+  ADMIN_CLAIM_SECRET=${ADMIN_CLAIM_SECRET}
+  JWT_EXPIRES_IN_SECONDS=604800
+  COOKIE_NAME=prizejito_session
+  GOOGLE_CLIENT_ID=
+  GOOGLE_CLIENT_SECRET=
+  GOOGLE_CALLBACK_URL=https://prizejito.com/api/auth/google/callback
+  ZINI_PAY_BRAND_ORIGIN=https://prizejito.com
+  ZINI_PAY_WEBHOOK_URL=https://prizejito.com/api/wallet/zinipay/webhook
+  TRUST_PROXY=1
+  API_RESTART_MODE=webuzo
+  DEPLOY_REPO_PATH=/home/nixbazar/prizeludo
+  WEB_ROOT=/home/nixbazar/prizejito.com
+  DEPLOY_BRANCH=main
+  EOF
+
+  chmod 600 .env
+
+Important:
+  WEB_ORIGIN and API_PUBLIC_URL must BOTH be https://prizejito.com
+  No trailing slash.
+  Single domain = login cookies work better (same site).
+
+
+7) Build web for same domain
+----------------------------
+  cat > apps/web/.env.production <<'EOF'
+  VITE_API_URL=https://prizejito.com
+  EOF
+
+  npm install
+  npm run build
+  npm run db:migrate
+
+
+8) Publish static website
+-------------------------
+  WEB_ROOT=/home/nixbazar/prizejito.com
+  mkdir -p "$WEB_ROOT"
+  cp -a apps/web/dist/. "$WEB_ROOT"/
+
+  cat > "$WEB_ROOT/runtime-config.json" <<'EOF'
+  {
+    "apiUrl": "https://prizejito.com",
+    "webOrigin": "https://prizejito.com"
+  }
+  EOF
+
+runtime-config.json is REQUIRED on single-domain setup.
+Without it, the app may try api.prizejito.com by default.
+
+
+9) Apache .htaccess (SPA + API proxy)
+---------------------------------------
+Replace NODE_PORT with your actual Node port (see step 10).
+Webuzo often assigns something like 30047 — check your Node app panel.
+
+  cat > "$WEB_ROOT/.htaccess" <<'HTACCESS'
+  <IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Block secrets / source if copied by mistake
+  RewriteRule (^|/)\.env($|[./]) - [F,L]
+  RewriteRule (^|/)\.git(/|$) - [F,L]
+  RewriteRule (^|/)(node_modules|apps|src|docs|scripts|drizzle)(/|$) - [F,L]
+
+  # www → non-www
+  RewriteCond %{HTTP_HOST} ^www\.prizejito\.com$ [NC]
+  RewriteRule ^(.*)$ https://prizejito.com/$1 [L,R=301]
+
+  # WebSocket upgrade for Socket.io
+  RewriteCond %{HTTP:Upgrade} =websocket [NC]
+  RewriteRule ^/socket\.io/(.*)$ ws://127.0.0.1:NODE_PORT/socket.io/$1 [P,L]
+
+  # Proxy API + Socket.io polling to Node
+  RewriteRule ^/api/(.*)$ http://127.0.0.1:NODE_PORT/api/$1 [P,L]
+  RewriteRule ^/socket\.io/(.*)$ http://127.0.0.1:NODE_PORT/socket.io/$1 [P,L]
+
+  # React SPA fallback
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+  </IfModule>
+  HTACCESS
+
+  sed -i 's/NODE_PORT/4000/g' "$WEB_ROOT/.htaccess"
+
+If proxy returns 500/503:
+  - Hosting must enable mod_proxy + mod_proxy_wstunnel for .htaccess [P] flag.
+  - Ask Webuzo/hosting support: "Enable ProxyPass / mod_rewrite proxy for Node.js"
+  - Confirm NODE_PORT matches Webuzo Node app internal port.
+
+
+10) Run Node.js API (internal, no subdomain)
+--------------------------------------------
+Webuzo → Applications → Node.js → Add Application
+
+Recommended settings:
+  Domain:        prizejito.com   (or "None / Internal" if panel offers it)
+  Application URL:  leave blank or /  (API reached via Apache proxy, not direct subdomain)
+  Application Root: /home/nixbazar/prizeludo
+  Startup file:     apps/api/dist/index.js
+  Node version:     22+
+  Environment:      production
+
+Copy .env if root is apps/api only:
+  cp /home/nixbazar/prizeludo/.env /home/nixbazar/prizeludo/apps/api/.env
+  chmod 600 /home/nixbazar/prizeludo/apps/api/.env
+
+WRONG startup files (do not use):
+  apps/api/dist/db/client.js
+  apps/api/dist/app.js
+
+Click Start / Restart.
+
+Note the internal PORT Webuzo assigns. Update .htaccess sed command if not 4000.
+
+
+11) Health checks
+-----------------
+  curl -s https://prizejito.com/api/health
+
+Expected:
+  {"status":"ok","service":"prizejito-api",...}
+
+  curl -sI https://prizejito.com/
+  curl -sI https://prizejito.com/.env
+
+Browser tests:
+  1. https://prizejito.com opens
+  2. Register / guest login works
+  3. Tournament list loads (no "Failed to fetch")
+  4. Live game connects (Socket.io)
+  5. https://prizejito.com/admin opens after first admin claim
+
+
+12) Payment / OAuth URLs (single domain)
+----------------------------------------
+ZiniPay dashboard:
+  Brand website: https://prizejito.com
+  Webhook URL:   https://prizejito.com/api/wallet/zinipay/webhook
+
+UddoktaPay webhook:
+  https://prizejito.com/api/wallet/uddokta/webhook
+
+Google OAuth (when ready):
+  Redirect URI: https://prizejito.com/api/auth/google/callback
+
+GitHub auto-deploy webhook (optional):
+  Payload URL: https://prizejito.com/api/webhook/git-update
+  Secret: same as GITHUB_WEBHOOK_SECRET in .env
+
+
+13) Future updates
+------------------
+Smart update (recommended):
+
+  cd /home/nixbazar/prizeludo
+  PUBLIC_API_URL=https://prizejito.com \
+  PUBLIC_WEB_ORIGIN=https://prizejito.com \
+  WEB_ROOT=/home/nixbazar/prizejito.com \
+  bash scripts/update-changed.sh
+
+Web only:
+  bash scripts/update-changed.sh --web-only
+
+After web deploy, confirm runtime-config.json still has:
+  "apiUrl": "https://prizejito.com"
+
+Then Webuzo → Node.js app → Restart.
+
+
+14) Common problems
+-------------------
+
+"Failed to fetch" on website:
+  curl https://prizejito.com/api/health
+  If fail → Node app stopped or .htaccess proxy wrong port.
+  If ok → rebuild web + check runtime-config.json apiUrl.
+
+Login works then lost on refresh:
+  WEB_ORIGIN=https://prizejito.com
+  API_PUBLIC_URL=https://prizejito.com
+  TRUST_PROXY=1
+  SSL active on prizejito.com
+
+Socket / live game not connecting:
+  WebSocket proxy rule in .htaccess
+  mod_proxy_wstunnel enabled
+  Restart Node app
+
+App still calls api.prizejito.com:
+  Fix $WEB_ROOT/runtime-config.json → "apiUrl": "https://prizejito.com"
+  Rebuild with VITE_API_URL=https://prizejito.com
+  Hard refresh browser / clear PWA cache
+
+Apache proxy [P] not allowed:
+  Contact hosting to enable mod_proxy for your account, OR
+  Ask them to add vhost ProxyPass:
+    ProxyPass /api http://127.0.0.1:PORT/api
+    ProxyPass /socket.io http://127.0.0.1:PORT/socket.io
+
+
+15) Quick copy-paste summary
+----------------------------
+
+  cd /home/nixbazar
+  git clone https://github.com/sumon626000/prizeludo.git prizeludo
+  cd prizeludo
+  # create .env (step 6) — WEB_ORIGIN and API_PUBLIC_URL both https://prizejito.com
+  cat > apps/web/.env.production <<'EOF'
+  VITE_API_URL=https://prizejito.com
+  EOF
+  npm install && npm run build && npm run db:migrate
+  WEB_ROOT=/home/nixbazar/prizejito.com
+  mkdir -p "$WEB_ROOT"
+  cp -a apps/web/dist/. "$WEB_ROOT"/
+  echo '{"apiUrl":"https://prizejito.com","webOrigin":"https://prizejito.com"}' > "$WEB_ROOT/runtime-config.json"
+  # add .htaccess with proxy (step 9)
+  # create Webuzo Node app → apps/api/dist/index.js → Restart
+  curl https://prizejito.com/api/health
+
+Done — one domain, no subdomain.

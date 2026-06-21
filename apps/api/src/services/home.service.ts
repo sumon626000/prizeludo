@@ -281,6 +281,11 @@ export async function getHomeSnapshot(userId?: string) {
       marqueeSpeedSeconds: Number(
         settingValues["home.marquee_speed_seconds"] || 28,
       ),
+      games: {
+        carrom: settingValues["home.game_carrom_visible"] !== "false",
+        hockey: settingValues["home.game_hockey_visible"] !== "false",
+        pool: settingValues["home.game_pool_visible"] !== "false",
+      },
       social: {
         telegram: settingValues["social.telegram_url"],
         whatsapp: settingValues["social.whatsapp_url"],

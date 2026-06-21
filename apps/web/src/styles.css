@@ -1078,6 +1078,56 @@ button.danger {
   min-height: 88px;
 }
 
+.admin-coming-soon-games {
+  grid-column: 1 / -1;
+}
+
+.admin-game-toggle-list {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-game-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(119, 247, 168, 0.12);
+  border-radius: 12px;
+  background: rgba(4, 24, 14, 0.55);
+}
+
+.admin-game-toggle__copy {
+  display: grid;
+  gap: 3px;
+}
+
+.admin-game-toggle__copy strong {
+  color: #d8ffe8;
+  font-size: 12px;
+}
+
+.admin-game-toggle__copy small {
+  color: rgba(186, 230, 201, 0.72);
+  font-size: 10px;
+}
+
+.admin-game-toggle .game-auto-switch {
+  flex: 0 0 auto;
+  min-width: 108px;
+}
+
+.home-game-categories__empty {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  color: rgba(200, 255, 220, 0.72);
+  background: rgba(4, 24, 14, 0.45);
+  font-size: 12px;
+  text-align: center;
+}
+
 .admin-team-form {
   grid-template-columns: repeat(3, minmax(130px, 1fr)) minmax(240px, 1.5fr) auto;
   align-items: end;
@@ -8399,8 +8449,6 @@ button.danger {
   width: 100%;
   height: 100%;
   border-radius: 999px;
-  object-fit: cover;
-}
   object-fit: cover;
 }
 

@@ -312,7 +312,7 @@
 }
 
 .profile-page--premium .profile-summary {
-  grid-template-columns: 46px minmax(0, 1fr) 34px) !important;
+  grid-template-columns: 46px minmax(0, 1fr) 34px !important;
   align-items: center !important;
 }
 

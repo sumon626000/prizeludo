@@ -1,3 +1,4 @@
 {
-  "apiUrl": "https://api.prizejito.com"
+  "apiUrl": "https://prizejito.com",
+  "webOrigin": "https://prizejito.com"
 }

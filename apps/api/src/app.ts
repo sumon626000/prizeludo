@@ -16,6 +16,7 @@ import {
   enforceTrustedOrigin,
   globalRateLimit,
 } from "./middleware/security.js";
+import { createStaticWebMiddleware } from "./middleware/static-web.js";
 import { authRouter } from "./routes/auth.routes.js";
 import { adminRouter } from "./routes/admin.routes.js";
 import { botRouter } from "./routes/bot.routes.js";
@@ -74,6 +75,10 @@ export function createApp() {
   app.use("/api/wallet", walletRouter);
   app.use("/api/tournaments", tournamentRouter);
   app.use("/api/support", supportRouter);
+
+  for (const handler of createStaticWebMiddleware()) {
+    app.use(handler);
+  }
 
   const notFound: RequestHandler = (_request, _response, next) => {
     next(new AppError(404, "NOT_FOUND", "এই API route পাওয়া যায়নি।"));

@@ -1713,6 +1713,38 @@ function ThemePresetCard({
   );
 }
 
+function AdminGameToggle(props: {
+  label: string;
+  hint: string;
+  enabled: boolean;
+  onChange: (enabled: boolean) => void;
+}) {
+  return (
+    <div className="admin-game-toggle">
+      <div className="admin-game-toggle__copy">
+        <strong>{props.label}</strong>
+        <small>{props.hint}</small>
+      </div>
+      <div className={`game-auto-switch ${props.enabled ? "is-on" : ""}`}>
+        <button
+          type="button"
+          className={!props.enabled ? "active" : ""}
+          onClick={() => props.onChange(false)}
+        >
+          Off
+        </button>
+        <button
+          type="button"
+          className={props.enabled ? "active" : ""}
+          onClick={() => props.onChange(true)}
+        >
+          On
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function SettingsEditor(props: {
   values: Record<string, string>;
   setValues: (values: Record<string, string>) => void;
@@ -1780,9 +1812,63 @@ function SettingsEditor(props: {
     },
   ];
 
+  const comingSoonGames = [
+    {
+      key: "home.game_carrom_visible",
+      label: "Carrom",
+      hint: "Show Carrom card on home page",
+    },
+    {
+      key: "home.game_hockey_visible",
+      label: "Ice Hockey",
+      hint: "Show Ice Hockey card on home page",
+    },
+    {
+      key: "home.game_pool_visible",
+      label: "Pool",
+      hint: "Show Pool card on home page",
+    },
+  ] as const;
+
+  const patchSetting = (patch: Record<string, string>, message: string) => {
+    props.setValues({ ...props.values, ...patch });
+    void props.run(async () => {
+      await apiRequest("/api/admin/settings", {
+        method: "PATCH",
+        body: JSON.stringify({ values: patch }),
+      });
+      await props.onSaved();
+    }, message);
+  };
+
   return (
     <>
       <section className="admin-settings-grid">
+        <article className="admin-panel admin-coming-soon-games">
+          <header>
+            <h2>Coming soon games</h2>
+            <p>Home page এ Carrom, Ice Hockey, Pool card দেখান বা লুকান</p>
+          </header>
+          <div className="admin-game-toggle-list">
+            {comingSoonGames.map((game) => {
+              const enabled = props.values[game.key] !== "false";
+              return (
+                <AdminGameToggle
+                  key={game.key}
+                  label={game.label}
+                  hint={game.hint}
+                  enabled={enabled}
+                  onChange={(next) =>
+                    patchSetting(
+                      { [game.key]: next ? "true" : "false" },
+                      `${game.label} ${next ? "shown" : "hidden"} on home page.`,
+                    )
+                  }
+                />
+              );
+            })}
+          </div>
+        </article>
         <article className="admin-panel admin-theme-panel">
           <header>
             <h2>Site color theme</h2>

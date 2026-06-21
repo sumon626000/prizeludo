@@ -20,7 +20,7 @@ function resolveApiUrlFromHost(): string | null {
 
   const { hostname, protocol } = window.location;
   if (hostname === "prizejito.com" || hostname === "www.prizejito.com") {
-    return "https://api.prizejito.com";
+    return "https://prizejito.com";
   }
 
   const baseHost = hostname.startsWith("www.") ? hostname.slice(4) : hostname;

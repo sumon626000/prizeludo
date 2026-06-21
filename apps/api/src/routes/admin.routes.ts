@@ -35,6 +35,7 @@ import {
   updateSubAdmin,
   updateSupportTicket,
 } from "../services/admin.service.js";
+import { getHomeSnapshot } from "../services/home.service.js";
 import {
   authenticateAdminPassword,
   issueSession,
@@ -486,6 +487,11 @@ router.patch(
       backgroundColor: saved["site.background_color"],
       accentColor: saved["site.accent_color"],
     });
+    const homeSnapshot = await getHomeSnapshot();
+    (request.app.get("io") as Server | undefined)?.emit(
+      "home:settings-update",
+      homeSnapshot.settings,
+    );
     response.json(result);
   }),
 );

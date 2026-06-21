@@ -192,6 +192,13 @@ export function HomePage({
   const onlinePlayers = snapshot
     ? 1000 + ((hashText(snapshot.serverTime) + liveTick * 13) % 900)
     : 1000;
+  const gameVisibility = snapshot?.settings.games ?? {
+    carrom: false,
+    hockey: false,
+    pool: false,
+  };
+  const showComingSoonGames =
+    gameVisibility.carrom || gameVisibility.hockey || gameVisibility.pool;
 
   if (loading && !snapshot) {
     return (
@@ -294,6 +301,7 @@ export function HomePage({
         </button>
 
         <div className="home-game-categories home-game-categories--soon">
+          {gameVisibility.carrom && (
           <button
             type="button"
             className="game-category game-category--soon game-category--carrom glass"
@@ -307,6 +315,8 @@ export function HomePage({
               <small>{i18n.language === "bn" ? "শীঘ্রই" : "Soon"}</small>
             </span>
           </button>
+          )}
+          {gameVisibility.hockey && (
           <button
             type="button"
             className="game-category game-category--soon game-category--hockey glass"
@@ -320,6 +330,8 @@ export function HomePage({
               <small>{i18n.language === "bn" ? "শীঘ্রই" : "Soon"}</small>
             </span>
           </button>
+          )}
+          {gameVisibility.pool && (
           <button
             type="button"
             className="game-category game-category--soon game-category--pool glass"
@@ -333,7 +345,15 @@ export function HomePage({
               <small>{i18n.language === "bn" ? "শীঘ্রই" : "Soon"}</small>
             </span>
           </button>
+          )}
         </div>
+        {!showComingSoonGames && (
+          <p className="home-game-categories__empty">
+            {i18n.language === "bn"
+              ? "আরও গেম শীঘ্রই যোগ হবে"
+              : "More games coming soon"}
+          </p>
+        )}
       </section>
 
       <section className="home-section leaderboard-section live-win-board glass">

@@ -13,6 +13,7 @@ import {
   TOKEN_RELEASE_MS,
   TOKEN_SINGLE_MOVE_MS,
   TOKEN_STEP_MS,
+  waitForPlayerDiceRollFinish,
 } from "./game-ui";
 
 describe("game UI helpers", () => {
@@ -83,5 +84,15 @@ describe("game UI helpers", () => {
     expect(
       getEarlyFinishLabel(["a"], "a", "2p", "active", false),
     ).toBeNull();
+  });
+
+  it("waits for dice animation before token pause", async () => {
+    let rolling = true;
+    const timer = window.setTimeout(() => {
+      rolling = false;
+    }, 30);
+    await waitForPlayerDiceRollFinish(() => rolling, "player-1");
+    window.clearTimeout(timer);
+    expect(rolling).toBe(false);
   });
 });

@@ -61,6 +61,7 @@ import {
   TOKEN_MOVE_AFTER_DICE_MS,
   TOKEN_STEP_MS,
   tokenPositionsEqual,
+  waitForPlayerDiceRollFinish,
   useMultiplayerDiceRolls,
 } from "../lib/game-ui";
 import { socket } from "../lib/socket";
@@ -541,6 +542,8 @@ export function GamePage() {
   const diceSpeed = room?.settings.diceSpeed ?? "normal";
   const { startRoll, setRollResult, isRolling, rollingFace, rollProgress } =
     useMultiplayerDiceRolls(diceSpeed, handleDiceReveal);
+  const isRollingRef = useRef(isRolling);
+  isRollingRef.current = isRolling;
 
   useEffect(() => {
     const onSnapshot = (
@@ -571,16 +574,30 @@ export function GamePage() {
           startRoll(payload.userId, payload.dice);
         }
       }
-      if (payload.state && payload.tokenPositions) {
-        applyActionState({
-          state: payload.state,
-          currentTurn: payload.currentTurn ?? null,
-          tokenPositions: payload.tokenPositions,
-          ...(payload.dice !== undefined ? { dice: payload.dice } : {}),
-        });
+      if (
+        payload.state &&
+        payload.tokenPositions &&
+        payload.userId &&
+        payload.userId !== user?.id
+      ) {
+        const actorId = payload.userId;
+        const boardState = payload.state;
+        const tokenPositions = payload.tokenPositions;
+        const currentTurn = payload.currentTurn ?? null;
+        const dice = payload.dice;
+        void (async () => {
+          await waitForPlayerDiceRollFinish(isRollingRef.current, actorId);
+          applyActionState({
+            state: boardState,
+            currentTurn,
+            tokenPositions,
+            ...(dice !== undefined ? { dice } : {}),
+          });
+        })();
       }
     };
     const onMove = (payload: {
+      userId?: string;
       killedUserIds?: string[];
       reachedHome?: boolean;
       state?: GameRoom["state"]["boardState"];
@@ -592,15 +609,25 @@ export function GamePage() {
       } else if (payload.reachedHome) {
         playSound("home");
       }
-      if (payload.state && payload.tokenPositions) {
-        applyActionState({
-          state: payload.state,
-          currentTurn: payload.currentTurn ?? null,
-          tokenPositions: payload.tokenPositions,
-        });
-      } else {
-        refreshNow();
+      const applyMoveState = () => {
+        if (payload.state && payload.tokenPositions) {
+          applyActionState({
+            state: payload.state,
+            currentTurn: payload.currentTurn ?? null,
+            tokenPositions: payload.tokenPositions,
+          });
+        } else {
+          refreshNow();
+        }
+      };
+      if (payload.userId) {
+        void (async () => {
+          await waitForPlayerDiceRollFinish(isRollingRef.current, payload.userId!);
+          applyMoveState();
+        })();
+        return;
       }
+      applyMoveState();
     };
     const onTurnChange = (payload: {
       userId?: string | null;
@@ -716,7 +743,6 @@ export function GamePage() {
         body: "{}",
       });
       setRollResult(user.id, result.dice);
-      applyActionState(result);
       const animationDuration = getDiceRollDuration(
         room?.settings.diceSpeed ?? "normal",
       );
@@ -724,6 +750,8 @@ export function GamePage() {
       if (remaining > 0) {
         await new Promise((resolve) => window.setTimeout(resolve, remaining));
       }
+      await waitForPlayerDiceRollFinish(isRollingRef.current, user.id);
+      applyActionState(result);
       if (!autoDice) {
         const autoTokenIndex = getOnlyLegalTokenIndex(
           result.state.roll?.legalTokenIndexes ?? [],
@@ -1142,6 +1170,7 @@ export function GamePage() {
           room={room}
           userId={user?.id}
           currentTurn={room.state.currentTurn}
+          diceSpeed={room.settings.diceSpeed}
           onMove={move}
           busy={busy}
           isDiceRolling={isRolling}
@@ -1812,6 +1841,7 @@ const LudoBoard = memo(function LudoBoard({
   room,
   userId,
   currentTurn,
+  diceSpeed,
   onMove,
   busy,
   isDiceRolling,
@@ -1823,6 +1853,7 @@ const LudoBoard = memo(function LudoBoard({
   room: GameRoom;
   userId?: string | undefined;
   currentTurn: string | null;
+  diceSpeed: "fast" | "normal" | "slow";
   onMove: (tokenIndex: number) => void;
   busy: string;
   isDiceRolling?: (playerId: string) => boolean;
@@ -1855,11 +1886,13 @@ const LudoBoard = memo(function LudoBoard({
   const onKillReturnSoundRef = useRef(onKillReturnSound);
   const isDiceRollingRef = useRef(isDiceRolling);
   const tokenSpeedRef = useRef(room.settings.tokenSpeed);
+  const diceSpeedRef = useRef(diceSpeed);
   onStepSoundRef.current = onStepSound;
   onKillSoundRef.current = onKillSound;
   onKillReturnSoundRef.current = onKillReturnSound;
   isDiceRollingRef.current = isDiceRolling;
   tokenSpeedRef.current = room.settings.tokenSpeed;
+  diceSpeedRef.current = diceSpeed;
 
   useLayoutEffect(() => {
     if (!movingToken && returningTokens.size === 0) return;
@@ -2055,16 +2088,12 @@ const LudoBoard = memo(function LudoBoard({
     };
 
     const waitForDiceRollToFinish = async () => {
-      const diceDuration = getDiceRollDuration(tokenSpeedRef.current);
-      const deadline = performance.now() + diceDuration + 400;
-      while (performance.now() < deadline) {
+      const checkRolling = (id: string) => isDiceRollingRef.current?.(id) ?? false;
+      while (checkRolling(playerId)) {
         if (cancelled) return;
-        if (!isDiceRollingRef.current?.(playerId)) {
-          await sleep(TOKEN_MOVE_AFTER_DICE_MS);
-          return;
-        }
         await sleep(40);
       }
+      await sleep(TOKEN_MOVE_AFTER_DICE_MS);
     };
 
     animatingActionKeyRef.current = actionKey;
@@ -2101,7 +2130,7 @@ const LudoBoard = memo(function LudoBoard({
     };
 
     const maxDuration =
-      getDiceRollDuration(tokenSpeedRef.current) +
+      getDiceRollDuration(diceSpeedRef.current) +
       TOKEN_MOVE_AFTER_DICE_MS +
       estimateForwardMoveDuration(
         tokenSpeedRef.current,
@@ -2338,6 +2367,7 @@ const LudoBoard = memo(function LudoBoard({
                   !legal ||
                   Boolean(busy) ||
                   Boolean(movingToken) ||
+                  Boolean(isDiceRolling?.(player.id)) ||
                   returningTokens.size > 0 ||
                   killedImpactTokens.size > 0
                 }

@@ -182,7 +182,7 @@ export const TOKEN_SINGLE_MOVE_MS = 620;
 /** Yard release / first step out. */
 export const TOKEN_RELEASE_MS = 700;
 /** Pause after dice lands before the token starts walking. */
-export const TOKEN_MOVE_AFTER_DICE_MS = 220;
+export const TOKEN_MOVE_AFTER_DICE_MS = 580;
 /** Total kill-return animation budget. */
 export const TOKEN_KILL_RETURN_TOTAL_MS = 960;
 /** Pause on the kill cell — impact shake before walking back. */
@@ -219,6 +219,21 @@ export function getDiceRollDuration(speed: "fast" | "normal" | "slow" = "normal"
   if (speed === "fast") return Math.round(DICE_ROLL_MS * 0.72);
   if (speed === "slow") return Math.round(DICE_ROLL_MS * 1.35);
   return DICE_ROLL_MS;
+}
+
+export function sleepMs(ms: number): Promise<void> {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+/** Wait until a player's dice animation finishes, then the standard Ludo pause. */
+export async function waitForPlayerDiceRollFinish(
+  isRolling: (playerId: string) => boolean,
+  playerId: string,
+): Promise<void> {
+  while (isRolling(playerId)) {
+    await sleepMs(40);
+  }
+  await sleepMs(TOKEN_MOVE_AFTER_DICE_MS);
 }
 
 export function getForwardStepDuration(
