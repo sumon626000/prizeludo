@@ -7,10 +7,47 @@ import { PrizeJitoBridge } from './platform-bridge.js';
 
 function formatMoney(value) {
   const symbol = PrizeJitoBridge.currencySymbol();
-  return symbol + Number(value).toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+  return (
+    symbol +
+    Number(value).toLocaleString("en-BD", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })
+  );
+}
+
+/**
+ * Balance Update displays in mobile/desktop headers.
+ */
+export function updateBalancesUI() {
+  const formatted =
+    PrizeJitoBridge.isActive() && !state.account.synced
+      ? `${PrizeJitoBridge.currencySymbol()}--`
+      : formatMoney(state.account.balance);
+  document.querySelectorAll(".stat-balance-val").forEach((el) => {
+    el.innerText = formatted;
+    el.classList.remove("balance-medium", "balance-long");
+    if (state.account.synced) {
+      if (formatted.length > 11) el.classList.add("balance-long");
+      else if (formatted.length > 8) el.classList.add("balance-medium");
+    }
   });
+  const legacyEl = document.getElementById("stat-balance");
+  if (legacyEl) legacyEl.innerText = formatted;
+}
+
+export function applyPlatformBalance(balance) {
+  if (!Number.isFinite(balance)) return;
+  state.account.balance = balance;
+  state.account.synced = true;
+  updateBalancesUI();
+  if (state.stakeAmount > state.account.balance) {
+    state.stakeAmount = Math.max(
+      CONFIG.MIN_STAKE,
+      Math.min(state.account.balance, CONFIG.MAX_STAKE),
+    );
+    updateStakeUI();
+  }
 }
 
 /**
@@ -95,27 +132,39 @@ export function showCustomPrompt(title, message, defaultValue = "") {
 }
 
 /**
- * Balance Update displays in mobile/desktop headers.
- */
-export function updateBalancesUI() {
-  const formatted = formatMoney(state.account.balance);
-  document.querySelectorAll('.stat-balance-val').forEach(el => {
-    el.innerText = formatted;
-  });
-  const legacyEl = document.getElementById('stat-balance');
-  if (legacyEl) legacyEl.innerText = formatted;
-}
-
-/**
  * Wager/Stake selection slider updates.
  */
 export function updateStakeUI() {
   document.getElementById('amount-text-stake').innerText = formatMoney(state.stakeAmount);
-  const payout = state.stakeAmount * 1.0;
+  const profit = state.stakeAmount * Math.max(0, CONFIG.WIN_MULTIPLIER - 1);
   const infoPayout = document.getElementById('info-payout');
   if (infoPayout) {
-    infoPayout.innerText = '+' + formatMoney(payout).slice(1);
+    infoPayout.innerText = '+' + formatMoney(profit).slice(1);
   }
+}
+
+export function applyTradeSettings(settings) {
+  if (!settings) return;
+  const minStake = Number(settings.minStake ?? CONFIG.MIN_STAKE);
+  const maxStake = Number(settings.maxStake ?? CONFIG.MAX_STAKE);
+  const defaultStake = Number(settings.defaultStake ?? CONFIG.DEFAULT_STAKE);
+  const winMultiplier = Number(settings.winMultiplier ?? CONFIG.WIN_MULTIPLIER);
+
+  CONFIG.MIN_STAKE = minStake;
+  CONFIG.MAX_STAKE = maxStake;
+  CONFIG.DEFAULT_STAKE = defaultStake;
+  CONFIG.WIN_MULTIPLIER = winMultiplier;
+  CONFIG.STAKE_PRESETS = [10, 50, 100, 250, 500, 1000, 2000, 5000].filter(
+    (value) => value >= minStake && value <= maxStake,
+  );
+  if (CONFIG.STAKE_PRESETS.length === 0) {
+    CONFIG.STAKE_PRESETS = [minStake, maxStake];
+  }
+
+  if (!state.account.synced || state.stakeAmount < minStake || state.stakeAmount > maxStake) {
+    state.stakeAmount = Math.min(Math.max(defaultStake, minStake), maxStake);
+  }
+  updateStakeUI();
 }
 
 /**
@@ -358,24 +407,6 @@ export function setupUIInteractions(chartInstance) {
     });
   }
 
-  if (!PrizeJitoBridge.isActive()) {
-    document.querySelectorAll('.btn-balance-reset-trigger').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        synth.playTap();
-        state.account.balance = CONFIG.BASE_BALANCE;
-        state.tradeHistory = [];
-        updateBalancesUI();
-        await showCustomAlert("BALANCE TOPPED UP", `Your simulated account balance has been reset to ${formatMoney(CONFIG.BASE_BALANCE)}.`);
-      });
-    });
-  } else {
-    document.querySelectorAll('.btn-balance-reset-trigger').forEach(btn => {
-      btn.style.pointerEvents = 'none';
-      btn.style.opacity = '0.72';
-      btn.title = 'PrizeJito wallet balance';
-    });
-  }
-
   // Easter eggs parameters inspection logs
   let clickCount = 0;
   document.querySelectorAll('.btn-logo-easter-trigger').forEach(logoBtn => {
@@ -383,7 +414,7 @@ export function setupUIInteractions(chartInstance) {
       clickCount++;
       synth.playTap();
       if (clickCount >= 3) {
-        await showCustomAlert("ENGINE METRICS", `💎 FX CASINO PREMIUM ENGINE v1.5\n- Trend Force: ${state.marketStructure.trend}\n- Volatility: ${state.marketStructure.volatility.toFixed(6)}\n- Total Play Stake: $${state.stakeAmount.toFixed(2)}`);
+        await showCustomAlert("ENGINE METRICS", `💎 TRADE JITO ENGINE v1.5\n- Trend Force: ${state.marketStructure.trend}\n- Volatility: ${state.marketStructure.volatility.toFixed(6)}\n- Total Play Stake: $${state.stakeAmount.toFixed(2)}`);
         clickCount = 0;
       }
     });

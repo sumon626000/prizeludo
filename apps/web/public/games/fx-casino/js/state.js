@@ -17,7 +17,8 @@ export const state = {
 
   // Wallet holdings
   account: {
-    balance: CONFIG.BASE_BALANCE
+    balance: 0,
+    synced: false,
   },
 
   // Active stake sizing choice

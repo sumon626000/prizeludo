@@ -28,6 +28,7 @@ export const CONFIG = {
 
   // Settlement rules
   TRADE_DURATION_CANDLES: 7, // Trades mature in 7 completed candlesticks
+  WIN_MULTIPLIER: 2,
 
   // Probabilities & Win Bias parameters (aligning with active trend boosts winning probability)
   WIN_BIAS_TREND: 0.70,         // 70% chance of winning when trading in the trend direction

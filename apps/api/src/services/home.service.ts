@@ -285,6 +285,7 @@ export async function getHomeSnapshot(userId?: string) {
         carrom: settingValues["home.game_carrom_visible"] !== "false",
         hockey: settingValues["home.game_hockey_visible"] !== "false",
         pool: settingValues["home.game_pool_visible"] !== "false",
+        tradeJito: settingValues["trade_jito.enabled"] !== "false",
       },
       social: {
         telegram: settingValues["social.telegram_url"],

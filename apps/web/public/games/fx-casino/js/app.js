@@ -14,6 +14,8 @@ import { ForexChart } from './chart.js';
 import {
   updateBalancesUI,
   updateStakeUI,
+  applyPlatformBalance,
+  applyTradeSettings,
   setupTradingRulesModal,
   setupTutorialSystem,
   setupUIInteractions,
@@ -156,8 +158,7 @@ async function handleOpenPosition(type) {
       });
       tradeId = result.tradeId;
       outcome = result.outcome;
-      state.account.balance = Number(result.balance);
-      updateBalancesUI();
+      applyPlatformBalance(Number(result.balance));
     } catch (error) {
       await showCustomAlert(
         "TRADE FAILED",
@@ -216,8 +217,7 @@ async function settleActiveTrade(isWin) {
       const result = await PrizeJitoBridge.settleTrade({
         tradeId: state.activeTrade.tradeId,
       });
-      state.account.balance = Number(result.balance);
-      updateBalancesUI();
+      applyPlatformBalance(Number(result.balance));
       if (result.outcome === 'WIN') synth.playWin();
       else synth.playLoss();
     } catch (error) {
@@ -407,6 +407,28 @@ function runAutostart() {
   if (splashOverlay) splashOverlay.remove();
 }
 
+async function syncPlatformSettings() {
+  if (!PrizeJitoBridge.isActive()) return;
+  try {
+    const settings = await PrizeJitoBridge.syncSettings();
+    if (settings) applyTradeSettings(settings);
+  } catch {
+    // Parent push will retry.
+  }
+}
+
+async function syncPlatformBalance() {
+  if (!PrizeJitoBridge.isActive()) return;
+  try {
+    const balance = await PrizeJitoBridge.syncBalance();
+    if (balance !== null) {
+      applyPlatformBalance(balance);
+    }
+  } catch {
+    // Parent push and auto-sync will retry.
+  }
+}
+
 /**
  * Main modular bootstrap sequence
  */
@@ -414,6 +436,11 @@ async function bootstrap() {
   // Initialize canvas drawings
   chart = new ForexChart('forex-candlestick-canvas');
   chart.handleResize();
+
+  if (!PrizeJitoBridge.isActive()) {
+    state.account.balance = CONFIG.BASE_BALANCE;
+    state.account.synced = true;
+  }
 
   // Draw HUD statistics initially
   updateStakeUI();
@@ -426,15 +453,10 @@ async function bootstrap() {
 
   if (PrizeJitoBridge.isActive()) {
     document.body.classList.add('prizejito-embedded');
-    try {
-      const balance = await PrizeJitoBridge.syncBalance();
-      if (balance !== null) {
-        state.account.balance = balance;
-        updateBalancesUI();
-      }
-    } catch {
-      // Parent bridge will surface auth errors.
-    }
+    PrizeJitoBridge.onBalancePush(applyPlatformBalance);
+    PrizeJitoBridge.onSettingsPush(applyTradeSettings);
+    PrizeJitoBridge.startAutoSync(syncPlatformBalance, 15_000);
+    await Promise.all([syncPlatformSettings(), syncPlatformBalance()]);
   }
 
   // Hook up Buy/Sell primary desk click listeners

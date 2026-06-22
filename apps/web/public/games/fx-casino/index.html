@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FX CASINO - Premium Candlestick Trading Simulator</title>
+    <title>Trade Jito - PrizeJito.com</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,15 +25,11 @@
       <!-- Central Minimalist Claymorphic Card Panel container -->
       <div class="clay-splash-card styled-4" >
         
-        <!-- Interactive FX CASINO Emblem / Logo with floating effect -->
-        <div class="flex-col-center styled-5" >
-          <div class="chrome-logo styled-6" >
-            FX
-          </div>
-          <div class="styled-7">
-            CASINO
-          </div>
-          <p class="font-mono styled-8" >TRADING SIMULATOR</p>
+        <!-- PrizeJito brand emblem -->
+        <div class="flex-col-center styled-5 prizejito-brand prizejito-brand--splash">
+          <span class="prizejito-brand__mark prizejito-brand__mark--splash">PRIZE</span>
+          <span class="prizejito-brand__name prizejito-brand__name--splash">JITO</span>
+          <p class="font-mono styled-8">LIVE TRADING</p>
         </div>
 
         <!-- Progressive Clay-Loading Deck -->
@@ -64,25 +60,27 @@
       
       <!-- Top Header Deck (Mobile Only) -->
       <header class="main-header">
-        <!-- Interactive Chrome Logo FX CASINO -->
-        <div class="btn-logo-easter-trigger styled-15"  title="View trading engine logs">
-          <div class="chrome-logo styled-16" >
-            FX
-          </div>
-          <div class="styled-17">
-            CASINO
-          </div>
+        <div class="btn-logo-easter-trigger styled-15 prizejito-brand" title="View trading engine logs">
+          <span class="prizejito-brand__mark prizejito-brand__mark--header">PRIZE</span>
+          <span class="prizejito-brand__name prizejito-brand__name--header">JITO</span>
         </div>
 
-        <!-- Wallet card frame with real simulation balance -->
-        <div class="leather-card gold-stub-border btn-balance-reset-trigger styled-18"  title="Reset balance to $1,000.00">
-          <div class="flex-col-center styled-19" >
-            <i data-lucide="rotate-ccw"  class="styled-20"></i>
+        <div class="prizejito-balance-box">
+          <div class="prizejito-balance-box__summary">
+            <strong class="prizejito-balance-box__amount stat-balance-val" id="stat-balance-mobile">৳--</strong>
           </div>
-          <div class="styled-21">
-            <div class="styled-22">WALLET BALANCE</div>
-            <div class="font-mono stat-balance-val styled-23" id="stat-balance-mobile" >$1,000.00</div>
-          </div>
+          <a
+            class="prizejito-balance-box__add"
+            href="/wallet?tab=deposit"
+            target="_parent"
+            aria-label="Add balance"
+            title="Add balance"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 12h14"></path>
+              <path d="M12 5v14"></path>
+            </svg>
+          </a>
         </div>
       </header>
 
@@ -94,13 +92,9 @@
           
           <!-- Desktop Only Logo Header to perfectly match reference image structure -->
           <div class="logo-header-desktop">
-            <div class="btn-logo-easter-trigger styled-24"  title="View trading engine logs">
-              <div class="chrome-logo styled-25" >
-                FX
-              </div>
-              <div class="styled-26">
-                CASINO
-              </div>
+            <div class="btn-logo-easter-trigger styled-24 prizejito-brand" title="View trading engine logs">
+              <span class="prizejito-brand__mark prizejito-brand__mark--desktop">PRIZE</span>
+              <span class="prizejito-brand__name prizejito-brand__name--desktop">JITO</span>
             </div>
           </div>
 
@@ -167,14 +161,22 @@
           
           <!-- Desktop Only Wallet Header to perfectly match reference image structure -->
           <div class="balance-header-desktop">
-            <div class="leather-card gold-stub-border btn-balance-reset-trigger styled-39"  title="Reset balance to $1,000.00">
-              <div class="flex-col-center styled-40" >
-                <i data-lucide="rotate-ccw"  class="styled-41"></i>
+            <div class="prizejito-balance-box">
+              <div class="prizejito-balance-box__summary">
+                <strong class="prizejito-balance-box__amount stat-balance-val" id="stat-balance-desktop">৳--</strong>
               </div>
-              <div class="styled-42">
-                <div class="styled-43">WALLET BALANCE</div>
-                <div class="font-mono stat-balance-val styled-44" id="stat-balance-desktop" >$1,000.00</div>
-              </div>
+              <a
+                class="prizejito-balance-box__add"
+                href="/wallet?tab=deposit"
+                target="_parent"
+                aria-label="Add balance"
+                title="Add balance"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M5 12h14"></path>
+                  <path d="M12 5v14"></path>
+                </svg>
+              </a>
             </div>
           </div>
 
@@ -286,9 +288,9 @@
             <div class="styled-55">
               <div class="clay-sphere-bullet-blue styled-56" ></div>
               <div>
-                <span class="styled-57">1. Stake Sizing & Reset</span>
+                <span class="styled-57">1. Stake Sizing</span>
                 <p class="styled-58">
-                  Set amounts with **MIN**, **MAX**, or double-click the steel plate to input custom stakes. Tap the **Wallet Balance** in the header at any time to instantly reset to **$1,000.00**.
+                  Set amounts with **MIN**, **MAX**, or double-click the steel plate to input custom stakes.
                 </p>
               </div>
             </div>
@@ -462,7 +464,7 @@
           <div class="tutorial-step-panel" id="tuto-step-4">
             <h4 class="tutorial-step-heading">You are Ready for Production!</h4>
             <p class="tutorial-step-description">
-              Outstanding work. You've unlocked the core mechanics of FX Casino:
+              Outstanding work. You've unlocked the core mechanics of Trade Jito:
             </p>
             <div class="styled-87">
               <div class="styled-88">

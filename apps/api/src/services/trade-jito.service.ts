@@ -6,13 +6,11 @@ import { transactions, users } from "../db/schema.js";
 import { AppError } from "../lib/errors.js";
 import { toPublicUser } from "../lib/public-user.js";
 import { emitBalanceUpdate } from "./realtime.service.js";
+import {
+  getTradeJitoSettings,
+  type TradeJitoSettings,
+} from "./trade-jito-settings.service.js";
 import { centsToMoney, moneyToCents } from "./wallet.service.js";
-
-const MIN_STAKE_CENTS = 1_000;
-const MAX_STAKE_CENTS = 1_000_000;
-const WIN_BIAS_TREND = 0.7;
-const WIN_BIAS_COUNTER_TREND = 0.3;
-const WIN_BIAS_NORMAL = 0.52;
 
 type TradeDirection = "BUY" | "SELL";
 type MarketTrend = "UPTREND" | "DOWNTREND";
@@ -42,14 +40,36 @@ function totalBalanceCents(user: {
 export function resolveTradeOutcome(
   direction: TradeDirection,
   trend: MarketTrend,
+  settings: Pick<
+    TradeJitoSettings,
+    "winBiasTrend" | "winBiasCounterTrend" | "winBiasNeutral"
+  >,
 ): TradeOutcome {
   const isBuy = direction === "BUY";
-  let winningProb = WIN_BIAS_NORMAL;
-  if (trend === "UPTREND" && isBuy) winningProb = WIN_BIAS_TREND;
-  if (trend === "DOWNTREND" && !isBuy) winningProb = WIN_BIAS_TREND;
-  if (trend === "UPTREND" && !isBuy) winningProb = WIN_BIAS_COUNTER_TREND;
-  if (trend === "DOWNTREND" && isBuy) winningProb = WIN_BIAS_COUNTER_TREND;
+  let winningProb = settings.winBiasNeutral / 100;
+  if (trend === "UPTREND" && isBuy) winningProb = settings.winBiasTrend / 100;
+  if (trend === "DOWNTREND" && !isBuy) {
+    winningProb = settings.winBiasTrend / 100;
+  }
+  if (trend === "UPTREND" && !isBuy) {
+    winningProb = settings.winBiasCounterTrend / 100;
+  }
+  if (trend === "DOWNTREND" && isBuy) {
+    winningProb = settings.winBiasCounterTrend / 100;
+  }
   return Math.random() < winningProb ? "WIN" : "LOSS";
+}
+
+export function calculateWinPayoutCents(
+  stakeCents: number,
+  settings: Pick<TradeJitoSettings, "winMultiplier" | "winCommissionPercent">,
+) {
+  const grossPayoutCents = Math.round(stakeCents * settings.winMultiplier);
+  const profitCents = Math.max(0, grossPayoutCents - stakeCents);
+  const commissionCents = Math.round(
+    profitCents * (settings.winCommissionPercent / 100),
+  );
+  return Math.max(stakeCents, grossPayoutCents - commissionCents);
 }
 
 export function getTradeJitoBalance(user: {
@@ -66,12 +86,23 @@ export async function openTradeJito(input: {
   trend: MarketTrend;
   io?: Server;
 }) {
+  const settings = await getTradeJitoSettings();
+  if (!settings.enabled) {
+    throw new AppError(
+      403,
+      "TRADE_JITO_DISABLED",
+      "Trade Jito is currently unavailable.",
+    );
+  }
+
   const stakeCents = moneyToCents(input.stake);
-  if (stakeCents < MIN_STAKE_CENTS || stakeCents > MAX_STAKE_CENTS) {
+  const minStakeCents = moneyToCents(String(settings.minStake));
+  const maxStakeCents = moneyToCents(String(settings.maxStake));
+  if (stakeCents < minStakeCents || stakeCents > maxStakeCents) {
     throw new AppError(
       400,
       "INVALID_STAKE",
-      "Stake must be between ৳10 and ৳10,000.",
+      `Stake must be between ৳${settings.minStake} and ৳${settings.maxStake}.`,
     );
   }
 
@@ -95,14 +126,12 @@ export async function openTradeJito(input: {
     }
 
     const mainBalanceCents = moneyToCents(user.mainBalance);
-    const winnerBalanceCents = moneyToCents(user.winnerBalance);
     const mainDebitCents = Math.min(mainBalanceCents, stakeCents);
     const winnerDebitCents = stakeCents - mainDebitCents;
     const mainDebit = centsToMoney(mainDebitCents);
     const winnerDebit = centsToMoney(winnerDebitCents);
-    const stake = centsToMoney(stakeCents);
     const tradeId = randomUUID();
-    const outcome = resolveTradeOutcome(input.direction, input.trend);
+    const outcome = resolveTradeOutcome(input.direction, input.trend, settings);
     const now = new Date();
 
     const [updatedUser] = await transaction
@@ -207,6 +236,7 @@ export async function settleTradeJito(input: {
     throw new AppError(409, "TRADE_ALREADY_SETTLED", "Trade already settled.");
   }
 
+  const settings = await getTradeJitoSettings();
   const result = await db.transaction(async (transaction) => {
     const [user] = await transaction
       .select()
@@ -219,8 +249,9 @@ export async function settleTradeJito(input: {
 
     const now = new Date();
     let updatedUser = user;
+    let payoutCents = 0;
     if (pending.outcome === "WIN") {
-      const payoutCents = pending.stakeCents * 2;
+      payoutCents = calculateWinPayoutCents(pending.stakeCents, settings);
       const payout = centsToMoney(payoutCents);
       const [credited] = await transaction
         .update(users)
@@ -245,6 +276,8 @@ export async function settleTradeJito(input: {
           tradeId: pending.id,
           direction: pending.direction,
           phase: "payout",
+          commissionPercent: settings.winCommissionPercent,
+          multiplier: settings.winMultiplier,
         },
       });
     }
@@ -254,10 +287,7 @@ export async function settleTradeJito(input: {
 
     return {
       outcome: pending.outcome,
-      payout:
-        pending.outcome === "WIN"
-          ? centsToMoney(pending.stakeCents * 2)
-          : "0.00",
+      payout: payoutCents > 0 ? centsToMoney(payoutCents) : "0.00",
       balance: getTradeJitoBalance(updatedUser),
       user: updatedUser,
     };

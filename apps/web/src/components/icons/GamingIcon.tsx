@@ -3,7 +3,9 @@ import "./gaming-icons.css";
 
 export type GamingIconName =
   | "ludo-dice"
+  | "ludo-board"
   | "ludo-token"
+  | "trade-chart"
   | "carrom-coin"
   | "carrom-striker"
   | "pool-ball"
@@ -50,6 +52,23 @@ function IconPaths({
           <circle cx="15" cy="15" r="1.15" fill="currentColor" stroke="none" />
         </svg>
       );
+    case "ludo-board":
+      return (
+        <svg viewBox="0 0 24 24" {...props}>
+          <rect x="3.2" y="3.2" width="17.6" height="17.6" rx="2.8" {...stroke} />
+          <path d="M3.2 12h17.6M12 3.2v17.6" stroke="currentColor" strokeWidth="0.8" opacity="0.28" />
+          <path d="M3.2 3.2h6.2v6.2H3.2Z" fill="#f25b55" opacity="0.62" stroke="none" />
+          <path d="M14.6 3.2H20.8v6.2H14.6Z" fill="#5cdb8b" opacity="0.62" stroke="none" />
+          <path d="M14.6 14.6H20.8v6.2H14.6Z" fill="#ffd54a" opacity="0.62" stroke="none" />
+          <path d="M3.2 14.6h6.2v6.2H3.2Z" fill="#5eb8ff" opacity="0.62" stroke="none" />
+          <rect x="9.1" y="9.1" width="5.8" height="5.8" rx="1.1" fill="currentColor" opacity="0.14" stroke="none" />
+          <path d="M12 9.1v5.8M9.1 12h5.8" stroke="currentColor" strokeWidth="0.75" opacity="0.35" />
+          <circle cx="6.3" cy="6.3" r="1.25" fill="#fff8f0" stroke="#f25b55" strokeWidth="0.8" />
+          <circle cx="17.7" cy="17.7" r="1.25" fill="#f0fff4" stroke="#5cdb8b" strokeWidth="0.8" />
+          <circle cx="17.7" cy="6.3" r="1.1" fill="#fffef0" stroke="#ffd54a" strokeWidth="0.75" />
+          <circle cx="6.3" cy="17.7" r="1.1" fill="#f0f8ff" stroke="#5eb8ff" strokeWidth="0.75" />
+        </svg>
+      );
     case "ludo-token":
       return (
         <svg viewBox="0 0 24 24" {...props}>
@@ -58,6 +77,30 @@ function IconPaths({
           <path d="M9.2 8.4 12 5.6l2.8 2.8" {...stroke} />
           <path d="M12 5.6v2.2" {...stroke} />
           <circle cx="12" cy="12.5" r="1.35" fill="currentColor" stroke="none" />
+        </svg>
+      );
+    case "trade-chart":
+      return (
+        <svg viewBox="0 0 24 24" {...props}>
+          <path d="M4 19.5h16" stroke="currentColor" strokeWidth="1.1" opacity="0.35" />
+          <path d="M4 15.5h16M4 11.5h16M4 7.5h16" stroke="currentColor" strokeWidth="0.55" opacity="0.16" />
+          <line x1="6" y1="10.2" x2="6" y2="17.4" stroke="#f25b55" strokeWidth="1" />
+          <rect x="5.1" y="12.4" width="1.8" height="4.2" rx="0.35" fill="#f25b55" />
+          <line x1="9.5" y1="8.4" x2="9.5" y2="16.8" stroke="#5cdb8b" strokeWidth="1" />
+          <rect x="8.6" y="9.8" width="1.8" height="5.6" rx="0.35" fill="#5cdb8b" />
+          <line x1="13" y1="11.2" x2="13" y2="17.8" stroke="#f25b55" strokeWidth="1" />
+          <rect x="12.1" y="13.2" width="1.8" height="3.8" rx="0.35" fill="#f25b55" />
+          <line x1="16.5" y1="6.8" x2="16.5" y2="15.2" stroke="#5cdb8b" strokeWidth="1" />
+          <rect x="15.6" y="7.8" width="1.8" height="6.4" rx="0.35" fill="#5cdb8b" />
+          <path
+            d="M5.6 15.8 9.2 11.6 12.4 13.1 17.8 7.4"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.35"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <circle cx="17.8" cy="7.4" r="1.1" fill="currentColor" stroke="none" />
         </svg>
       );
     case "carrom-coin":
@@ -217,7 +260,9 @@ export function GamingIcon({
 
 export const GAMING_ICON_NAMES = [
   "ludo-dice",
+  "ludo-board",
   "ludo-token",
+  "trade-chart",
   "carrom-coin",
   "carrom-striker",
   "pool-ball",

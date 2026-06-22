@@ -9,6 +9,7 @@ import { GamingIcon } from "../components/icons";
 import { AppInstallButton } from "../components/AppInstallButton";
 import type { HomeSnapshot, LeaderboardPlayer } from "../types";
 
+const LIVE_BOARD_VISIBLE_ROWS = 5;
 const liveModes = ["Time", "Time", "Quick", "Quick", "Classic", "Time", "Speed"];
 const liveSeconds = [16, 16, 4, 32, 50, 1, 40];
 const liveAmounts = [100, 190, 300, 500, 930, 1250, 2160, 2930, 3650, 3800];
@@ -187,6 +188,10 @@ export function HomePage({
         : [],
     [liveTick, snapshot],
   );
+  const liveRowsVisible = useMemo(
+    () => liveRows.slice(0, LIVE_BOARD_VISIBLE_ROWS),
+    [liveRows],
+  );
   const paidToday = liveRows.reduce(
     (total, row) => total + Math.max(0, row.amount),
     0,
@@ -199,6 +204,7 @@ export function HomePage({
     carrom: false,
     hockey: false,
     pool: false,
+    tradeJito: true,
   };
   if (loading && !snapshot) {
     return (
@@ -228,7 +234,7 @@ export function HomePage({
       <section className="home-hero-banner glass">
         <div className="home-hero-banner__mesh" aria-hidden="true" />
         <div className="home-hero-banner__visual" aria-hidden="true">
-          <GamingIcon name="game-controller" size={42} motion="float" />
+          <GamingIcon name="game-controller" size={36} motion="float" />
         </div>
         <div className="home-hero-banner__content">
           <div className="home-hero-banner__topline">
@@ -270,6 +276,7 @@ export function HomePage({
             <ArrowRight size={16} />
           </span>
         </button>
+        {gameVisibility.tradeJito ? (
         <button
           type="button"
           className="home-trade-cta glass"
@@ -283,6 +290,7 @@ export function HomePage({
             <small>{t("tradeJitoDescription")}</small>
           </span>
         </button>
+        ) : null}
         <AppInstallButton className="home-install-cta" />
       </div>
 
@@ -297,39 +305,49 @@ export function HomePage({
           </small>
         </header>
 
-        <button
-          type="button"
-          className="game-category game-category--featured game-category--ludo glass"
-          onClick={onOpenTournaments}
+        <div
+          className={`home-game-featured-grid${
+            gameVisibility.tradeJito ? "" : " home-game-featured-grid--solo"
+          }`}
         >
-          <span className="game-category__icon" aria-hidden="true">
-            <GamingIcon name="ludo-dice" size={28} motion="shine" />
-          </span>
-          <span className="game-category__copy">
-            <strong>Ludo</strong>
-            <small>{i18n.language === "bn" ? "এখন খেলুন" : "Play now"}</small>
-          </span>
-          <em className="game-category__badge">
-            {i18n.language === "bn" ? "লাইভ" : "Live"}
-          </em>
-        </button>
+          <button
+            type="button"
+            className="game-tile game-tile--ludo glass"
+            onClick={onOpenTournaments}
+          >
+            <span className="game-tile__art" aria-hidden="true">
+              <GamingIcon name="ludo-board" size={46} motion="shine" />
+            </span>
+            <span className="game-tile__copy">
+              <strong>Ludo</strong>
+              <small>{i18n.language === "bn" ? "এখন খেলুন" : "Play now"}</small>
+            </span>
+            <em className="game-tile__badge">
+              {i18n.language === "bn" ? "লাইভ" : "Live"}
+            </em>
+          </button>
 
-        <button
-          type="button"
-          className="game-category game-category--featured game-category--fx glass"
-          onClick={onOpenTradeJito}
-        >
-          <span className="game-category__icon" aria-hidden="true">
-            <TrendingUp size={26} strokeWidth={2.2} />
-          </span>
-          <span className="game-category__copy">
-            <strong>{t("tradeJito")}</strong>
-            <small>{i18n.language === "bn" ? "এখন ট্রেড করুন" : "Trade now"}</small>
-          </span>
-          <em className="game-category__badge">
-            {i18n.language === "bn" ? "লাইভ" : "Live"}
-          </em>
-        </button>
+          {gameVisibility.tradeJito ? (
+            <button
+              type="button"
+              className="game-tile game-tile--trade glass"
+              onClick={onOpenTradeJito}
+            >
+              <span className="game-tile__art" aria-hidden="true">
+                <GamingIcon name="trade-chart" size={46} motion="shine" />
+              </span>
+              <span className="game-tile__copy">
+                <strong>{t("tradeJito")}</strong>
+                <small>
+                  {i18n.language === "bn" ? "এখন ট্রেড করুন" : "Trade now"}
+                </small>
+              </span>
+              <em className="game-tile__badge">
+                {i18n.language === "bn" ? "লাইভ" : "Live"}
+              </em>
+            </button>
+          ) : null}
+        </div>
 
         <div className="home-game-categories home-game-categories--soon">
           {gameVisibility.carrom && (
@@ -395,8 +413,7 @@ export function HomePage({
             <span><small>Live Games</small><strong>{liveGames}</strong></span>
           </div>
           <div className="live-win-board__rows" aria-live="polite">
-            <div className="live-win-board__scroller">
-            {liveRows.map((row) => {
+            {liveRowsVisible.map((row) => {
               const positive = row.amount >= 0;
               return (
               <article className={positive ? "win" : "loss"} key={row.id}>
@@ -417,7 +434,6 @@ export function HomePage({
               </article>
               );
             })}
-            </div>
           </div>
         </section>
 

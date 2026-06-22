@@ -11,7 +11,7 @@ const snapshot: HomeSnapshot = {
     logoUrl: "/prizejito-logo.png",
     maxWinAmount: 10_000,
     marqueeSpeedSeconds: 28,
-    games: { carrom: false, hockey: false, pool: false },
+    games: { carrom: false, hockey: false, pool: false, tradeJito: true },
     social: { telegram: "", whatsapp: "", facebook: "" },
   },
   winners: [

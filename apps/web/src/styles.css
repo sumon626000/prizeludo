@@ -3834,24 +3834,24 @@ button.danger {
 
 .home-trade-cta {
   width: 100%;
-  min-height: 54px;
+  min-height: 46px;
   display: grid;
   grid-template-columns: auto 1fr;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
+  gap: 8px;
+  padding: 8px 10px;
   border: 1px solid rgba(164, 255, 94, 0.24);
-  border-radius: 16px;
+  border-radius: 14px;
   background: linear-gradient(160deg, rgba(8, 28, 14, 0.96), rgba(0, 0, 0, 0.98));
   text-align: left;
 }
 
 .home-trade-cta__icon {
-  width: 38px;
-  height: 38px;
+  width: 34px;
+  height: 34px;
   display: grid;
   place-items: center;
-  border-radius: 12px;
+  border-radius: 10px;
   color: #b8ff7a;
   background: rgba(164, 255, 94, 0.12);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
@@ -14141,6 +14141,75 @@ body {
 .game-category--pool { --category-glow: #b78cff; }
 .game-category--fx { --category-glow: #34d399; }
 
+.home-game-featured-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.home-game-featured-grid--solo {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.game-tile {
+  position: relative;
+  min-width: 0;
+  min-height: 108px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 10px;
+  border: 1px solid color-mix(in srgb, var(--theme-accent) 24%, transparent);
+  border-radius: 16px;
+  color: #eafff0;
+  text-align: center;
+  background:
+    radial-gradient(circle at 18% 18%, color-mix(in srgb, var(--theme-accent) 22%, transparent), transparent 52%),
+    linear-gradient(145deg, color-mix(in srgb, var(--theme-card) 92%, black), color-mix(in srgb, var(--theme-background) 96%, black));
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.09), 0 8px 20px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+.game-tile__art {
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--theme-accent) 22%, transparent);
+  background: rgba(2, 20, 10, 0.55);
+}
+
+.game-tile__copy {
+  display: grid;
+  gap: 2px;
+}
+
+.game-tile__copy strong {
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.game-tile__copy small {
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.game-tile__badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--theme-accent) 36%, transparent);
+  background: color-mix(in srgb, var(--theme-accent) 10%, transparent);
+  color: var(--green-bright);
+  font-size: 9px;
+  font-weight: 900;
+  font-style: normal;
+}
+
 .fx-casino-page {
   min-height: 100dvh;
   display: grid;
@@ -14508,14 +14577,14 @@ body {
   }
 
   .live-win-board__rows {
-    max-height: 206px;
+    max-height: none;
+    overflow: visible;
   }
 
   .live-win-board__rows article {
-    grid-template-columns: 9px minmax(58px, 1fr) 42px 28px minmax(58px, auto);
-    min-height: 29px;
+    min-height: 40px !important;
+    padding: 5px 10px !important;
     gap: 5px;
-    padding: 0 9px;
   }
 
   .live-win-board__rows strong,

@@ -415,6 +415,7 @@ export interface HomeSnapshot {
       carrom: boolean;
       hockey: boolean;
       pool: boolean;
+      tradeJito: boolean;
     };
     social: {
       telegram: string;

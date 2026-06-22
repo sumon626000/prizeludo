@@ -5,26 +5,26 @@
    ═══════════════════════════════════════ */
 .app-shell--premium .home-page--premium {
   display: grid !important;
-  grid-template-rows: auto auto auto minmax(220px, 1fr) auto !important;
-  gap: 14px !important;
+  grid-template-rows: auto auto auto auto auto !important;
+  gap: 8px !important;
   min-height: 0 !important;
-  padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px)) !important;
+  padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px)) !important;
   overflow-x: hidden !important;
-  overflow-y: auto !important;
-  scroll-padding-bottom: 12px;
+  overflow-y: visible !important;
+  scroll-padding-bottom: 8px;
 }
 
 .app-shell--premium .home-hero-banner {
   position: relative;
-  min-height: 148px;
-  padding: 16px 16px 16px 18px;
+  min-height: 112px;
+  padding: 12px 12px 12px 14px;
   overflow: hidden;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 76px;
+  grid-template-columns: minmax(0, 1fr) 64px;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   border: 1px solid rgba(164, 255, 94, 0.32) !important;
-  border-radius: 22px !important;
+  border-radius: 18px !important;
   background:
     radial-gradient(circle at 92% 12%, rgba(164, 255, 94, 0.2), transparent 44%),
     radial-gradient(circle at 6% 92%, rgba(255, 213, 74, 0.1), transparent 40%),
@@ -122,7 +122,7 @@
 .app-shell--premium .home-hero-banner__copy h1 {
   margin: 0;
   color: #f4fff7;
-  font-size: clamp(16px, 4.6vw, 20px);
+  font-size: clamp(15px, 4.2vw, 18px);
   font-weight: 900;
   line-height: 1.12;
   letter-spacing: -0.01em;
@@ -139,8 +139,8 @@
 .app-shell--premium .home-hero-banner__logo-wrap {
   position: relative;
   z-index: 1;
-  width: 72px;
-  height: 72px;
+  width: 64px;
+  height: 64px;
   display: grid;
   place-items: center;
 }
@@ -173,8 +173,8 @@
 .app-shell--premium .home-hero-banner__logo {
   position: relative;
   z-index: 1;
-  width: 58px;
-  height: 58px;
+  width: 50px;
+  height: 50px;
   object-fit: cover;
   border-radius: 50%;
   filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.48));
@@ -188,7 +188,7 @@
 .app-shell--premium .home-play-cta {
   position: relative;
   width: 100%;
-  min-height: 54px;
+  min-height: 46px;
   display: grid !important;
   grid-template-columns: auto 1fr auto;
   align-items: center;
@@ -252,7 +252,7 @@
 
 .app-shell--premium .home-game-hub {
   display: grid;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
 }
 
@@ -282,6 +282,128 @@
   font-size: 9px;
   font-weight: 700;
   white-space: nowrap;
+}
+
+.app-shell--premium .home-game-featured-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  min-width: 0;
+}
+
+.app-shell--premium .home-game-featured-grid--solo {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.app-shell--premium .game-tile {
+  position: relative;
+  min-width: 0;
+  min-height: 108px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  padding: 10px 8px 9px;
+  border: 1.5px solid rgba(164, 255, 94, 0.24);
+  border-radius: 18px;
+  color: #eafff2;
+  text-align: center;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(164, 255, 94, 0.2), transparent 54%),
+    radial-gradient(circle at 82% 88%, rgba(255, 213, 74, 0.1), transparent 50%),
+    linear-gradient(160deg, rgba(12, 48, 26, 0.96), rgba(3, 16, 9, 0.98));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 10px 22px rgba(0, 0, 0, 0.24),
+    0 0 18px rgba(164, 255, 94, 0.1);
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease;
+}
+
+.app-shell--premium .game-tile:hover,
+.app-shell--premium .game-tile:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(164, 255, 94, 0.42);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 14px 28px rgba(0, 0, 0, 0.28),
+    0 0 24px rgba(164, 255, 94, 0.16);
+}
+
+.app-shell--premium .game-tile--trade {
+  background:
+    radial-gradient(circle at 18% 12%, rgba(92, 219, 139, 0.18), transparent 54%),
+    radial-gradient(circle at 82% 88%, rgba(52, 211, 153, 0.12), transparent 50%),
+    linear-gradient(160deg, rgba(8, 38, 24, 0.96), rgba(2, 14, 8, 0.98));
+}
+
+.app-shell--premium .game-tile__art {
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  border: 1px solid rgba(164, 255, 94, 0.22);
+  background:
+    radial-gradient(circle at 30% 24%, rgba(196, 255, 148, 0.18), transparent 58%),
+    rgba(2, 20, 10, 0.72);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 8px 18px rgba(0, 0, 0, 0.22);
+}
+
+.app-shell--premium .game-tile--trade .game-tile__art {
+  border-color: rgba(92, 219, 139, 0.28);
+  background:
+    radial-gradient(circle at 30% 24%, rgba(125, 255, 176, 0.16), transparent 58%),
+    rgba(2, 18, 11, 0.74);
+}
+
+.app-shell--premium .game-tile__art .gaming-icon-wrap {
+  filter: drop-shadow(0 0 10px rgba(164, 255, 94, 0.28));
+}
+
+.app-shell--premium .game-tile--trade .game-tile__art .gaming-icon-wrap {
+  filter: drop-shadow(0 0 10px rgba(92, 219, 139, 0.3));
+}
+
+.app-shell--premium .game-tile__copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.app-shell--premium .game-tile__copy strong {
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+  color: #f2fff6;
+}
+
+.app-shell--premium .game-tile__copy small {
+  font-size: 10px;
+  font-weight: 700;
+  color: #9bc8aa;
+}
+
+.app-shell--premium .game-tile__badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(164, 255, 94, 0.42);
+  background: rgba(164, 255, 94, 0.1);
+  color: #c8ffd8;
+  font-size: 9px;
+  font-weight: 900;
+  font-style: normal;
+  letter-spacing: 0.04em;
+  line-height: 1;
 }
 
 .app-shell--premium .game-category--featured {
@@ -451,17 +573,17 @@
 .app-shell--premium .live-win-board {
   min-height: 0;
   display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr);
+  grid-template-rows: auto auto auto;
   padding: 0 !important;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .app-shell--premium .live-win-board__header--premium {
-  min-height: 38px;
+  min-height: 32px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 12px;
+  padding: 0 10px;
   border-bottom: 1px solid rgba(164, 255, 94, 0.14);
   background: rgba(4, 14, 8, 0.72);
 }
@@ -469,9 +591,9 @@
 .app-shell--premium .live-win-board__header--premium > span {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   color: #f4fff7;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 900;
 }
 
@@ -501,15 +623,15 @@
 .app-shell--premium .live-win-board__stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 6px;
-  padding: 8px 10px;
+  gap: 4px;
+  padding: 6px 8px;
   border-bottom: 1px solid rgba(164, 255, 94, 0.08);
 }
 
 .app-shell--premium .live-win-board__stats span {
   text-align: center;
-  padding: 6px 4px;
-  border-radius: 10px;
+  padding: 4px 3px;
+  border-radius: 8px;
   background: rgba(255, 255, 255, 0.03);
 }
 
@@ -521,28 +643,21 @@
 
 .app-shell--premium .live-win-board__stats strong {
   color: var(--ui-neon);
-  font-size: 11px;
+  font-size: 10px;
 }
 
 .app-shell--premium .live-win-board__rows {
   min-height: 0;
-  max-height: 42vh;
-  overflow: hidden;
-}
-
-.app-shell--premium .live-win-board__scroller {
-  max-height: 42vh;
-  overflow-y: auto;
-  scrollbar-width: none;
+  overflow: visible;
 }
 
 .app-shell--premium .live-win-board__rows article {
   display: grid !important;
-  grid-template-columns: 34px minmax(0, 1fr) auto auto !important;
+  grid-template-columns: 28px minmax(0, 1fr) auto auto !important;
   align-items: center;
-  gap: 8px !important;
-  min-height: 52px !important;
-  padding: 8px 12px !important;
+  gap: 6px !important;
+  min-height: 40px !important;
+  padding: 5px 10px !important;
   border-bottom: 1px solid rgba(164, 255, 94, 0.06) !important;
   background: transparent !important;
   border-radius: 0 !important;
@@ -550,15 +665,15 @@
 
 .app-shell--premium .live-win-board__avatar {
   grid-column: 1;
-  width: 34px;
-  height: 34px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   display: grid;
   place-items: center;
   border: 1px solid rgba(164, 255, 94, 0.28);
   background: linear-gradient(145deg, rgba(164, 255, 94, 0.18), rgba(8, 32, 18, 0.9));
   color: var(--ui-neon);
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 900;
 }
 
@@ -578,22 +693,22 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   color: #f4fff7;
-  font-size: 11px;
+  font-size: 10px;
 }
 
 .app-shell--premium .live-win-board__legacy small {
   color: var(--ui-muted);
-  font-size: 9px;
+  font-size: 8px;
 }
 
 .app-shell--premium .live-win-board__rows em {
   grid-column: 3;
-  padding: 3px 7px;
+  padding: 2px 6px;
   border-radius: 999px;
   border: 1px solid rgba(164, 255, 94, 0.16);
   background: rgba(164, 255, 94, 0.06);
   color: #b8e8c8;
-  font-size: 8px;
+  font-size: 7px;
   font-style: normal;
   white-space: nowrap;
 }
@@ -1779,6 +1894,17 @@
     border-radius: 14px !important;
   }
 
+  .app-shell--premium .game-tile {
+    min-height: 124px;
+    padding: 10px 8px;
+  }
+
+  .app-shell--premium .game-tile__art {
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
+  }
+
   .app-shell--premium .game-category--featured {
     min-height: 70px;
     grid-template-columns: 46px minmax(0, 1fr) auto;
@@ -1822,9 +1948,13 @@
     grid-column: 1 / -1;
   }
 
-  .app-shell--premium .game-category--featured {
+  .app-shell--premium .home-game-featured-grid {
     grid-column: 1;
-    min-height: 100%;
+    align-self: stretch;
+  }
+
+  .app-shell--premium .game-tile {
+    min-height: 148px;
   }
 
   .app-shell--premium .home-game-categories--soon {

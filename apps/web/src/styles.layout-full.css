@@ -101,11 +101,13 @@
   overflow: hidden;
 }
 
-.live-win-board__scroller,
 .live-win-board__rows {
-  overflow-x: hidden;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  overflow: visible;
+}
+
+.app-shell--premium .live-win-board.glass,
+.app-shell--premium .leaderboard-section.live-win-board {
+  overflow: visible;
 }
 
 @media (max-width: 520px) {
@@ -117,7 +119,7 @@
 
   .app-shell--premium .live-win-board__rows article,
   .live-win-board__rows article {
-    min-height: 58px !important;
-    padding: 10px 10px !important;
+    min-height: 40px !important;
+    padding: 5px 10px !important;
   }
 }

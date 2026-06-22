@@ -30,6 +30,7 @@ import {
 } from "react";
 import { useAuth } from "../context/AuthContext";
 import { PaymentGatewayAdminSection } from "../components/PaymentGatewayAdminSection";
+import { TradeJitoAdminSection } from "../components/TradeJitoAdminSection";
 import { apiBlob, apiRequest, apiUpload } from "../lib/api";
 import { resolvedAvatar } from "../lib/avatar";
 import {
@@ -1197,6 +1198,7 @@ export function AdminPage() {
                 </span>
               </section>
               <PaymentGatewayAdminSection />
+              <TradeJitoAdminSection />
               <SettingsEditor
                 values={settingsValues}
                 setValues={setSettingsValues}
