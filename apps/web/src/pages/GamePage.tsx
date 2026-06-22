@@ -37,7 +37,7 @@ import { GamingIcon } from "../components/icons";
 import { useAuth } from "../context/AuthContext";
 import { ApiError, apiRequest } from "../lib/api";
 import { getGameSoundEngine } from "../lib/game-sounds";
-import { canLeaveGame } from "../lib/tournament-ui";
+import { canLeaveGame, formatBracketRoundLabel } from "../lib/tournament-ui";
 import { resolvedAvatar } from "../lib/avatar";
 import {
   buildTokenMovementSteps,
@@ -1250,6 +1250,11 @@ export function GamePage() {
     (Number(room.tournament.prizePool) * Number(room.tournament.prizeFirst)) /
     100;
   const gameCompleted = room.state.boardState.phase === "completed";
+  const roundLabel = formatBracketRoundLabel(
+    room.match.round,
+    room.tournament.totalRounds,
+    i18n.language,
+  );
 
   return (
     <main
@@ -1260,6 +1265,10 @@ export function GamePage() {
         <button onClick={() => navigate("/tournaments")} aria-label="Back">
           <ArrowLeft size={17} />
         </button>
+        <span className="game-topbar__title">
+          <small>{room.tournament.gameMode} · {room.tournament.boardType}</small>
+          <strong>{roundLabel}</strong>
+        </span>
         <div className="game-prize-badge glass" title="Tournament first prize">
           <GamingIcon name="trophy" size={18} />
           <span>
@@ -1267,10 +1276,6 @@ export function GamePage() {
             <strong>{prizeMoney(firstPrize)}</strong>
           </span>
         </div>
-        <span>
-          <small>{room.tournament.gameMode} · {room.tournament.boardType}</small>
-          <strong>{room.tournament.title}</strong>
-        </span>
         <div className="game-spectator">
           <Eye size={15} />
           <span>
@@ -1989,7 +1994,7 @@ const PlayerDicePod = memo(function PlayerDicePod({
         >
           <DiceFace value={diceValue} rolling={rolling} />
         </button>
-        {showTurnTimer && (
+        {showTurnTimer ? (
           <div
             className={`game-player-pod__turn-meter ${urgentTimer ? "is-urgent" : ""}`}
             role="timer"
@@ -2002,6 +2007,14 @@ const PlayerDicePod = memo(function PlayerDicePod({
             }
           >
             <span className="game-player-pod__turn-meter-value">{secondsLabel}s</span>
+            <div className="game-player-pod__turn-meter-track">
+              <i />
+              <b aria-hidden="true" />
+            </div>
+          </div>
+        ) : (
+          <div className="game-player-pod__turn-meter is-placeholder" aria-hidden="true">
+            <span className="game-player-pod__turn-meter-value">0s</span>
             <div className="game-player-pod__turn-meter-track">
               <i />
               <b aria-hidden="true" />

@@ -67,3 +67,19 @@ export function canLeaveGame(
   }
   return true;
 }
+
+export function formatBracketRoundLabel(
+  round: number,
+  totalRounds: number,
+  language: string,
+): string {
+  const bn = language === "bn";
+  if (round === totalRounds) return bn ? "ফাইনাল" : "Final";
+  if (round === totalRounds - 1 && totalRounds > 2) {
+    return bn ? "সেমি" : "Semi";
+  }
+  if (round === totalRounds - 2 && totalRounds > 3) {
+    return bn ? "কোয়ার্টার" : "Quarter";
+  }
+  return bn ? `রাউন্ড ${round}` : `Round ${round}`;
+}

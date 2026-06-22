@@ -841,11 +841,17 @@
     min-height: 0;
   }
 
+  .game-player-pod,
+  .app-surface--game .game-player-pod {
+    width: min(100%, 176px) !important;
+    max-width: 176px;
+  }
+
   .game-player-pod__top,
   .app-surface--game .game-player-pod__top {
     grid-area: top;
     display: grid;
-    grid-template-columns: 36px minmax(0, 1fr) 36px;
+    grid-template-columns: 36px minmax(52px, 1fr) 36px;
     align-items: center;
     gap: 6px;
     width: 100%;
@@ -856,18 +862,28 @@
   .app-surface--game .game-player-pod .player-dice {
     order: 3;
     width: 36px !important;
+    min-width: 36px !important;
+    height: 36px !important;
     min-height: 36px !important;
     justify-self: end;
     align-self: center;
     border-radius: 10px !important;
     flex-shrink: 0;
+    display: grid;
+    place-items: center;
   }
 
   .game-player-pod__turn-meter,
   .app-surface--game .game-player-pod__turn-meter {
     order: 2;
-    min-width: 0;
+    min-width: 52px;
     padding: 0 2px;
+  }
+
+  .game-player-pod__turn-meter.is-placeholder,
+  .app-surface--game .game-player-pod__turn-meter.is-placeholder {
+    visibility: hidden;
+    pointer-events: none;
   }
 
   .game-player-pod__turn-meter-track,

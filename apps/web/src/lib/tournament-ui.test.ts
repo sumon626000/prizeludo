@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   canLeaveGame,
   canLeaveTournament,
+  formatBracketRoundLabel,
   sortTournamentsForUser,
 } from "./tournament-ui";
 import type { TournamentSummary } from "../types";
@@ -74,5 +75,12 @@ describe("tournament UI helpers", () => {
     expect(sortTournamentsForUser([other, joined]).map((item) => item.id)).toEqual(
       ["joined", "other"],
     );
+  });
+
+  it("labels bracket rounds for the game header", () => {
+    expect(formatBracketRoundLabel(3, 3, "en")).toBe("Final");
+    expect(formatBracketRoundLabel(2, 3, "en")).toBe("Semi");
+    expect(formatBracketRoundLabel(2, 4, "en")).toBe("Quarter");
+    expect(formatBracketRoundLabel(2, 3, "bn")).toBe("সেমি");
   });
 });
