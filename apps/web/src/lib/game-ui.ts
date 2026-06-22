@@ -4,12 +4,13 @@ export function getPlayerPodSeat(
   playerIndex: number,
   ownPlayerIndex: number,
   boardType: "2p" | "4p",
+  boardSeat?: number,
 ) {
   if (ownPlayerIndex < 0) {
     return boardType === "2p" && playerIndex === 1 ? 2 : playerIndex;
   }
   if (boardType === "2p") return playerIndex === ownPlayerIndex ? 2 : 0;
-  return (2 + playerIndex - ownPlayerIndex + 4) % 4;
+  return boardSeat ?? playerIndex;
 }
 
 export function getOnlyLegalTokenIndex(legalTokenIndexes: number[]) {

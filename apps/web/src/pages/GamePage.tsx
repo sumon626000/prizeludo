@@ -1306,6 +1306,7 @@ export function GamePage() {
             index,
             ownPlayerIndex,
             room.tournament.boardType,
+            boardSeat,
           );
           const active = room.state.currentTurn === player.id;
           const ownDice = player.id === user?.id;
@@ -2161,45 +2162,28 @@ const LudoBoard = memo(function LudoBoard({
     room.settings.tokenSpeed,
   ]);
 
-  const ownPlayerIndex = room.players.findIndex(
-    ({ user: player }) => player.id === userId,
-  );
-  const seatColors = useMemo(() => {
-    const colors = [...COLORS];
-    room.players.forEach(({ user: player }) => {
-      const podSeat = getPlayerPodSeat(
-        room.players.findIndex(({ user }) => user.id === player.id),
-        ownPlayerIndex,
-        room.tournament.boardType,
-      );
-      const colorSeat = getBoardSeatForPlayer(
-        player.id,
-        room.state.boardState.playerOrder,
-        room.tournament.boardType,
-      );
-      colors[podSeat] = COLORS[colorSeat]!;
-    });
-    return colors;
-  }, [
-    ownPlayerIndex,
-    room.players,
-    room.state.boardState.playerOrder,
-    room.tournament.boardType,
-  ]);
   const activeSeats = useMemo(
     () =>
       new Set(
-        room.players.map((_, index) =>
-          getPlayerPodSeat(index, ownPlayerIndex, room.tournament.boardType),
+        room.players.map(({ user: player }) =>
+          getBoardSeatForPlayer(
+            player.id,
+            room.state.boardState.playerOrder,
+            room.tournament.boardType,
+          ),
         ),
       ),
-    [ownPlayerIndex, room.players.length, room.tournament.boardType],
+    [
+      room.players,
+      room.state.boardState.playerOrder,
+      room.tournament.boardType,
+    ],
   );
   const cells = useMemo(() => {
     const trackMap = new Map(TRACK.map(([row, col], index) => [`${row}:${col}`, index]));
     const homeMap = new Map<string, string>();
     HOME_LANES.forEach((lane, seat) =>
-      lane.forEach(([row, col]) => homeMap.set(`${row}:${col}`, seatColors[seat]!)),
+      lane.forEach(([row, col]) => homeMap.set(`${row}:${col}`, COLORS[seat]!)),
     );
     return Array.from({ length: 225 }, (_, index) => {
       const row = Math.floor(index / 15);
@@ -2212,7 +2196,7 @@ const LudoBoard = memo(function LudoBoard({
         className += " path";
         const startSeat = START_CELLS.indexOf(track);
         if (startSeat >= 0) {
-          className += ` start ${seatColors[startSeat]}`;
+          className += ` start ${COLORS[startSeat]}`;
         } else if (room.rules.safeGlobalCells.includes(track)) {
           className += " safe";
         }
@@ -2221,13 +2205,13 @@ const LudoBoard = memo(function LudoBoard({
       } else if (row >= 6 && row <= 8 && col >= 6 && col <= 8) {
         className += " center";
       } else if (row < 6 && col < 6) {
-        className += ` yard ${seatColors[0]} ${activeSeats.has(0) ? "active-yard" : "inactive-yard"}`;
+        className += ` yard ${COLORS[0]} ${activeSeats.has(0) ? "active-yard" : "inactive-yard"}`;
       } else if (row < 6 && col > 8) {
-        className += ` yard ${seatColors[1]} ${activeSeats.has(1) ? "active-yard" : "inactive-yard"}`;
+        className += ` yard ${COLORS[1]} ${activeSeats.has(1) ? "active-yard" : "inactive-yard"}`;
       } else if (row > 8 && col > 8) {
-        className += ` yard ${seatColors[2]} ${activeSeats.has(2) ? "active-yard" : "inactive-yard"}`;
+        className += ` yard ${COLORS[2]} ${activeSeats.has(2) ? "active-yard" : "inactive-yard"}`;
       } else if (row > 8 && col < 6) {
-        className += ` yard ${seatColors[3]} ${activeSeats.has(3) ? "active-yard" : "inactive-yard"}`;
+        className += ` yard ${COLORS[3]} ${activeSeats.has(3) ? "active-yard" : "inactive-yard"}`;
       }
       return (
         <div
@@ -2237,7 +2221,7 @@ const LudoBoard = memo(function LudoBoard({
         />
       );
     });
-  }, [activeSeats, room.rules.safeGlobalCells, seatColors]);
+  }, [activeSeats, room.rules.safeGlobalCells]);
 
   useEffect(() => {
     if (room.state.boardState.phase !== "completed") return;
@@ -2544,7 +2528,7 @@ const LudoBoard = memo(function LudoBoard({
   return (
     <div className="ludo-board" ref={boardRef}>
       {cells}
-      {seatColors.map((color, seat) => (
+      {COLORS.map((color, seat) => (
         <div
           className={`board-yard-shell ${color}`}
           key={`${color}-${seat}`}
@@ -2561,7 +2545,7 @@ const LudoBoard = memo(function LudoBoard({
         className="board-center-home"
         aria-hidden="true"
         style={{
-          background: `conic-gradient(from 45deg, ${BOARD_COLOR_HEX[seatColors[1]!]} 0 25%, ${BOARD_COLOR_HEX[seatColors[2]!]} 0 50%, ${BOARD_COLOR_HEX[seatColors[3]!]} 0 75%, ${BOARD_COLOR_HEX[seatColors[0]!]} 0)`,
+          background: `conic-gradient(from 45deg, ${BOARD_COLOR_HEX[COLORS[1]!]} 0 25%, ${BOARD_COLOR_HEX[COLORS[2]!]} 0 50%, ${BOARD_COLOR_HEX[COLORS[3]!]} 0 75%, ${BOARD_COLOR_HEX[COLORS[0]!]} 0)`,
         }}
       >
         <span>✦</span>

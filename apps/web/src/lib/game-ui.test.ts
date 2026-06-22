@@ -24,9 +24,11 @@ describe("game UI helpers", () => {
     expect(getPlayerPodSeat(1, 1, "2p")).toBe(2);
   });
 
-  it("rotates four-player pods around a bottom-right local seat", () => {
-    expect([0, 1, 2, 3].map((index) => getPlayerPodSeat(index, 1, "4p")))
-      .toEqual([1, 2, 3, 0]);
+  it("keeps four-player pods on matching board seats", () => {
+    expect(getPlayerPodSeat(0, 1, "4p", 0)).toBe(0);
+    expect(getPlayerPodSeat(1, 1, "4p", 1)).toBe(1);
+    expect(getPlayerPodSeat(2, 1, "4p", 2)).toBe(2);
+    expect(getPlayerPodSeat(3, 1, "4p", 3)).toBe(3);
   });
 
   it("auto-selects only an unambiguous legal move", () => {
