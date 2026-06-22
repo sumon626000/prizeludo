@@ -1,0 +1,26 @@
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# Block secrets / source if copied by mistake
+RewriteRule (^|/)\.env($|[./]) - [F,L]
+RewriteRule (^|/)\.git(/|$) - [F,L]
+RewriteRule (^|/)(node_modules|apps|src|docs|scripts|drizzle)(/|$) - [F,L]
+
+# www → non-www
+RewriteCond %{HTTP_HOST} ^www\.prizejito\.com$ [NC]
+RewriteRule ^(.*)$ https://prizejito.com/$1 [L,R=301]
+
+# WebSocket upgrade for Socket.io
+RewriteCond %{HTTP:Upgrade} =websocket [NC]
+RewriteRule ^/socket\.io/(.*)$ ws://127.0.0.1:30047/socket.io/$1 [P,L]
+
+# Proxy API + Socket.io polling to Node (when Apache serves static files)
+RewriteRule ^/api/(.*)$ http://127.0.0.1:30047/api/$1 [P,L]
+RewriteRule ^/socket\.io/(.*)$ http://127.0.0.1:30047/socket.io/$1 [P,L]
+
+# React SPA fallback
+RewriteRule ^index\.html$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.html [L]
+</IfModule>

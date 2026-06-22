@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="260" viewBox="0 0 720 260" role="img" aria-label="Emerald River">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#03251c"/>
+      <stop offset="0.58" stop-color="#08745f"/>
+      <stop offset="1" stop-color="#03251c"/>
+    </linearGradient>
+    <radialGradient id="halo">
+      <stop offset="0" stop-color="#39d4b4" stop-opacity=".52"/>
+      <stop offset="1" stop-color="#39d4b4" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff39a"/>
+      <stop offset=".38" stop-color="#ddff91"/>
+      <stop offset="1" stop-color="#9c5c05"/>
+    </linearGradient>
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#000" flood-opacity=".55"/>
+    </filter>
+  </defs>
+  <rect width="720" height="260" rx="28" fill="url(#bg)"/>
+  <ellipse cx="360" cy="112" rx="245" ry="130" fill="url(#halo)"/>
+  <path d="M0 147 Q110 82 220 151 T445 138 T720 114 V260 H0 Z" fill="#03251c" opacity=".67"/>
+  <path d="M0 202 Q120 154 240 205 T480 190 T720 195 V260 H0 Z" fill="#001b0d" opacity=".62"/>
+  <path d="M50 214 L58 162 L66 214 Z" fill="#03251c" opacity="0.36"/><path d="M192 214 L201.5 131 L211 214 Z" fill="#39d4b4" opacity="0.20"/><path d="M365 214 L373 176 L381 214 Z" fill="#03251c" opacity="0.28"/><path d="M190 214 L207 125 L224 214 Z" fill="#39d4b4" opacity="0.24"/><path d="M504 214 L520 179 L536 214 Z" fill="#03251c" opacity="0.38"/><path d="M425 214 L433 137 L441 214 Z" fill="#39d4b4" opacity="0.18"/><path d="M429 214 L448 129 L467 214 Z" fill="#03251c" opacity="0.40"/><path d="M607 214 L620.5 172 L634 214 Z" fill="#39d4b4" opacity="0.40"/><path d="M4 214 L19 145 L34 214 Z" fill="#03251c" opacity="0.25"/><path d="M247 214 L256.5 136 L266 214 Z" fill="#39d4b4" opacity="0.25"/><path d="M291 214 L301.5 128 L312 214 Z" fill="#03251c" opacity="0.20"/><path d="M242 214 L252 155 L262 214 Z" fill="#39d4b4" opacity="0.35"/><path d="M19 214 L33 166 L47 214 Z" fill="#03251c" opacity="0.28"/><path d="M358 214 L377 168 L396 214 Z" fill="#39d4b4" opacity="0.38"/><path d="M208 214 L221.5 147 L235 214 Z" fill="#03251c" opacity="0.28"/><path d="M545 214 L563 165 L581 214 Z" fill="#39d4b4" opacity="0.16"/><path d="M369 214 L387 153 L405 214 Z" fill="#03251c" opacity="0.32"/><path d="M312 214 L323.5 136 L335 214 Z" fill="#39d4b4" opacity="0.22"/>
+  <circle cx="679" cy="131" r="2.4" fill="#ddff91" opacity="0.38"/><circle cx="484" cy="99" r="1.6" fill="#ddff91" opacity="0.27"/><circle cx="178" cy="30" r="1.8" fill="#ddff91" opacity="0.66"/><circle cx="194" cy="63" r="2.2" fill="#ddff91" opacity="0.51"/><circle cx="594" cy="192" r="1.4" fill="#ddff91" opacity="0.87"/><circle cx="410" cy="104" r="1.3" fill="#ddff91" opacity="0.74"/><circle cx="218" cy="208" r="1.8" fill="#ddff91" opacity="0.57"/><circle cx="92" cy="38" r="1.3" fill="#ddff91" opacity="0.36"/><circle cx="223" cy="158" r="2.4" fill="#ddff91" opacity="0.41"/><circle cx="74" cy="196" r="2.3" fill="#ddff91" opacity="0.43"/><circle cx="315" cy="197" r="1.0" fill="#ddff91" opacity="0.81"/><circle cx="342" cy="118" r="1.5" fill="#ddff91" opacity="0.77"/><circle cx="34" cy="160" r="2.3" fill="#ddff91" opacity="0.28"/><circle cx="263" cy="115" r="0.9" fill="#ddff91" opacity="0.54"/><circle cx="270" cy="125" r="1.9" fill="#ddff91" opacity="0.68"/><circle cx="367" cy="173" r="0.8" fill="#ddff91" opacity="0.63"/><circle cx="233" cy="41" r="2.0" fill="#ddff91" opacity="0.46"/><circle cx="278" cy="200" r="2.8" fill="#ddff91" opacity="0.48"/><circle cx="68" cy="124" r="1.9" fill="#ddff91" opacity="0.63"/><circle cx="249" cy="105" r="2.6" fill="#ddff91" opacity="0.49"/><circle cx="295" cy="128" r="1.5" fill="#ddff91" opacity="0.68"/><circle cx="190" cy="63" r="2.6" fill="#ddff91" opacity="0.89"/>
+  <g transform="translate(288 42)" filter="url(#shadow)">
+    <path d="M21 17 H123 V53 C123 91 102 111 72 116 C42 111 21 91 21 53 Z" fill="url(#gold)" stroke="#fff1a0" stroke-width="3"/>
+    <path d="M21 29 H4 V49 C4 76 21 88 43 88" fill="none" stroke="#ddff91" stroke-width="12" stroke-linecap="round"/>
+    <path d="M123 29 H140 V49 C140 76 123 88 101 88" fill="none" stroke="#ddff91" stroke-width="12" stroke-linecap="round"/>
+    <path d="M64 114 H80 V139 H111 V154 H33 V139 H64 Z" fill="url(#gold)"/>
+    <path d="M72 43 L81 61 L101 64 L86 78 L90 98 L72 88 L54 98 L58 78 L43 64 L63 61 Z" fill="#08745f" stroke="#f4ffb0" stroke-width="2"/>
+  </g>
+  <g opacity=".76">
+    <path d="M45 232 C94 182 139 182 191 229 C143 218 98 219 45 232 Z" fill="#39d4b4"/>
+    <path d="M675 232 C626 182 581 182 529 229 C577 218 622 219 675 232 Z" fill="#39d4b4"/>
+  </g>
+  <rect x="20" y="18" width="680" height="224" rx="24" fill="none" stroke="#39d4b4" stroke-opacity=".35" stroke-width="2"/>
+  <text x="676" y="224" text-anchor="end" fill="#fff" opacity=".45" font-family="Arial, sans-serif" font-size="18" font-weight="700">10</text>
+</svg>
