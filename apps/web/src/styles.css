@@ -4209,31 +4209,23 @@ button.danger {
 
 .game-player-pod__top {
   display: grid;
-  grid-template-columns: 48px minmax(0, 1fr) 46px;
+  grid-template-columns: 46px minmax(0, 1fr) 48px;
   align-items: center;
   gap: 8px;
   min-width: 0;
 }
 
-.game-player-pod.seat-1 .game-player-pod__top,
-.game-player-pod.seat-2 .game-player-pod__top {
-  grid-template-columns: 46px minmax(0, 1fr) 48px;
-}
-
-.game-player-pod.seat-1 .player-dice,
-.game-player-pod.seat-2 .player-dice {
+.game-player-pod .player-dice {
   order: 3;
   justify-self: end;
 }
 
-.game-player-pod.seat-1 .game-player-pod__avatar,
-.game-player-pod.seat-2 .game-player-pod__avatar {
+.game-player-pod__avatar {
   order: 1;
   justify-self: start;
 }
 
-.game-player-pod.seat-1 .game-player-pod__turn-meter,
-.game-player-pod.seat-2 .game-player-pod__turn-meter {
+.game-player-pod__turn-meter {
   order: 2;
 }
 

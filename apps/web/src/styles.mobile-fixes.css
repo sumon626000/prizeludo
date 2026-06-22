@@ -852,37 +852,20 @@
     min-width: 0;
   }
 
-  .app-surface--game .game-player-pod.seat-1 .game-player-pod__top,
-  .app-surface--game .game-player-pod.seat-2 .game-player-pod__top,
-  .game-player-pod.seat-1 .game-player-pod__top,
-  .game-player-pod.seat-2 .game-player-pod__top {
-    grid-template-columns: 36px minmax(0, 1fr) 36px;
-  }
-
-  .app-surface--game .game-player-pod.seat-1,
-  .app-surface--game .game-player-pod.seat-2,
-  .game-player-pod.seat-1,
-  .game-player-pod.seat-2 {
-    justify-self: stretch;
-  }
-
   .game-player-pod .player-dice,
   .app-surface--game .game-player-pod .player-dice {
+    order: 3;
     width: 36px !important;
     min-height: 36px !important;
-    justify-self: start;
+    justify-self: end;
     align-self: center;
     border-radius: 10px !important;
     flex-shrink: 0;
   }
 
-  .game-player-pod.seat-1 .player-dice,
-  .game-player-pod.seat-2 .player-dice {
-    justify-self: end;
-  }
-
   .game-player-pod__turn-meter,
   .app-surface--game .game-player-pod__turn-meter {
+    order: 2;
     min-width: 0;
     padding: 0 2px;
   }
@@ -904,17 +887,13 @@
 
   .game-player-pod__avatar,
   .app-surface--game .game-player-pod__avatar {
+    order: 1;
     width: 36px !important;
     height: 36px !important;
-    justify-self: end;
+    justify-self: start;
     align-self: center;
     border-width: 2px;
     flex-shrink: 0;
-  }
-
-  .game-player-pod.seat-1 .game-player-pod__avatar,
-  .game-player-pod.seat-2 .game-player-pod__avatar {
-    justify-self: start;
   }
 
   .game-player-pod__identity,
