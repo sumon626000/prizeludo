@@ -158,6 +158,16 @@ function visualSeat(index: number, boardType: "2p" | "4p") {
   return boardType === "2p" && index === 1 ? 2 : index;
 }
 
+function getBoardSeatForPlayer(
+  playerId: string,
+  playerOrder: string[],
+  boardType: "2p" | "4p",
+) {
+  const orderIndex = playerOrder.indexOf(playerId);
+  if (orderIndex < 0) return 0;
+  return visualSeat(orderIndex, boardType);
+}
+
 function prizeMoney(value: number) {
   return `৳${value.toLocaleString("en-BD", { maximumFractionDigits: 2 })}`;
 }
@@ -1287,7 +1297,11 @@ export function GamePage() {
         className={`game-arena game-arena--${room.tournament.boardType}${simpleGameplay ? " game-simple-mode" : ""}`}
       >
         {room.players.map(({ participant, user: player }, index) => {
-          const boardSeat = visualSeat(index, room.tournament.boardType);
+          const boardSeat = getBoardSeatForPlayer(
+            player.id,
+            room.state.boardState.playerOrder,
+            room.tournament.boardType,
+          );
           const seat = getPlayerPodSeat(
             index,
             ownPlayerIndex,
@@ -2152,16 +2166,26 @@ const LudoBoard = memo(function LudoBoard({
   );
   const seatColors = useMemo(() => {
     const colors = [...COLORS];
-    room.players.forEach((_, index) => {
-      const boardSeat = getPlayerPodSeat(
-        index,
+    room.players.forEach(({ user: player }) => {
+      const podSeat = getPlayerPodSeat(
+        room.players.findIndex(({ user }) => user.id === player.id),
         ownPlayerIndex,
         room.tournament.boardType,
       );
-      colors[boardSeat] = COLORS[visualSeat(index, room.tournament.boardType)]!;
+      const colorSeat = getBoardSeatForPlayer(
+        player.id,
+        room.state.boardState.playerOrder,
+        room.tournament.boardType,
+      );
+      colors[podSeat] = COLORS[colorSeat]!;
     });
     return colors;
-  }, [ownPlayerIndex, room.players.length, room.tournament.boardType]);
+  }, [
+    ownPlayerIndex,
+    room.players,
+    room.state.boardState.playerOrder,
+    room.tournament.boardType,
+  ]);
   const activeSeats = useMemo(
     () =>
       new Set(
@@ -2467,11 +2491,11 @@ const LudoBoard = memo(function LudoBoard({
   ]);
 
   const renderedTokens = useMemo(() => {
-    const tokens = room.players.flatMap(({ user: player }, playerIndex) => {
-      const colorSeat = visualSeat(playerIndex, room.tournament.boardType);
-      const seat = getPlayerPodSeat(
-        playerIndex,
-        ownPlayerIndex,
+    const playerOrder = room.state.boardState.playerOrder;
+    const tokens = room.players.flatMap(({ user: player }) => {
+      const colorSeat = getBoardSeatForPlayer(
+        player.id,
+        playerOrder,
         room.tournament.boardType,
       );
       return (displayPositions[player.id] ?? []).map((position, tokenIndex) => {
@@ -2510,10 +2534,10 @@ const LudoBoard = memo(function LudoBoard({
     });
   }, [
     displayPositions,
-    ownPlayerIndex,
     room.players,
     room.rules.finishPosition,
     room.rules.homeLaneStart,
+    room.state.boardState.playerOrder,
     room.tournament.boardType,
   ]);
 

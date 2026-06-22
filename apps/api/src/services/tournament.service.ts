@@ -2656,7 +2656,8 @@ export async function connectToMatch(matchId: string, userId: string) {
           eq(matchPlayers.matchId, matchId),
           eq(matchPlayers.isEliminated, false),
         ),
-      );
+      )
+      .orderBy(asc(matchPlayers.seat));
     const allConnected = players.every(
       (player) => player.userId === userId || player.connectedAt,
     );

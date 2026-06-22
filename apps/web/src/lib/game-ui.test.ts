@@ -44,7 +44,7 @@ describe("game UI helpers", () => {
   it("reads dice from active roll, diceValue, or last roll action", () => {
     const board = {
       roll: { dice: 5, legalTokenIndexes: [0] },
-      lastAction: { type: "roll", userId: "opp", dice: 5, at: "" },
+      lastAction: { type: "roll", userId: "opp", dice: 5 },
     };
     expect(getAuthoritativeDiceForPlayer(board, "opp", "opp", 5)).toBe(5);
     expect(
@@ -59,7 +59,7 @@ describe("game UI helpers", () => {
       getAuthoritativeDiceForPlayer(
         {
           roll: null,
-          lastAction: { type: "move", userId: "opp", at: "" },
+          lastAction: { type: "move", userId: "opp" },
         },
         "opp",
         "opp",
