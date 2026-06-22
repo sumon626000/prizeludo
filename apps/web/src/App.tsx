@@ -28,6 +28,11 @@ const HomePage = lazy(() =>
 const GamePage = lazy(() =>
   import("./pages/GamePage").then((module) => ({ default: module.GamePage })),
 );
+const FxCasinoPage = lazy(() =>
+  import("./pages/FxCasinoPage").then((module) => ({
+    default: module.FxCasinoPage,
+  })),
+);
 const LegalPage = lazy(() =>
   import("./pages/LegalPage").then((module) => ({ default: module.LegalPage })),
 );
@@ -78,7 +83,10 @@ export default function App() {
   const { loading, user, refresh: refreshAuth } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const gameMode = location.pathname.startsWith("/game/");
+  const immersiveMode =
+    location.pathname.startsWith("/game/") ||
+    location.pathname.startsWith("/games/");
+  const gameMode = immersiveMode;
   const adminMode = location.pathname.startsWith("/admin");
   const tournamentMode = location.pathname.startsWith("/tournaments");
   const homeFeed = useHomeFeed(Boolean(user));
@@ -204,6 +212,7 @@ export default function App() {
                 loading={homeFeed.loading}
                 error={homeFeed.error}
                 onOpenTournaments={() => navigate("/tournaments")}
+                onOpenFxCasino={() => navigate("/games/fx-casino")}
                 onRefresh={homeFeed.refresh}
               />
             }
@@ -221,6 +230,7 @@ export default function App() {
             }
           />
           <Route path="/game/:matchId" element={<GamePage />} />
+          <Route path="/games/fx-casino" element={<FxCasinoPage />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route
             path="/leaders"

@@ -14087,6 +14087,49 @@ body {
 .game-category--carrom { --category-glow: #ffb84d; }
 .game-category--hockey { --category-glow: #72d8ff; }
 .game-category--pool { --category-glow: #b78cff; }
+.game-category--fx { --category-glow: #34d399; }
+
+.fx-casino-page {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  background: #020a06;
+}
+
+.fx-casino-page__bar {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(164, 255, 94, 0.16);
+}
+
+.fx-casino-page__back {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(164, 255, 94, 0.24);
+  border-radius: 10px;
+  color: #d8ffe6;
+  background: rgba(164, 255, 94, 0.08);
+}
+
+.fx-casino-page__title {
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #efffef;
+}
+
+.fx-casino-page__frame {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  border: 0;
+  background: #0d1117;
+}
 
 .game-category:hover,
 .game-category:focus-visible {

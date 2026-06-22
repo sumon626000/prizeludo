@@ -153,12 +153,14 @@ export function HomePage({
   loading,
   error,
   onOpenTournaments,
+  onOpenFxCasino,
   onRefresh,
 }: {
   snapshot: HomeSnapshot | null;
   loading: boolean;
   error: string;
   onOpenTournaments: () => void;
+  onOpenFxCasino: () => void;
   onRefresh: () => Promise<void>;
 }) {
   const { i18n, t } = useTranslation();
@@ -293,6 +295,23 @@ export function HomePage({
           <span className="game-category__copy">
             <strong>Ludo</strong>
             <small>{i18n.language === "bn" ? "এখন খেলুন" : "Play now"}</small>
+          </span>
+          <em className="game-category__badge">
+            {i18n.language === "bn" ? "লাইভ" : "Live"}
+          </em>
+        </button>
+
+        <button
+          type="button"
+          className="game-category game-category--featured game-category--fx glass"
+          onClick={onOpenFxCasino}
+        >
+          <span className="game-category__icon" aria-hidden="true">
+            <TrendingUp size={26} strokeWidth={2.2} />
+          </span>
+          <span className="game-category__copy">
+            <strong>FX Casino</strong>
+            <small>{i18n.language === "bn" ? "ট্রেডিং সিমুলেটর" : "Trading simulator"}</small>
           </span>
           <em className="game-category__badge">
             {i18n.language === "bn" ? "লাইভ" : "Live"}

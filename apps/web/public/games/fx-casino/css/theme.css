@@ -1,0 +1,69 @@
+/* FX CASINO - Dynamic Reskinning Theme Variable Sheet */
+
+:root {
+  /* Typography */
+  --font-display: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-sans: 'Outfit', sans-serif;
+
+  /* Base Color Palette */
+  --color-bg-body: #04060b;
+  --color-bg-canvas: #0d1017;
+  --color-bg-panel: rgba(16, 20, 30, 0.98);
+  --color-bg-inner-dark: #04060a;
+  --color-border-dark: #141b26;
+
+  /* Bull and Bear Candlesticks / Indicators */
+  --color-bull-solid: #24b245;
+  --color-bull-glow: #34d399;
+  --color-bull-border: #177a2d;
+  --color-bull-light: rgba(16, 185, 129, 0.2);
+  --color-bear-solid: #cf2e2e;
+  --color-bear-glow: #f87171;
+  --color-bear-border: #911d1d;
+  --color-bear-light: rgba(239, 68, 68, 0.2);
+
+  /* Premium Gold Finishes */
+  --color-gold-light: #fef08a;
+  --color-gold-mid: #ecd084;
+  --color-gold-brushed: #ab8637;
+  --color-gold-dark: #6a4f15;
+  --border-gold-stitch: rgba(236, 208, 132, 0.48);
+
+  /* Metallic Gradients (Chrome Bevels, Steel Plates) */
+  --gradient-chrome-bevel: linear-gradient(135deg, 
+    #7a8a9e 0%, 
+    #404d5e 12%, 
+    #8fa3ba 25%, 
+    #242b36 45%, 
+    #abbfd6 68%, 
+    #1f242e 85%, 
+    #63748a 100%
+  );
+  --gradient-steel-plate: linear-gradient(180deg, 
+    #f2f5f8 0%, 
+    #cbd5e0 15%, 
+    #adb7c4 48%, 
+    #7f8b9b 100%
+  );
+  --gradient-gold-belt: linear-gradient(180deg, 
+    #ecd084 0%, 
+    #b89146 30%, 
+    #8c6729 70%, 
+    #ecd084 100%
+  );
+  --gradient-leather-wallet: linear-gradient(180deg, 
+    #1d1b18 0%, 
+    #0c0b0a 100%
+  );
+
+  /* Button Actions */
+  --gradient-button-buy: linear-gradient(180deg, #3cd261 0%, #168a35 48%, #0d5920 100%);
+  --gradient-button-sell: linear-gradient(180deg, #e13c3c 0%, #a21c1c 48%, #590d0d 100%);
+  --gradient-button-modal: radial-gradient(circle at 45% 30%, #ffd066 0%, #ab802d 60%, #684a0d 100%);
+
+  /* Utility HUD Colors */
+  --color-text-meta: #8e99a8;
+  --color-text-dim: #64748b;
+  --color-text-high: #f1f5f9;
+}

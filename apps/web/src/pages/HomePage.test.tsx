@@ -46,6 +46,7 @@ describe("HomePage", () => {
           loading={false}
           error=""
           onOpenTournaments={onOpenTournaments}
+          onOpenFxCasino={vi.fn()}
           onRefresh={vi.fn()}
         />
       </MemoryRouter>,

@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FX CASINO - Premium Candlestick Trading Simulator</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght=500;700&family=JetBrains+Mono:wght=400;700&family=Outfit:wght=400;600;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="js/vendor/lucide.min.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+  </head>
+  <body>
+
+    <!-- Beautiful Modern Minimalist Claymorphism Style Splash Screen Overlay -->
+    <div id="clay-splash-screen" class="clay-splash-overlay styled-1" >
+      
+      <!-- Ambient backing decorative spheres showing claymorphism in action -->
+      <div class="clay-splash-sphere-lg styled-2" ></div>
+      <div class="clay-splash-sphere-sm styled-3" ></div>
+      
+      <!-- Central Minimalist Claymorphic Card Panel container -->
+      <div class="clay-splash-card styled-4" >
+        
+        <!-- Interactive FX CASINO Emblem / Logo with floating effect -->
+        <div class="flex-col-center styled-5" >
+          <div class="chrome-logo styled-6" >
+            FX
+          </div>
+          <div class="styled-7">
+            CASINO
+          </div>
+          <p class="font-mono styled-8" >TRADING SIMULATOR</p>
+        </div>
+
+        <!-- Progressive Clay-Loading Deck -->
+        <div id="clay-splash-loader-group" class="flex-col-center styled-9" >
+          <!-- Digital LCD Percent Count -->
+          <div class="font-mono text-center styled-10"  id="clay-splash-percent">0%</div>
+          
+          <!-- Outer squishy pill slider -->
+          <div class="clay-splash-progress-track styled-11" >
+            <div id="clay-splash-fill" class="clay-splash-progress-fill styled-12" ></div>
+          </div>
+          
+          <span class="font-mono styled-13" >BOOTSTRAPPING SIMULATOR</span>
+        </div>
+
+        <!-- Final CTA Claymorphic Action Button (Discovered post-load) -->
+        <button id="btn-clay-splash-enter" class="clay-splash-btn styled-14" >
+          <!-- Reflection high gloss glare overlay -->
+          <span class="glass-reflection-glare"></span>
+          <span>BEGIN MASTERCLASS</span>
+        </button>
+
+      </div>
+    </div>
+
+    <!-- Primary Layout Container (Centering beautifully tailored mobile layout, expanding into dual-column desktop) -->
+    <div class="app-container">
+      
+      <!-- Top Header Deck (Mobile Only) -->
+      <header class="main-header">
+        <!-- Interactive Chrome Logo FX CASINO -->
+        <div class="btn-logo-easter-trigger styled-15"  title="View trading engine logs">
+          <div class="chrome-logo styled-16" >
+            FX
+          </div>
+          <div class="styled-17">
+            CASINO
+          </div>
+        </div>
+
+        <!-- Wallet card frame with real simulation balance -->
+        <div class="leather-card gold-stub-border btn-balance-reset-trigger styled-18"  title="Reset balance to $1,000.00">
+          <div class="flex-col-center styled-19" >
+            <i data-lucide="rotate-ccw"  class="styled-20"></i>
+          </div>
+          <div class="styled-21">
+            <div class="styled-22">WALLET BALANCE</div>
+            <div class="font-mono stat-balance-val styled-23" id="stat-balance-mobile" >$1,000.00</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Side-by-side Workspace (Stacked on mobile, Split dual-column on Desktop) -->
+      <main class="workspace">
+
+        <!-- Chart Column (Left Column) -->
+        <div class="chart-column">
+          
+          <!-- Desktop Only Logo Header to perfectly match reference image structure -->
+          <div class="logo-header-desktop">
+            <div class="btn-logo-easter-trigger styled-24"  title="View trading engine logs">
+              <div class="chrome-logo styled-25" >
+                FX
+              </div>
+              <div class="styled-26">
+                CASINO
+              </div>
+            </div>
+          </div>
+
+          <!-- Chart Double-Bevel Chrome Card -->
+          <div class="chrome-plate-outer-bevel">
+            <div class="chrome-inner-dark">
+              <section class="main-screen-panel">
+                
+                <!-- Header status bar inside Chart -->
+                <div class="chart-header-row">
+                  <div class="chart-header-left">
+                    <div class="styled-27">
+                      <div class="asset-badge">
+                        <span id="active-symbol-title">EUR/USD</span>
+                      </div>
+                      <div class="asset-rates-subheader">
+                        <span id="live-price-header" class="live-price-header-val text-emerald-400 styled-28" >1.09645</span>
+                        <span id="pct-change-header" class="pct-change-header-val text-emerald-400 styled-29" >(+0.12%)</span>
+                      </div>
+                    </div>
+
+                    <!-- Live Position Status Widget (Moved next to currency pair display, showing only P&L) -->
+                    <div id="active-position-widget"  class="active-position-indicator styled-30">
+                      <span class="pnl-label-compact">P&L:</span>
+                      <span id="widget-profit" class="pnl-val-compact text-up" >+$0.00</span>
+                      <!-- Keep hidden elements to prevent JavaScript errors -->
+                      <span id="widget-type-badge"  style="display: none;"></span>
+                      <div id="widget-meta"  style="display: none;"></div>
+                    </div>
+                  </div>
+
+                  <div class="chart-header-right">
+                    <!-- Masterclass Button (Reopens interactive tutorial) -->
+                    <button class="btn-rules-util styled-34" id="btn-open-tutorial" title="Launch masterclass tutorial" >
+                      <i data-lucide="graduation-cap"  class="styled-35"></i>
+                      <span class="tracking-wider uppercase text-[9px] font-sans">TUTORIAL</span>
+                    </button>
+
+                    <!-- Interactive Trading Rules Button -->
+                    <button class="btn-rules-util" id="btn-open-rules" title="How to play / Trading rules">
+                      <i data-lucide="book-open"  class="styled-36"></i>
+                      <span class="tracking-wider uppercase text-[9px] font-sans">RULES</span>
+                    </button>
+
+                    <div id="glow-indicator"  class="styled-37"></div>
+                    <!-- Volume speaker Mute system button -->
+                    <button class="btn-sound-util" id="btn-toggle-sound" title="Toggle audio feedback">
+                      <i data-lucide="volume-2" id="sound-icon-meta"  class="styled-38"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Canvas Frame Area -->
+                <div class="chart-body">
+                  <canvas id="forex-candlestick-canvas" class="chart-canvas"></canvas>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+
+        <!-- Controls Column (Right Column) -->
+        <div class="controls-column">
+          
+          <!-- Desktop Only Wallet Header to perfectly match reference image structure -->
+          <div class="balance-header-desktop">
+            <div class="leather-card gold-stub-border btn-balance-reset-trigger styled-39"  title="Reset balance to $1,000.00">
+              <div class="flex-col-center styled-40" >
+                <i data-lucide="rotate-ccw"  class="styled-41"></i>
+              </div>
+              <div class="styled-42">
+                <div class="styled-43">WALLET BALANCE</div>
+                <div class="font-mono stat-balance-val styled-44" id="stat-balance-desktop" >$1,000.00</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Controls Double-Bevel Chrome Card -->
+          <div class="chrome-plate-outer-bevel styled-45" >
+            <div class="chrome-inner-dark">
+              <section class="main-screen-panel">
+                <div class="order-panel">
+                  
+                  <div class="order-panel-title">Order Entry</div>
+
+                  <!-- Stake Title -->
+                  <div class="styled-46">
+                    <div class="stake-label">Stake Amount</div>
+                    
+                    <!-- Premium Gold-Border slider belt -->
+                    <div class="gold-belt-bezel">
+                      
+                      <!-- MIN Button -->
+                      <button id="btn-amount-min" class="gold-ring-button">
+                        <div class="gold-ring-button-inner">
+                          <span class="styled-47">MIN</span>
+                        </div>
+                      </button>
+
+                      <!-- Steel plate display for active stake -->
+                      <div id="btn-steel-interactive" class="steel-plate" title="Double click to edit stake">
+                        <span id="amount-text-stake">$100.00</span>
+                      </div>
+
+                      <!-- MAX Button -->
+                      <button id="btn-amount-max" class="gold-ring-button">
+                        <div class="gold-ring-button-inner">
+                          <span class="styled-48">MAX</span>
+                        </div>
+                      </button>
+
+                    </div>
+                  </div>
+
+                  <!-- BUY / SELL Glowing 3D Glass Actions -->
+                  <div class="actions-buttons-grid">
+                    
+                    <!-- BUY Button Outer Gold Ring Bevel -->
+                    <div class="buy-btn-bevel-ring">
+                      <div class="buy-btn-border-fill">
+                        <button id="btn-action-buy" class="buy-btn-3d">
+                          <!-- Reflection High gloss glare glass overlay -->
+                          <div class="glass-reflection-glare"></div>
+                          <span class="button-title-text">BUY</span>
+                          <!-- Dynamic live buying fee tag -->
+                          <span class="button-rate-display" id="active-buy-tag">1.09648</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- SELL Button Outer Gold Ring Bevel -->
+                    <div class="sell-btn-bevel-ring">
+                      <div class="sell-btn-border-fill">
+                        <button id="btn-action-sell" class="sell-btn-3d">
+                          <!-- Reflection High gloss glare glass overlay -->
+                          <div class="glass-reflection-glare"></div>
+                          <span class="button-title-text">SELL</span>
+                          <!-- Dynamic live selling fee tag -->
+                          <span class="button-rate-display" id="active-sell-tag">1.09642</span>
+                        </button>
+                      </div>
+                    </div>
+
+                  </div>
+
+                  <!-- Decorative multi-point star sparkle watermark centered in remaining space on Desktop -->
+                  <div class="watermark-container">
+                    <i data-lucide="sparkle"  class="styled-49"></i>
+                    <span class="caption">99.8% FIDELITY ENGINE</span>
+                  </div>
+
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+
+    <!-- Modern claymorphism style Trading Rules Modal -->
+    <div id="clay-rules-modal" class="custom-modal-overlay">
+      <!-- Modal Inner Container Card -->
+      <div class="custom-modal-card styled-50" >
+        <!-- Header Row -->
+        <div class="custom-modal-header border-bottom">
+          <div class="clay-sphere-bullet"></div>
+          <h3 class="custom-modal-title">TRADING RULES</h3>
+        </div>
+
+        <!-- Rules Content (Scrollable but hides scrollbar beautifully) -->
+        <div class="rules-body-scrollable">
+          
+          <div class="styled-51">
+            <p class="styled-52">Simulator Objective</p>
+            <p class="styled-53">
+              Forecast high-frequency directional shifts of the **EUR/USD** currency pair. Back your predictions with live stakes to double your holdings or trade conservatively.
+            </p>
+          </div>
+
+          <div class="styled-54">
+            
+            <div class="styled-55">
+              <div class="clay-sphere-bullet-blue styled-56" ></div>
+              <div>
+                <span class="styled-57">1. Stake Sizing & Reset</span>
+                <p class="styled-58">
+                  Set amounts with **MIN**, **MAX**, or double-click the steel plate to input custom stakes. Tap the **Wallet Balance** in the header at any time to instantly reset to **$1,000.00**.
+                </p>
+              </div>
+            </div>
+
+            <div class="styled-59">
+              <div class="clay-sphere-bullet-blue styled-60" ></div>
+              <div>
+                <span class="styled-61">2. Dynamic Order Execution</span>
+                <p class="styled-62">
+                  Execute **BUY** if you anticipate price rising, or **SELL** if you expect a downward drop. Only one live position can be held at any single time.
+                </p>
+              </div>
+            </div>
+
+            <div class="styled-63">
+              <div class="clay-sphere-bullet-green styled-64" ></div>
+              <div>
+                <span class="styled-65">3. Trend Multiplier (Secret Tip!)</span>
+                <p class="styled-66">
+                  The market shifts dynamically between **UPTREND** and **DOWNTREND**. Aligning your order with the active trend raises your winning probability to **70%**! Trading counter-trend heavily reduces success rate.
+                </p>
+              </div>
+            </div>
+
+            <div class="styled-67">
+              <div class="clay-sphere-bullet-blue styled-68" ></div>
+              <div>
+                <span class="styled-69">4. Expiration & Maturity</span>
+                <p class="styled-70">
+                  Trades mature and settle automatically over **7 completed candlesticks**. Watch real-time profit/loss metrics update on the live widget next to the currency pair name.
+                </p>
+              </div>
+            </div>
+
+            <div class="styled-71">
+              <div class="clay-sphere-bullet-blue styled-72" ></div>
+              <div>
+                <span class="styled-73">5. Simulated Returns</span>
+                <p class="styled-74">
+                  Successful predictions payout **double your stake amount (+100% Net Profit)** directly to simulated wallet holdings. Incorrect trades result in loss of stake.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Got it Button -->
+        <button id="btn-close-rules-gotit" class="modal-btn-confirm styled-75" >
+          UNDERSTOOD
+        </button>
+      </div>
+    </div>
+
+    <!-- Asynchronous custom alert modal overlay -->
+    <div id="custom-alert-modal" class="custom-modal-overlay">
+      <div class="custom-modal-card">
+        <div class="custom-modal-header border-bottom">
+          <div class="clay-sphere-bullet-blue"></div>
+          <h4 class="custom-modal-title" id="custom-alert-title">NOTIFICATION</h4>
+        </div>
+        <div class="custom-modal-body">
+          <p id="custom-alert-message"  class="styled-76"></p>
+        </div>
+        <button id="custom-alert-btn-ok" class="modal-btn-confirm styled-77" >
+          OK
+        </button>
+      </div>
+    </div>
+
+    <!-- Asynchronous custom prompt modal overlay -->
+    <div id="custom-prompt-modal" class="custom-modal-overlay">
+      <div class="custom-modal-card">
+        <div class="custom-modal-header border-bottom">
+          <div class="clay-sphere-bullet styled-78" ></div>
+          <h4 class="custom-modal-title" id="custom-prompt-title">ENTER VALUE</h4>
+        </div>
+        <div class="custom-modal-body">
+          <p id="custom-prompt-msg"  class="styled-79"></p>
+          <input type="text" id="custom-prompt-field" class="custom-modal-input" maxlength="10">
+          <div id="custom-prompt-error" class="custom-modal-error-message">Please enter a valid amount.</div>
+        </div>
+        <div class="custom-modal-footer">
+          <button id="custom-prompt-btn-cancel" class="modal-btn-cancel">CANCEL</button>
+          <button id="custom-prompt-btn-confirm" class="modal-btn-confirm">CONFIRM</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Masterclass Stepwise Interactive Tutorial Modal Overlay -->
+    <div id="game-tutorial-overlay" class="custom-modal-overlay">
+      <div class="tutorial-card">
+        <div class="tutorial-header">
+          <span class="tutorial-title">TRADING MASTERCLASS</span>
+          <span class="tutorial-step-indicator" id="tutorial-indicator">STEP 1 of 4</span>
+        </div>
+
+        <div class="tutorial-content-scroll">
+          
+          <!-- STEP 1: Basic mechanics -->
+          <div class="tutorial-step-panel active" id="tuto-step-1">
+            <h4 class="tutorial-step-heading">Welcome to the Trading Floor!</h4>
+            <p class="tutorial-step-description">
+              This simulator models a real-time Forex exchange order book. Each candle represents the aggregate price action over a distinct block of time:
+            </p>
+            <div class="tutorial-visual-box">
+              <div class="demo-pips-ticker">
+                <div class="demo-bar-candle green-candle"></div>
+                <div class="demo-bar-candle red-candle"></div>
+                <div class="demo-bar-candle green-candle pulse-candle"></div>
+              </div>
+              <span class="caption">TICKING PRICE BAR FORMATIONS</span>
+            </div>
+            <p class="tutorial-step-description styled-80" >
+              Green bodies mean the price closed **UP**; red bodies mean the price retreated **DOWN**. The candlestick’s body stretches from open to close extremes.
+            </p>
+          </div>
+
+          <!-- STEP 2: The multiplier bias -->
+          <div class="tutorial-step-panel" id="tuto-step-2">
+            <h4 class="tutorial-step-heading">The Hidden Trend Advantage</h4>
+            <p class="tutorial-step-description">
+              In this casino, the market experiences high volatility trends. The active trend is indicated by structural movements on the EMA ribbon.
+            </p>
+            <div class="tutorial-visual-box">
+              <div class="styled-81">
+                <i data-lucide="trending-up"  class="styled-82"></i>
+                <span>UPTREND DETECTED</span>
+              </div>
+              <p class="styled-83">WINNING ODDS BOOSTED TO 70%</p>
+            </div>
+            <p class="tutorial-step-description styled-84" >
+              **CRITICAL:** Executing trades inside the trend multiplies your winning probability to **70%**! Going against the trend cuts your progress down. Always stay trend-aligned.
+            </p>
+          </div>
+
+          <!-- STEP 3: Multi-point interactive practice widget -->
+          <div class="tutorial-step-panel" id="tuto-step-3">
+            <h4 class="tutorial-step-heading">Interactive Practice Routine</h4>
+            <p class="tutorial-step-description">
+              Let's run a practice execution. Assess the trend status below, and place a mock order to test the pipeline:
+            </p>
+            <div class="tutorial-interactive-panel">
+              <div class="trend-status-box">
+                <span class="text-secondary">EMA TREND STATE</span>
+                <span id="tuto-active-trend" class="trend-badge-active">UPTREND</span>
+              </div>
+              <div class="flex-row-gap-2">
+                <button id="btn-tuto-mock-buy" class="tuto-interactive-btn buy-btn font-mono">MOCK BUY</button>
+                <button id="btn-tuto-mock-sell" class="tuto-interactive-btn sell-btn font-mono">MOCK SELL</button>
+              </div>
+              <div class="tuto-feedback-message" id="tuto-interactive-feedback">
+                Tap BUY or SELL to trigger simulation...
+              </div>
+              <div id="tuto-simulation-candles" class="tuto-mini-board styled-85" >
+                <span class="text-secondary styled-86" >SETTLING SIMULATED TRADE (7 CANDLES)</span>
+                <div class="demo-progress-candles-row" id="tuto-candles-row">
+                  <div class="tuto-dot"></div>
+                  <div class="tuto-dot"></div>
+                  <div class="tuto-dot"></div>
+                  <div class="tuto-dot"></div>
+                  <div class="tuto-dot"></div>
+                  <div class="tuto-dot"></div>
+                  <div class="tuto-dot"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 4: Success, starting masterclass -->
+          <div class="tutorial-step-panel" id="tuto-step-4">
+            <h4 class="tutorial-step-heading">You are Ready for Production!</h4>
+            <p class="tutorial-step-description">
+              Outstanding work. You've unlocked the core mechanics of FX Casino:
+            </p>
+            <div class="styled-87">
+              <div class="styled-88">
+                <i data-lucide="check-circle-2"  class="styled-89"></i>
+                <p class="styled-90">**Flexible Stakes**: Standard 3D MIN/MAX options with numeric text edit rules.</p>
+              </div>
+              <div class="styled-91">
+                <i data-lucide="check-circle-2"  class="styled-92"></i>
+                <p class="styled-93">**Biased Outcome**: Trading with the active trend is heavily favored.</p>
+              </div>
+              <div class="styled-94">
+                <i data-lucide="check-circle-2"  class="styled-95"></i>
+                <p class="styled-96">**Wallet Recovery**: Click wallet panel anytime to top up instantly.</p>
+              </div>
+            </div>
+            <p class="tutorial-step-description">
+              Good luck! Tap 'Start simulator' below to access the live trading suite.
+            </p>
+          </div>
+
+        </div>
+
+        <div class="tutorial-footer">
+          <button id="btn-tuto-skip" class="tuto-footer-btn outline-btn uppercase tracking-wider">SKIP</button>
+          <div class="tuto-dots-indicator" id="tuto-dots-nav">
+            <div class="tuto-dot active"></div>
+            <div class="tuto-dot"></div>
+            <div class="tuto-dot"></div>
+            <div class="tuto-dot"></div>
+          </div>
+          <button id="btn-tuto-next" class="tuto-footer-btn solid-btn uppercase tracking-widest">NEXT</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Logic Script -->
+    <script type="module" src="js/app.js"></script>
+  </body>
+</html>

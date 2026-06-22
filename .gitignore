@@ -18,6 +18,7 @@ cookies.txt
 api.pid
 logs/
 *.apk
+/games/
 
 # Live web files copied to domain root — never commit (build output)
 /index.html
