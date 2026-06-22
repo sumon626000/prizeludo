@@ -3,6 +3,15 @@
 import { CONFIG } from './config.js';
 import { state } from './state.js';
 import { synth } from './synth.js';
+import { PrizeJitoBridge } from './platform-bridge.js';
+
+function formatMoney(value) {
+  const symbol = PrizeJitoBridge.currencySymbol();
+  return symbol + Number(value).toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
 
 /**
  * Custom Promise-driven Alert Dialog utility.
@@ -89,7 +98,7 @@ export function showCustomPrompt(title, message, defaultValue = "") {
  * Balance Update displays in mobile/desktop headers.
  */
 export function updateBalancesUI() {
-  const formatted = '$' + state.account.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const formatted = formatMoney(state.account.balance);
   document.querySelectorAll('.stat-balance-val').forEach(el => {
     el.innerText = formatted;
   });
@@ -101,11 +110,11 @@ export function updateBalancesUI() {
  * Wager/Stake selection slider updates.
  */
 export function updateStakeUI() {
-  document.getElementById('amount-text-stake').innerText = '$' + state.stakeAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  document.getElementById('amount-text-stake').innerText = formatMoney(state.stakeAmount);
   const payout = state.stakeAmount * 1.0;
   const infoPayout = document.getElementById('info-payout');
   if (infoPayout) {
-    infoPayout.innerText = '+$' + payout.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    infoPayout.innerText = '+' + formatMoney(payout).slice(1);
   }
 }
 
@@ -335,29 +344,37 @@ export function setupUIInteractions(chartInstance) {
     // Custom text input prompt on double click
     steelBtn.addEventListener('dblclick', async () => {
       synth.init();
-      const userInput = await showCustomPrompt("CUSTOM STAKE", `Enter wager amount ($${CONFIG.MIN_STAKE} to $${CONFIG.MAX_STAKE}):`, state.stakeAmount.toFixed(2));
+      const symbol = PrizeJitoBridge.currencySymbol();
+      const userInput = await showCustomPrompt("CUSTOM STAKE", `Enter wager amount (${symbol}${CONFIG.MIN_STAKE} to ${symbol}${CONFIG.MAX_STAKE}):`, state.stakeAmount.toFixed(2));
       if (userInput !== null) {
         const parsed = parseFloat(userInput);
         if (!isNaN(parsed) && parsed >= CONFIG.MIN_STAKE && parsed <= CONFIG.MAX_STAKE) {
           state.stakeAmount = parsed;
           updateStakeUI();
         } else {
-          await showCustomAlert("INVALID ENTRY", `Wager must range between $${CONFIG.MIN_STAKE} and $${CONFIG.MAX_STAKE}.`);
+          await showCustomAlert("INVALID ENTRY", `Wager must range between ${symbol}${CONFIG.MIN_STAKE} and ${symbol}${CONFIG.MAX_STAKE}.`);
         }
       }
     });
   }
 
-  // Wallet reset balances buttons
-  document.querySelectorAll('.btn-balance-reset-trigger').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      synth.playTap();
-      state.account.balance = CONFIG.BASE_BALANCE;
-      state.tradeHistory = [];
-      updateBalancesUI();
-      await showCustomAlert("BALANCE TOPPED UP", `Your simulated account balance has been reset to $${CONFIG.BASE_BALANCE.toFixed(2)}.`);
+  if (!PrizeJitoBridge.isActive()) {
+    document.querySelectorAll('.btn-balance-reset-trigger').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        synth.playTap();
+        state.account.balance = CONFIG.BASE_BALANCE;
+        state.tradeHistory = [];
+        updateBalancesUI();
+        await showCustomAlert("BALANCE TOPPED UP", `Your simulated account balance has been reset to ${formatMoney(CONFIG.BASE_BALANCE)}.`);
+      });
     });
-  });
+  } else {
+    document.querySelectorAll('.btn-balance-reset-trigger').forEach(btn => {
+      btn.style.pointerEvents = 'none';
+      btn.style.opacity = '0.72';
+      btn.title = 'PrizeJito wallet balance';
+    });
+  }
 
   // Easter eggs parameters inspection logs
   let clickCount = 0;

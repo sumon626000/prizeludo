@@ -30,6 +30,7 @@ import { realtimeRouter } from "./routes/realtime.routes.js";
 import { tournamentRouter } from "./routes/tournament.routes.js";
 import { walletRouter } from "./routes/wallet.routes.js";
 import { supportRouter } from "./routes/support.routes.js";
+import { tradeJitoRouter } from "./routes/trade-jito.routes.js";
 import { webhookRouter } from "./routes/webhook.routes.js";
 
 export function createApp() {
@@ -74,6 +75,7 @@ export function createApp() {
   app.use("/api/realtime", realtimeRouter);
   app.use("/api/wallet", walletRouter);
   app.use("/api/tournaments", tournamentRouter);
+  app.use("/api/trade-jito", tradeJitoRouter);
   app.use("/api/support", supportRouter);
 
   for (const handler of createStaticWebMiddleware()) {

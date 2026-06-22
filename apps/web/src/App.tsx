@@ -212,7 +212,9 @@ export default function App() {
                 loading={homeFeed.loading}
                 error={homeFeed.error}
                 onOpenTournaments={() => navigate("/tournaments")}
-                onOpenFxCasino={() => navigate("/games/fx-casino")}
+                onOpenTradeJito={() =>
+                  requireLogin(() => navigate("/games/fx-casino"))
+                }
                 onRefresh={homeFeed.refresh}
               />
             }

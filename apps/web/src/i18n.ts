@@ -95,6 +95,8 @@ const resources = {
       free: "ফ্রি",
       paid: "পেইড",
       installApp: "অ্যাপ ইনস্টল",
+      tradeJito: "Trade Jito",
+      tradeJitoDescription: "লাইভ চার্টে ট্রেড করুন — সাইট ব্যালেন্স দিয়ে",
       installKhanLudo: "PrizeJito.com ইনস্টল করুন",
       installAppDescription: "দ্রুত খেলার জন্য অ্যাপটি আপনার হোম স্ক্রিনে রাখুন।",
       downloadApk: "APK ডাউনলোড",
@@ -357,6 +359,8 @@ const resources = {
       free: "Free",
       paid: "Paid",
       installApp: "Install app",
+      tradeJito: "Trade Jito",
+      tradeJitoDescription: "Trade live charts with your site balance",
       installKhanLudo: "Install PrizeJito.com",
       installAppDescription:
         "Keep the app on your home screen for faster play.",

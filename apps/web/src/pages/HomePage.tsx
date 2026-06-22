@@ -153,14 +153,14 @@ export function HomePage({
   loading,
   error,
   onOpenTournaments,
-  onOpenFxCasino,
+  onOpenTradeJito,
   onRefresh,
 }: {
   snapshot: HomeSnapshot | null;
   loading: boolean;
   error: string;
   onOpenTournaments: () => void;
-  onOpenFxCasino: () => void;
+  onOpenTradeJito: () => void;
   onRefresh: () => Promise<void>;
 }) {
   const { i18n, t } = useTranslation();
@@ -270,6 +270,19 @@ export function HomePage({
             <ArrowRight size={16} />
           </span>
         </button>
+        <button
+          type="button"
+          className="home-trade-cta glass"
+          onClick={onOpenTradeJito}
+        >
+          <span className="home-trade-cta__icon" aria-hidden="true">
+            <TrendingUp size={18} strokeWidth={2.2} />
+          </span>
+          <span className="home-trade-cta__copy">
+            <strong>{t("tradeJito")}</strong>
+            <small>{t("tradeJitoDescription")}</small>
+          </span>
+        </button>
         <AppInstallButton className="home-install-cta" />
       </div>
 
@@ -304,14 +317,14 @@ export function HomePage({
         <button
           type="button"
           className="game-category game-category--featured game-category--fx glass"
-          onClick={onOpenFxCasino}
+          onClick={onOpenTradeJito}
         >
           <span className="game-category__icon" aria-hidden="true">
             <TrendingUp size={26} strokeWidth={2.2} />
           </span>
           <span className="game-category__copy">
-            <strong>FX Casino</strong>
-            <small>{i18n.language === "bn" ? "ট্রেডিং সিমুলেটর" : "Trading simulator"}</small>
+            <strong>{t("tradeJito")}</strong>
+            <small>{i18n.language === "bn" ? "এখন ট্রেড করুন" : "Trade now"}</small>
           </span>
           <em className="game-category__badge">
             {i18n.language === "bn" ? "লাইভ" : "Live"}

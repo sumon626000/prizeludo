@@ -3,6 +3,7 @@
 import { CONFIG } from './config.js';
 import { state } from './state.js';
 import { synth } from './synth.js';
+import { PrizeJitoBridge } from './platform-bridge.js';
 import {
   generateInitialHistory,
   generateTickPath,
@@ -123,29 +124,55 @@ function initAssetMarket() {
 /**
  * Execute buy/sell transaction desk triggers
  */
-function handleOpenPosition(type) {
+async function handleOpenPosition(type) {
   if (state.activeTrade) return;
+
+  if (state.stakeAmount > state.account.balance) {
+    await showCustomAlert(
+      "INSUFFICIENT BALANCE",
+      `You need at least ${PrizeJitoBridge.currencySymbol()}${state.stakeAmount.toFixed(2)} to place this trade.`,
+    );
+    return;
+  }
 
   synth.playOrder();
 
   const entryPrice = state.activePrice;
   const isBuy = type === 'BUY';
-  
-  // Set pip targets for resolution
   const targetPips = 45;
   const pipsDeltaPrice = getPriceDeltaFromPips(targetPips);
-
   const takeProfit = isBuy ? entryPrice + pipsDeltaPrice : entryPrice - pipsDeltaPrice;
   const stopLoss = isBuy ? entryPrice - pipsDeltaPrice : entryPrice + pipsDeltaPrice;
 
-  // Aligning with trend shifts raises odds to 70%!
-  let winningProb = CONFIG.WIN_BIAS_NORMAL;
-  if (state.marketStructure.trend === 'UPTREND' && isBuy) winningProb = CONFIG.WIN_BIAS_TREND;
-  if (state.marketStructure.trend === 'DOWNTREND' && !isBuy) winningProb = CONFIG.WIN_BIAS_TREND;
-  if (state.marketStructure.trend === 'UPTREND' && !isBuy) winningProb = CONFIG.WIN_BIAS_COUNTER_TREND;
-  if (state.marketStructure.trend === 'DOWNTREND' && isBuy) winningProb = CONFIG.WIN_BIAS_COUNTER_TREND;
+  let outcome;
+  let tradeId = null;
 
-  const outcome = Math.random() < winningProb ? 'WIN' : 'LOSS';
+  if (PrizeJitoBridge.isActive()) {
+    try {
+      const result = await PrizeJitoBridge.openTrade({
+        stake: state.stakeAmount.toFixed(2),
+        direction: type,
+        trend: state.marketStructure.trend,
+      });
+      tradeId = result.tradeId;
+      outcome = result.outcome;
+      state.account.balance = Number(result.balance);
+      updateBalancesUI();
+    } catch (error) {
+      await showCustomAlert(
+        "TRADE FAILED",
+        error instanceof Error ? error.message : "Could not open trade.",
+      );
+      return;
+    }
+  } else {
+    let winningProb = CONFIG.WIN_BIAS_NORMAL;
+    if (state.marketStructure.trend === 'UPTREND' && isBuy) winningProb = CONFIG.WIN_BIAS_TREND;
+    if (state.marketStructure.trend === 'DOWNTREND' && !isBuy) winningProb = CONFIG.WIN_BIAS_TREND;
+    if (state.marketStructure.trend === 'UPTREND' && !isBuy) winningProb = CONFIG.WIN_BIAS_COUNTER_TREND;
+    if (state.marketStructure.trend === 'DOWNTREND' && isBuy) winningProb = CONFIG.WIN_BIAS_COUNTER_TREND;
+    outcome = Math.random() < winningProb ? 'WIN' : 'LOSS';
+  }
 
   state.activeTrade = {
     type,
@@ -154,6 +181,8 @@ function handleOpenPosition(type) {
     takeProfit,
     status: 'OPEN',
     outcome,
+    tradeId,
+    platformManaged: PrizeJitoBridge.isActive(),
     profit: 0.0
   };
 
@@ -163,7 +192,7 @@ function handleOpenPosition(type) {
   // DOM visual update
   const profitWidgetVal = document.getElementById('widget-profit');
   if (profitWidgetVal) {
-    profitWidgetVal.innerText = '$0.00';
+    profitWidgetVal.innerText = `${PrizeJitoBridge.currencySymbol()}0.00`;
     profitWidgetVal.className = 'pnl-val-compact text-up';
   }
   const widgetFrame = document.getElementById('active-position-widget');
@@ -174,6 +203,45 @@ function handleOpenPosition(type) {
   if (chart) {
     chart.render();
   }
+}
+
+async function settleActiveTrade(isWin) {
+  if (!state.activeTrade || state.activeTrade.status !== 'OPEN') return;
+
+  state.activeTrade.status = isWin ? 'WON' : 'LOST';
+  const finalPayoutProfit = isWin ? state.stakeAmount * 1.0 : -state.stakeAmount;
+
+  if (state.activeTrade.platformManaged && state.activeTrade.tradeId) {
+    try {
+      const result = await PrizeJitoBridge.settleTrade({
+        tradeId: state.activeTrade.tradeId,
+      });
+      state.account.balance = Number(result.balance);
+      updateBalancesUI();
+      if (result.outcome === 'WIN') synth.playWin();
+      else synth.playLoss();
+    } catch (error) {
+      await showCustomAlert(
+        "SETTLEMENT FAILED",
+        error instanceof Error ? error.message : "Could not settle trade.",
+      );
+    }
+  } else {
+    state.account.balance += finalPayoutProfit;
+    updateBalancesUI();
+    if (isWin) synth.playWin();
+    else synth.playLoss();
+  }
+
+  const resolvedTrade = Object.assign({}, state.activeTrade, {
+    payout: finalPayoutProfit,
+    time: new Date().toLocaleTimeString()
+  });
+  state.tradeHistory.push(resolvedTrade);
+  state.activeTrade = null;
+  const widgetFrame = document.getElementById('active-position-widget');
+  if (widgetFrame) widgetFrame.style.display = 'none';
+  updateActionButtonsState();
 }
 
 /**
@@ -207,7 +275,7 @@ function startSimulatorHeartbeat() {
 
       const profitWidgetVal = document.getElementById('widget-profit');
       if (profitWidgetVal) {
-        profitWidgetVal.innerText = (state.activeTrade.profit >= 0 ? '+' : '') + '$' + state.activeTrade.profit.toFixed(2);
+        profitWidgetVal.innerText = (state.activeTrade.profit >= 0 ? '+' : '') + PrizeJitoBridge.currencySymbol() + Math.abs(state.activeTrade.profit).toFixed(2);
         profitWidgetVal.className = `pnl-val-compact ${state.activeTrade.profit >= 0 ? 'text-up' : 'text-down'}`;
       }
     }
@@ -233,30 +301,7 @@ function startSimulatorHeartbeat() {
       if (state.activeTrade && state.activeTrade.status === 'OPEN') {
         if (state.guidedCandleIndex >= state.guidedCandles.length) {
           const isWin = state.activeTrade.outcome === 'WIN';
-          state.activeTrade.status = isWin ? 'WON' : 'LOST';
-
-          const finalPayoutProfit = isWin ? state.stakeAmount * 1.0 : -state.stakeAmount;
-          
-          state.account.balance += finalPayoutProfit;
-          updateBalancesUI();
-
-          if (isWin) {
-            synth.playWin();
-          } else {
-            synth.playLoss();
-          }
-
-          const resolvedTrade = Object.assign({}, state.activeTrade, {
-            payout: finalPayoutProfit,
-            time: new Date().toLocaleTimeString()
-          });
-          state.tradeHistory.push(resolvedTrade);
-
-          state.activeTrade = null;
-          const widgetFrame = document.getElementById('active-position-widget');
-          if (widgetFrame) widgetFrame.style.display = 'none';
-          
-          updateActionButtonsState();
+          void settleActiveTrade(isWin);
         }
       }
 
@@ -356,10 +401,16 @@ function runClaySplashScreen() {
   }
 }
 
+function runAutostart() {
+  synth.init();
+  const splashOverlay = document.getElementById('clay-splash-screen');
+  if (splashOverlay) splashOverlay.remove();
+}
+
 /**
  * Main modular bootstrap sequence
  */
-function bootstrap() {
+async function bootstrap() {
   // Initialize canvas drawings
   chart = new ForexChart('forex-candlestick-canvas');
   chart.handleResize();
@@ -373,15 +424,32 @@ function bootstrap() {
   setupTutorialSystem();
   setupUIInteractions(chart);
 
+  if (PrizeJitoBridge.isActive()) {
+    document.body.classList.add('prizejito-embedded');
+    try {
+      const balance = await PrizeJitoBridge.syncBalance();
+      if (balance !== null) {
+        state.account.balance = balance;
+        updateBalancesUI();
+      }
+    } catch {
+      // Parent bridge will surface auth errors.
+    }
+  }
+
   // Hook up Buy/Sell primary desk click listeners
   const buyActionBtn = document.getElementById('btn-action-buy');
   const sellActionBtn = document.getElementById('btn-action-sell');
 
   if (buyActionBtn) {
-    buyActionBtn.addEventListener('click', () => handleOpenPosition('BUY'));
+    buyActionBtn.addEventListener('click', () => {
+      void handleOpenPosition('BUY');
+    });
   }
   if (sellActionBtn) {
-    sellActionBtn.addEventListener('click', () => handleOpenPosition('SELL'));
+    sellActionBtn.addEventListener('click', () => {
+      void handleOpenPosition('SELL');
+    });
   }
 
   // Pre-load market tickers historical data
@@ -393,7 +461,11 @@ function bootstrap() {
   }
 
   // Execute Splash transitions
-  runClaySplashScreen();
+  if (PrizeJitoBridge.shouldAutostart()) {
+    runAutostart();
+  } else {
+    runClaySplashScreen();
+  }
   
   // Start pricing walking pulse intervals
   startSimulatorHeartbeat();
