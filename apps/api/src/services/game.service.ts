@@ -163,7 +163,7 @@ async function writeGameState(
   diceValue: number | null,
   now: Date,
 ) {
-  await transaction
+  const [row] = await transaction
     .update(gameStates)
     .set({
       boardState: state,
@@ -173,7 +173,9 @@ async function writeGameState(
       stateVersion: sql`${gameStates.stateVersion} + 1`,
       updatedAt: now,
     })
-    .where(eq(gameStates.id, stateId));
+    .where(eq(gameStates.id, stateId))
+    .returning({ stateVersion: gameStates.stateVersion });
+  return row!.stateVersion;
 }
 
 async function finalizeGame(
@@ -359,7 +361,7 @@ export async function rollGameDice(matchId: string, userId: string) {
         userId,
         dice,
       );
-      await writeGameState(
+      const stateVersion = await writeGameState(
         transaction,
         locked.stateRow.id,
         rolled.state,
@@ -377,7 +379,12 @@ export async function rollGameDice(matchId: string, userId: string) {
             eq(matchPlayers.userId, userId),
           ),
         );
-      return { dice, tokenPositions: locked.tokenPositions, ...rolled };
+      return {
+        dice,
+        tokenPositions: locked.tokenPositions,
+        stateVersion,
+        ...rolled,
+      };
     } catch (error) {
       engineError(error);
     }
@@ -414,7 +421,7 @@ export async function moveGameToken(
         userId,
         tokenIndex,
       );
-      await writeGameState(
+      const stateVersion = await writeGameState(
         transaction,
         locked.stateRow.id,
         moved.state,
@@ -432,7 +439,7 @@ export async function moveGameToken(
             eq(matchPlayers.userId, userId),
           ),
         );
-      return moved;
+      return { ...moved, stateVersion };
     } catch (error) {
       engineError(error);
     }
@@ -757,6 +764,13 @@ async function processTurnTimeout(matchId: string, now: Date) {
     let currentTurn: string | null = locked.stateRow.currentTurn;
     let autoDice: number | null = null;
     let autoTokenIndex: number | null = null;
+    let rollSnapshot: {
+      state: GameBoardState;
+      tokenPositions: TokenPositions;
+      currentTurn: string | null;
+      stateVersion: number;
+    } | null = null;
+    let stateVersion = locked.stateRow.stateVersion;
 
     if (!state.roll) {
       autoDice = createServerDiceRoll();
@@ -770,6 +784,22 @@ async function processTurnTimeout(matchId: string, now: Date) {
       );
       state = rolled.state;
       currentTurn = rolled.currentTurn;
+      const rollVersion = await writeGameState(
+        transaction,
+        locked.stateRow.id,
+        rolled.state,
+        positions,
+        rolled.currentTurn,
+        autoDice,
+        now,
+      );
+      rollSnapshot = {
+        state: rolled.state,
+        tokenPositions: positions,
+        currentTurn: rolled.currentTurn,
+        stateVersion: rollVersion,
+      };
+      stateVersion = rollVersion;
     }
 
     if (currentTurn === player.userId && state.roll) {
@@ -795,6 +825,15 @@ async function processTurnTimeout(matchId: string, now: Date) {
         state = moved.state;
         positions = moved.tokenPositions;
         currentTurn = moved.currentTurn;
+        stateVersion = await writeGameState(
+          transaction,
+          locked.stateRow.id,
+          moved.state,
+          moved.tokenPositions,
+          moved.currentTurn,
+          null,
+          now,
+        );
       }
     }
 
@@ -805,6 +844,8 @@ async function processTurnTimeout(matchId: string, now: Date) {
       missCount: nextMissCount,
       eliminated: false,
       autoPlayEnabled,
+      stateVersion,
+      rollSnapshot,
     };
     await transaction
       .update(matchPlayers)
@@ -818,15 +859,6 @@ async function processTurnTimeout(matchId: string, now: Date) {
           eq(matchPlayers.userId, player.userId),
         ),
       );
-    await writeGameState(
-      transaction,
-      locked.stateRow.id,
-      timedOut.state,
-      timedOut.tokenPositions,
-      timedOut.currentTurn,
-      null,
-      now,
-    );
     return {
       ...timedOut,
       userId: player.userId,
@@ -885,6 +917,13 @@ async function processProactiveAutoPlay(matchId: string, now: Date) {
     let currentTurn: string | null = locked.stateRow.currentTurn;
     let autoDice: number | null = null;
     let autoTokenIndex: number | null = null;
+    let rollSnapshot: {
+      state: GameBoardState;
+      tokenPositions: TokenPositions;
+      currentTurn: string | null;
+      stateVersion: number;
+    } | null = null;
+    let stateVersion = locked.stateRow.stateVersion;
 
     if (!state.roll) {
       autoDice = createServerDiceRoll();
@@ -898,6 +937,22 @@ async function processProactiveAutoPlay(matchId: string, now: Date) {
       );
       state = rolled.state;
       currentTurn = rolled.currentTurn;
+      const rollVersion = await writeGameState(
+        transaction,
+        locked.stateRow.id,
+        rolled.state,
+        positions,
+        rolled.currentTurn,
+        autoDice,
+        now,
+      );
+      rollSnapshot = {
+        state: rolled.state,
+        tokenPositions: positions,
+        currentTurn: rolled.currentTurn,
+        stateVersion: rollVersion,
+      };
+      stateVersion = rollVersion;
     }
 
     if (currentTurn === player.userId && state.roll) {
@@ -923,18 +978,18 @@ async function processProactiveAutoPlay(matchId: string, now: Date) {
         state = moved.state;
         positions = moved.tokenPositions;
         currentTurn = moved.currentTurn;
+        stateVersion = await writeGameState(
+          transaction,
+          locked.stateRow.id,
+          moved.state,
+          moved.tokenPositions,
+          moved.currentTurn,
+          null,
+          now,
+        );
       }
     }
 
-    await writeGameState(
-      transaction,
-      locked.stateRow.id,
-      state,
-      positions,
-      currentTurn,
-      null,
-      now,
-    );
     return {
       userId: player.userId,
       state,
@@ -945,6 +1000,8 @@ async function processProactiveAutoPlay(matchId: string, now: Date) {
       missCount: player.missCount,
       autoPlayEnabled: true,
       eliminated: false,
+      stateVersion,
+      rollSnapshot,
     };
   });
   if (result) await finalizeGame(matchId, result.state);
@@ -964,19 +1021,33 @@ function emitTurnTimeoutEvents(
     missCount: number;
     eliminated: boolean;
     autoPlayEnabled?: boolean;
+    stateVersion: number;
+    rollSnapshot?: {
+      state: GameBoardState;
+      tokenPositions: TokenPositions;
+      currentTurn: string | null;
+      stateVersion: number;
+    } | null;
   },
   now: Date,
 ) {
   if (!io) return;
   if (result.autoDice !== null) {
+    const dicePayload = result.rollSnapshot ?? {
+      state: result.state,
+      tokenPositions: result.tokenPositions,
+      currentTurn: result.currentTurn,
+      stateVersion: result.stateVersion,
+    };
     io.to(`match:${matchId}`).emit("game:dice-roll", {
       matchId,
       userId: result.userId,
       dice: result.autoDice,
       autoPassed: result.autoTokenIndex === null,
-      state: result.state,
-      currentTurn: result.currentTurn,
-      tokenPositions: result.tokenPositions,
+      state: dicePayload.state,
+      currentTurn: dicePayload.currentTurn,
+      tokenPositions: dicePayload.tokenPositions,
+      stateVersion: dicePayload.stateVersion,
       timedOut: true,
       at: now.toISOString(),
     });
@@ -992,6 +1063,7 @@ function emitTurnTimeoutEvents(
       state: result.state,
       currentTurn: result.currentTurn,
       tokenPositions: result.tokenPositions,
+      stateVersion: result.stateVersion,
       timedOut: true,
       at: now.toISOString(),
     });
@@ -1005,12 +1077,10 @@ function emitTurnTimeoutEvents(
     missCount: result.missCount,
     eliminated: result.eliminated,
     autoPlayEnabled: result.autoPlayEnabled ?? result.missCount > 0,
-    autoDice: result.autoDice,
-    autoTokenIndex: result.autoTokenIndex,
+    stateVersion: result.stateVersion,
     serverTime: now.toISOString(),
     at: now.toISOString(),
   });
-  emitGameState(io, matchId);
 }
 
 function emitAutoPlayEvents(
@@ -1026,19 +1096,33 @@ function emitAutoPlayEvents(
     missCount: number;
     autoPlayEnabled: boolean;
     eliminated: boolean;
+    stateVersion: number;
+    rollSnapshot?: {
+      state: GameBoardState;
+      tokenPositions: TokenPositions;
+      currentTurn: string | null;
+      stateVersion: number;
+    } | null;
   },
   now: Date,
 ) {
   if (!io) return;
   if (result.autoDice !== null) {
+    const dicePayload = result.rollSnapshot ?? {
+      state: result.state,
+      tokenPositions: result.tokenPositions,
+      currentTurn: result.currentTurn,
+      stateVersion: result.stateVersion,
+    };
     io.to(`match:${matchId}`).emit("game:dice-roll", {
       matchId,
       userId: result.userId,
       dice: result.autoDice,
       autoPassed: result.autoTokenIndex === null,
-      state: result.state,
-      currentTurn: result.currentTurn,
-      tokenPositions: result.tokenPositions,
+      state: dicePayload.state,
+      currentTurn: dicePayload.currentTurn,
+      tokenPositions: dicePayload.tokenPositions,
+      stateVersion: dicePayload.stateVersion,
       autoPlay: true,
       at: now.toISOString(),
     });
@@ -1054,6 +1138,7 @@ function emitAutoPlayEvents(
       state: result.state,
       currentTurn: result.currentTurn,
       tokenPositions: result.tokenPositions,
+      stateVersion: result.stateVersion,
       autoPlay: true,
       at: now.toISOString(),
     });
@@ -1064,12 +1149,10 @@ function emitAutoPlayEvents(
     turnDeadline: result.state.turnDeadline,
     turnStartedAt: result.state.turnStartedAt,
     autoPlayEnabled: result.autoPlayEnabled,
-    autoDice: result.autoDice,
-    autoTokenIndex: result.autoTokenIndex,
+    stateVersion: result.stateVersion,
     serverTime: now.toISOString(),
     at: now.toISOString(),
   });
-  emitGameState(io, matchId);
 }
 
 export async function processGameTick(io?: Server, now = new Date()) {

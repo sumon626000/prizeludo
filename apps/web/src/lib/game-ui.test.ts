@@ -9,6 +9,7 @@ import {
   getTurnProgress,
   pickSmartAutoToken,
   getEarlyFinishLabel,
+  getAuthoritativeDiceForPlayer,
   TOKEN_KILL_RETURN_TOTAL_MS,
   TOKEN_RELEASE_MS,
   TOKEN_SINGLE_MOVE_MS,
@@ -40,13 +41,40 @@ describe("game UI helpers", () => {
     expect(getTurnProgress(-1, 10)).toBe(0);
   });
 
+  it("reads dice from active roll, diceValue, or last roll action", () => {
+    const board = {
+      roll: { dice: 5, legalTokenIndexes: [0] },
+      lastAction: { type: "roll", userId: "opp", dice: 5, at: "" },
+    };
+    expect(getAuthoritativeDiceForPlayer(board, "opp", "opp", 5)).toBe(5);
+    expect(
+      getAuthoritativeDiceForPlayer(
+        { ...board, roll: null },
+        "opp",
+        "opp",
+        5,
+      ),
+    ).toBe(5);
+    expect(
+      getAuthoritativeDiceForPlayer(
+        {
+          roll: null,
+          lastAction: { type: "move", userId: "opp", at: "" },
+        },
+        "opp",
+        "opp",
+        null,
+      ),
+    ).toBeNull();
+  });
+
   it("matches recommended token movement timing", () => {
     expect(getForwardStepDuration("normal", 0, 3, 6)).toBe(TOKEN_STEP_MS);
     expect(getForwardStepDuration("normal", 0, -1, 4)).toBe(TOKEN_RELEASE_MS);
     expect(getForwardStepDuration("normal", 0, 8, 1)).toBe(
       TOKEN_SINGLE_MOVE_MS,
     );
-    expect(estimateForwardMoveDuration("normal", 3, 6)).toBe(3120);
+    expect(estimateForwardMoveDuration("normal", 3, 6)).toBe(6 * TOKEN_STEP_MS);
     expect(estimateForwardMoveDuration("normal", 8, 1)).toBe(
       TOKEN_SINGLE_MOVE_MS,
     );

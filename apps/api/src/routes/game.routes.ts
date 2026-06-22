@@ -118,6 +118,7 @@ router.post(
       state: result.state,
       currentTurn: result.currentTurn,
       tokenPositions: result.tokenPositions,
+      stateVersion: result.stateVersion,
       serverTime: now.toISOString(),
       at: now.toISOString(),
     });
@@ -127,10 +128,10 @@ router.post(
       turnDeadline: result.state.turnDeadline,
       turnStartedAt: result.state.turnStartedAt,
       autoPassed: result.autoPassed,
+      stateVersion: result.stateVersion,
       serverTime: now.toISOString(),
       at: now.toISOString(),
     });
-    emitGameState(io, matchId);
     response.json(result);
   }),
 );
@@ -165,6 +166,7 @@ router.post(
       state: result.state,
       currentTurn: result.currentTurn,
       tokenPositions: result.tokenPositions,
+      stateVersion: result.stateVersion,
       serverTime: now.toISOString(),
       at: now.toISOString(),
     });
@@ -173,6 +175,7 @@ router.post(
       userId: result.currentTurn,
       turnDeadline: result.state.turnDeadline,
       turnStartedAt: result.state.turnStartedAt,
+      stateVersion: result.stateVersion,
       serverTime: now.toISOString(),
       at: now.toISOString(),
     });
@@ -207,7 +210,6 @@ router.post(
         });
       }
     }
-    emitGameState(io, matchId);
     response.json(result);
   }),
 );

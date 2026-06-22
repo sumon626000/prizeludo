@@ -110,7 +110,13 @@
   background: rgba(10, 10, 10, 0.98) !important;
 }
 
+.app-surface--game .game-page {
+  grid-template-rows: 52px minmax(0, 1fr) minmax(54px, auto) minmax(50px, auto);
+  gap: 6px;
+}
+
 .app-surface--game .game-controls {
+  min-height: 46px;
   border: 1px solid rgba(164, 255, 94, 0.24);
   border-radius: 16px;
   background: linear-gradient(160deg, rgba(6, 28, 14, 0.96), rgba(0, 0, 0, 0.98));
@@ -119,8 +125,16 @@
     0 0 12px rgba(164, 255, 94, 0.1);
 }
 
+.app-surface--game .game-controls__tools {
+  gap: 6px;
+}
+
+.app-surface--game .game-communication {
+  padding: 4px 6px !important;
+}
+
 .app-surface--game .game-controls > button,
-.app-surface--game .game-sound {
+.app-surface--game .game-controls .game-sound {
   border-color: rgba(164, 255, 94, 0.28) !important;
   color: var(--ui-neon, #a4ff5e) !important;
   background: rgba(164, 255, 94, 0.08) !important;
@@ -158,8 +172,8 @@
 }
 
 .app-surface--game .game-roll-streak {
-  width: 46px;
-  height: 46px;
+  width: 38px;
+  height: 38px;
 }
 
 .app-surface--game .game-roll-streak strong {
@@ -628,8 +642,12 @@
 
 @media (max-width: 360px) {
   .app-surface--game .game-controls {
-    grid-template-columns: 36px 68px minmax(0, 1fr) 40px;
-    padding: 6px;
+    grid-template-columns: auto minmax(64px, 72px) minmax(0, 1fr) 34px;
+    padding: 5px 6px;
+  }
+
+  .app-surface--game .game-action-status {
+    font-size: 10px !important;
   }
 
   .app-surface--game .game-communication button {

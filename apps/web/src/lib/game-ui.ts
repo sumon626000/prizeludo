@@ -165,8 +165,33 @@ export function buildAutoMoveContext(
   };
 }
 
-export const AUTO_HUMAN_ROLL_DELAY_MS = 520;
-export const AUTO_HUMAN_MOVE_DELAY_MS = 820;
+export const AUTO_HUMAN_ROLL_DELAY_MS = 380;
+export const AUTO_HUMAN_MOVE_DELAY_MS = 520;
+
+const GAME_SPEED_SCALE = {
+  fast: 0.8,
+  normal: 1,
+  slow: 1.2,
+} as const;
+
+export function scaleGameSpeedMs(
+  base: number,
+  speed: "fast" | "normal" | "slow" = "normal",
+) {
+  return Math.max(80, Math.round(base * GAME_SPEED_SCALE[speed]));
+}
+
+export function getAutoHumanRollDelayMs(
+  diceSpeed: "fast" | "normal" | "slow" = "normal",
+) {
+  return scaleGameSpeedMs(AUTO_HUMAN_ROLL_DELAY_MS, diceSpeed);
+}
+
+export function getAutoHumanMoveDelayMs(
+  tokenSpeed: "fast" | "normal" | "slow" = "normal",
+) {
+  return scaleGameSpeedMs(AUTO_HUMAN_MOVE_DELAY_MS, tokenSpeed);
+}
 
 export function getTurnProgress(remainingMs: number, turnSeconds: number) {
   if (turnSeconds <= 0) return 0;
@@ -174,28 +199,32 @@ export function getTurnProgress(remainingMs: number, turnSeconds: number) {
   return Math.max(0, Math.min(1, remainingMs / totalMs));
 }
 
-export const DICE_ROLL_MS = 1500;
+export const DICE_ROLL_MS = 700;
 /** Standard board cell hop — step-by-step movement with visible bounce. */
-export const TOKEN_STEP_MS = 520;
+export const TOKEN_STEP_MS = 160;
 /** Single-cell move total. */
-export const TOKEN_SINGLE_MOVE_MS = 620;
+export const TOKEN_SINGLE_MOVE_MS = 180;
 /** Yard release / first step out. */
-export const TOKEN_RELEASE_MS = 700;
+export const TOKEN_RELEASE_MS = 200;
 /** Pause after dice lands before the token starts walking. */
-export const TOKEN_MOVE_AFTER_DICE_MS = 580;
+export const TOKEN_MOVE_AFTER_DICE_MS = 180;
 /** Total kill-return animation budget. */
-export const TOKEN_KILL_RETURN_TOTAL_MS = 960;
+export const TOKEN_KILL_RETURN_TOTAL_MS = 640;
 /** Pause on the kill cell — impact shake before walking back. */
-export const TOKEN_KILL_PAUSE_MS = 380;
+export const TOKEN_KILL_PAUSE_MS = 240;
 export const TOKEN_KILL_IMPACT_MS = TOKEN_KILL_PAUSE_MS;
 
 function scaleTokenMs(
   base: number,
   speed: "fast" | "normal" | "slow" = "normal",
 ) {
-  if (speed === "fast") return Math.round(base * 0.92);
-  if (speed === "slow") return Math.round(base * 1.22);
-  return base;
+  return scaleGameSpeedMs(base, speed);
+}
+
+export function getTokenMoveAfterDiceMs(
+  tokenSpeed: "fast" | "normal" | "slow" = "normal",
+) {
+  return scaleGameSpeedMs(TOKEN_MOVE_AFTER_DICE_MS, tokenSpeed);
 }
 
 export function tokenPositionsEqual(
@@ -216,9 +245,31 @@ export function tokenPositionsEqual(
 }
 
 export function getDiceRollDuration(speed: "fast" | "normal" | "slow" = "normal") {
-  if (speed === "fast") return Math.round(DICE_ROLL_MS * 0.72);
-  if (speed === "slow") return Math.round(DICE_ROLL_MS * 1.35);
+  if (speed === "fast") return 560;
+  if (speed === "slow") return 840;
   return DICE_ROLL_MS;
+}
+
+export function getAuthoritativeDiceForPlayer(
+  boardState: {
+    roll: { dice: number } | null;
+    lastAction: { type: string; userId?: string; dice?: number };
+  },
+  currentTurn: string | null,
+  playerId: string,
+  diceValue?: number | null,
+): number | null {
+  if (boardState.roll && currentTurn === playerId) {
+    return boardState.roll.dice;
+  }
+  if (currentTurn === playerId && diceValue) {
+    return diceValue;
+  }
+  const action = boardState.lastAction;
+  if (action.userId === playerId && action.dice) {
+    return action.dice;
+  }
+  return null;
 }
 
 export function sleepMs(ms: number): Promise<void> {
@@ -229,11 +280,15 @@ export function sleepMs(ms: number): Promise<void> {
 export async function waitForPlayerDiceRollFinish(
   isRolling: (playerId: string) => boolean,
   playerId: string,
+  tokenSpeed: "fast" | "normal" | "slow" = "normal",
+  maxWaitMs = 6_000,
 ): Promise<void> {
+  const startedAt = Date.now();
   while (isRolling(playerId)) {
+    if (Date.now() - startedAt >= maxWaitMs) return;
     await sleepMs(40);
   }
-  await sleepMs(TOKEN_MOVE_AFTER_DICE_MS);
+  await sleepMs(getTokenMoveAfterDiceMs(tokenSpeed));
 }
 
 export function getForwardStepDuration(
@@ -307,25 +362,67 @@ export function useMultiplayerDiceRolls(
   onReveal?: (playerId: string, dice: number) => void,
 ) {
   const [activeRolls, setActiveRolls] = useState<Record<string, number>>({});
-  const pendingDiceRef = useRef<Record<string, number>>({});
-  const faceStateRef = useRef<Map<string, { face: number; lastChange: number }>>(
-    new Map(),
-  );
   const [rollFaces, setRollFaces] = useState<Record<string, number>>({});
   const [rollProgressByPlayer, setRollProgressByPlayer] = useState<
     Record<string, number>
   >({});
+  const pendingDiceRef = useRef<Record<string, number>>({});
+  const faceStateRef = useRef<Map<string, { face: number; lastChange: number }>>(
+    new Map(),
+  );
+  const failsafeTimersRef = useRef<Record<string, number>>({});
+  const diceSpeedRef = useRef(diceSpeed);
+  const onRevealRef = useRef(onReveal);
+  diceSpeedRef.current = diceSpeed;
+  onRevealRef.current = onReveal;
 
-  const startRoll = useCallback((playerId: string, dice?: number) => {
+  const clearFailsafe = useCallback((playerId: string) => {
+    const timerId = failsafeTimersRef.current[playerId];
+    if (timerId !== undefined) {
+      window.clearTimeout(timerId);
+      delete failsafeTimersRef.current[playerId];
+    }
+  }, []);
+
+  const finishRoll = useCallback((playerId: string, dice?: number) => {
+    clearFailsafe(playerId);
     if (dice !== undefined) {
       pendingDiceRef.current[playerId] = dice;
     }
-    faceStateRef.current.set(playerId, {
-      face: 1,
-      lastChange: performance.now(),
+    setActiveRolls((current) => {
+      if (!(playerId in current)) return current;
+      const finalDice = pendingDiceRef.current[playerId];
+      delete pendingDiceRef.current[playerId];
+      faceStateRef.current.delete(playerId);
+      const next = { ...current };
+      delete next[playerId];
+      if (finalDice !== undefined) {
+        onRevealRef.current?.(playerId, finalDice);
+      }
+      return next;
     });
-    setActiveRolls((current) => ({ ...current, [playerId]: performance.now() }));
-  }, []);
+  }, [clearFailsafe]);
+
+  const startRoll = useCallback(
+    (playerId: string, dice?: number) => {
+      if (dice !== undefined) {
+        pendingDiceRef.current[playerId] = dice;
+      }
+      clearFailsafe(playerId);
+      faceStateRef.current.set(playerId, {
+        face: 1,
+        lastChange: performance.now(),
+      });
+      setActiveRolls((current) => ({
+        ...current,
+        [playerId]: performance.now(),
+      }));
+      failsafeTimersRef.current[playerId] = window.setTimeout(() => {
+        finishRoll(playerId);
+      }, getDiceRollDuration(diceSpeedRef.current) + 320);
+    },
+    [clearFailsafe, finishRoll],
+  );
 
   const setRollResult = useCallback((playerId: string, dice: number) => {
     pendingDiceRef.current[playerId] = dice;
@@ -383,10 +480,12 @@ export function useMultiplayerDiceRolls(
         nextFaces[playerId] = currentFace.face;
 
         if (progress >= 1) {
-          finished.push({
-            playerId,
-            dice: pendingDiceRef.current[playerId] ?? currentFace.face,
-          });
+          const finalDice = pendingDiceRef.current[playerId];
+          if (finalDice !== undefined) {
+            finished.push({ playerId, dice: finalDice });
+          } else {
+            finished.push({ playerId, dice: 0 });
+          }
         }
       }
 
@@ -400,16 +499,13 @@ export function useMultiplayerDiceRolls(
       }
 
       if (finished.length > 0) {
-        setActiveRolls((current) => {
-          const next = { ...current };
-          for (const item of finished) {
-            delete next[item.playerId];
-            delete pendingDiceRef.current[item.playerId];
-            faceStateRef.current.delete(item.playerId);
-            onReveal?.(item.playerId, item.dice);
+        for (const item of finished) {
+          if (item.dice > 0) {
+            finishRoll(item.playerId, item.dice);
+          } else {
+            finishRoll(item.playerId);
           }
-          return next;
-        });
+        }
       }
 
       const stillRolling = rollingIds.some(
@@ -422,11 +518,22 @@ export function useMultiplayerDiceRolls(
 
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [activeRolls, diceSpeed, onReveal]);
+  }, [activeRolls, diceSpeed, finishRoll]);
+
+  useEffect(
+    () => () => {
+      for (const timerId of Object.values(failsafeTimersRef.current)) {
+        window.clearTimeout(timerId);
+      }
+      failsafeTimersRef.current = {};
+    },
+    [],
+  );
 
   return {
     startRoll,
     setRollResult,
+    finishRoll,
     isRolling,
     rollingFace: (playerId: string) => rollFaces[playerId],
     rollProgress: (playerId: string) => rollProgressByPlayer[playerId] ?? 0,

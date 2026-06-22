@@ -12,6 +12,29 @@ export function buildCapturedReturnSteps(from: number): number[] {
   return Array.from({ length: from + 1 }, (_, index) => from - index - 1);
 }
 
+/** Map logical token position to board grid cell (0-based row/col). */
+export function tokenBoardCoordinate(
+  position: number,
+  tokenIndex: number,
+  boardSeat: number,
+  homeLaneStart: number,
+  finishPosition: number,
+  track: Array<[number, number]>,
+  homeLanes: Array<Array<[number, number]>>,
+  yards: Array<Array<[number, number]>>,
+): [number, number] {
+  if (position < 0) return yards[boardSeat]![tokenIndex]!;
+  if (position >= finishPosition) {
+    return homeLanes[boardSeat]![5]!;
+  }
+  if (position >= homeLaneStart) {
+    const progress = Math.min(5, position - homeLaneStart);
+    return homeLanes[boardSeat]![progress]!;
+  }
+  const offset = [0, 13, 26, 39][boardSeat]!;
+  return track[(offset + position) % 52]!;
+}
+
 export type CapturedTokenAnimation = {
   playerId: string;
   tokenIndex: number;

@@ -55,30 +55,48 @@
 }
 
 .game-board-wrap::before {
-  box-shadow:
-    0 0 0 1px rgba(255, 214, 74, 0.22),
-    0 10px 24px rgba(0, 0, 0, 0.42);
+  box-shadow: 0 0 0 1px rgba(255, 214, 74, 0.16);
 }
 
 .game-board-wrap .ludo-board {
-  outline-width: 2px;
-  box-shadow:
-    inset 0 0 0 2px rgba(255, 249, 185, 0.72),
-    0 10px 22px rgba(0, 0, 0, 0.5);
+  outline-width: 1px;
+  box-shadow: inset 0 0 0 1px rgba(255, 249, 185, 0.5);
+  filter: none !important;
+}
+
+.app-surface--game .ludo-token i {
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+.app-surface--game .ludo-token svg {
+  display: none !important;
+}
+
+.app-surface--game .board-yard-well {
+  opacity: 0.92;
+  box-shadow: none !important;
+}
+
+.app-surface--game .board-cell {
+  box-shadow: none !important;
+}
+
+.app-surface--game .board-center-home {
+  filter: none !important;
+  box-shadow: none !important;
 }
 
 .app-surface--game .game-player-pod.active {
   box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, var(--pod-color) 20%, transparent),
-    0 0 12px color-mix(in srgb, var(--pod-color) 22%, transparent),
-    0 6px 14px rgba(0, 0, 0, 0.4) !important;
+    inset 0 0 0 1px color-mix(in srgb, var(--pod-color) 16%, transparent),
+    0 4px 10px rgba(0, 0, 0, 0.32) !important;
 }
 
 .app-surface--game .player-dice.can-roll {
   box-shadow:
-    inset 0 1px 0 rgba(220, 255, 230, 0.1),
-    0 0 10px rgba(164, 255, 94, 0.18),
-    0 3px 8px rgba(0, 0, 0, 0.4) !important;
+    inset 0 1px 0 rgba(220, 255, 230, 0.08),
+    0 0 6px rgba(164, 255, 94, 0.14) !important;
 }
 
 .ludo-board {
@@ -93,4 +111,22 @@
   .game-scene-backdrop__glow--board {
     display: none;
   }
+}
+
+/* Instant gameplay — skip dice/token motion when user enables simple mode */
+.game-simple-mode .dice-face.is-rolling,
+.game-simple-mode .player-dice.rolling {
+  animation: none !important;
+}
+
+.game-simple-mode .ludo-token.hopping,
+.game-simple-mode .ludo-token.moving,
+.game-simple-mode .ludo-token.returning,
+.game-simple-mode .ludo-token.killed-impact {
+  animation: none !important;
+  transition: none !important;
+}
+
+.game-simple-mode .ludo-token.legal {
+  animation: none !important;
 }

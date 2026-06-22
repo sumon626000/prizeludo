@@ -197,9 +197,6 @@ export function HomePage({
     hockey: false,
     pool: false,
   };
-  const showComingSoonGames =
-    gameVisibility.carrom || gameVisibility.hockey || gameVisibility.pool;
-
   if (loading && !snapshot) {
     return (
       <main className="page home-page home-page--loading">
@@ -347,13 +344,6 @@ export function HomePage({
           </button>
           )}
         </div>
-        {!showComingSoonGames && (
-          <p className="home-game-categories__empty">
-            {i18n.language === "bn"
-              ? "আরও গেম শীঘ্রই যোগ হবে"
-              : "More games coming soon"}
-          </p>
-        )}
       </section>
 
       <section className="home-section leaderboard-section live-win-board glass">

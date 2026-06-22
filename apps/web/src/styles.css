@@ -1118,16 +1118,6 @@ button.danger {
   min-width: 108px;
 }
 
-.home-game-categories__empty {
-  margin: 0;
-  padding: 10px 12px;
-  border-radius: 12px;
-  color: rgba(200, 255, 220, 0.72);
-  background: rgba(4, 24, 14, 0.45);
-  font-size: 12px;
-  text-align: center;
-}
-
 .admin-team-form {
   grid-template-columns: repeat(3, minmax(130px, 1fr)) minmax(240px, 1.5fr) auto;
   align-items: end;
@@ -4124,8 +4114,8 @@ button.danger {
   position: relative;
   min-height: 0;
   display: grid;
-  grid-template-rows: 52px minmax(0, 1fr) 58px 52px;
-  gap: 8px;
+  grid-template-rows: 52px minmax(0, 1fr) minmax(54px, auto) minmax(50px, auto);
+  gap: 6px;
   overflow: hidden;
   overscroll-behavior: none;
   touch-action: manipulation;
@@ -4144,6 +4134,18 @@ button.danger {
   display: none;
 }
 
+.game-page.game-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+  gap: 14px;
+  padding: 16px;
+  text-align: center;
+  grid-template-rows: unset;
+}
+
 .game-loading {
   place-items: center;
   align-content: center;
@@ -4152,11 +4154,14 @@ button.danger {
 }
 
 .game-loading img {
-  width: 76px;
-  height: 76px;
+  display: block;
+  width: 80px;
+  height: 80px;
+  margin: 0 auto;
   border-radius: 50%;
   object-fit: cover;
   filter: drop-shadow(0 0 18px rgba(73, 236, 128, 0.34));
+  animation: loading-pulse 1.4s ease-in-out infinite alternate;
 }
 
 .game-arena {
@@ -5119,15 +5124,15 @@ button.danger {
 }
 
 .speed-fast {
-  --token-hop-ms: 300ms;
+  --token-hop-ms: 360ms;
 }
 
 .speed-normal {
-  --token-hop-ms: 400ms;
+  --token-hop-ms: 520ms;
 }
 
 .speed-slow {
-  --token-hop-ms: 400ms;
+  --token-hop-ms: 800ms;
 }
 
 .ludo-token.green {
@@ -5461,28 +5466,42 @@ button.danger {
 
 .game-controls {
   display: grid;
-  grid-template-columns: 38px 72px minmax(0, 1fr) 42px;
+  grid-template-columns: auto minmax(72px, 80px) minmax(0, 1fr) 38px;
   align-items: center;
-  gap: 5px;
-  padding: 7px;
+  gap: 6px;
+  min-width: 0;
+  padding: 6px 8px;
   border: 1px solid rgba(220, 188, 65, 0.28);
   border-radius: 18px;
   background: linear-gradient(160deg, rgba(10, 62, 30, 0.95), rgba(1, 31, 15, 0.97));
   box-shadow: inset 0 1px 0 rgba(255, 239, 138, 0.1), 0 5px 14px rgba(0, 7, 2, 0.42);
 }
 
-.game-controls > button {
+.game-controls__tools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.game-controls .game-sound {
   border: 1px solid rgba(225, 192, 70, 0.32);
   color: #f4d65f;
   background: linear-gradient(145deg, #15542d, #063218);
 }
 
 .game-sound {
+  flex: 0 0 auto;
   width: 34px;
   height: 34px;
   display: grid;
   place-items: center;
   border-radius: 50%;
+}
+
+.game-sound--fast.active {
+  color: #ffe566;
+  box-shadow: 0 0 8px rgba(255, 229, 102, 0.28);
 }
 
 .game-sound.active {
@@ -5492,8 +5511,10 @@ button.danger {
 .game-auto-switch {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  width: 72px;
+  width: 100%;
+  max-width: 80px;
   height: 34px;
+  justify-self: center;
   padding: 3px;
   border: 1px solid rgba(164, 255, 94, 0.24);
   border-radius: 999px;
@@ -5534,15 +5555,19 @@ button.danger {
 
 .game-action-status {
   min-width: 0;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0 4px;
   color: #8dbb99;
   font-size: 11px;
   font-weight: 850;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
   text-align: center;
-  line-height: 1.25;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .game-action-status.active {
@@ -5731,7 +5756,9 @@ button.danger {
 }
 
 .game-roll-streak {
-  height: 42px;
+  width: 38px;
+  height: 38px;
+  justify-self: end;
   display: grid;
   place-items: center;
   align-content: center;
@@ -5743,6 +5770,11 @@ button.danger {
   box-shadow: inset 0 1px 2px rgba(255, 248, 156, 0.14);
 }
 
+.game-roll-streak svg {
+  width: 15px;
+  height: 15px;
+}
+
 .game-roll-streak strong {
   font-size: 9px;
   font-weight: 900;
@@ -5750,9 +5782,10 @@ button.danger {
 
 .game-communication-stack {
   position: relative;
-  z-index: 22;
+  z-index: 12;
   min-height: 0;
-  overflow: visible;
+  overflow: hidden;
+  isolation: isolate;
 }
 
 .game-comms-overlay {
@@ -5786,10 +5819,9 @@ button.danger {
 
 .game-communication {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 4px;
-  gap: 7px;
-  padding: 4px 20px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  padding: 4px 6px;
   border-radius: 16px;
 }
 
@@ -6971,7 +7003,7 @@ button.danger {
 
 @media (max-height: 650px) {
   .app-surface--game .game-page {
-    grid-template-rows: 48px minmax(0, 1fr) 52px 48px;
+    grid-template-rows: 48px minmax(0, 1fr) minmax(50px, auto) minmax(48px, auto);
   }
 
   .app-surface--game .game-arena {
@@ -6993,7 +7025,7 @@ button.danger {
 
 @media (max-height: 650px) {
   .game-page {
-    grid-template-rows: 48px minmax(0, 1fr) 52px 48px;
+    grid-template-rows: 48px minmax(0, 1fr) minmax(50px, auto) minmax(48px, auto);
     gap: 5px;
   }
 
@@ -7028,7 +7060,23 @@ button.danger {
   }
 
   .game-controls {
-    padding: 4px 6px;
+    grid-template-columns: auto minmax(68px, 76px) minmax(0, 1fr) 36px;
+    gap: 5px;
+    padding: 5px 6px;
+  }
+
+  .game-controls__tools {
+    gap: 5px;
+  }
+
+  .game-sound {
+    width: 32px;
+    height: 32px;
+  }
+
+  .game-roll-streak {
+    width: 34px;
+    height: 34px;
   }
 
   .ludo-board {

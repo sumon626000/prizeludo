@@ -3,6 +3,7 @@ import {
   buildCapturedReturnSteps,
   buildTokenMovementSteps,
   resolveCapturedTokens,
+  tokenBoardCoordinate,
 } from "./game-animation";
 
 describe("buildTokenMovementSteps", () => {
@@ -65,5 +66,61 @@ describe("resolveCapturedTokens", () => {
         steps: [3, 2, 1, 0, -1],
       },
     ]);
+  });
+});
+
+describe("tokenBoardCoordinate", () => {
+  const homeLanes = [
+    [
+      [7, 1],
+      [7, 2],
+      [7, 3],
+      [7, 4],
+      [7, 5],
+      [7, 6],
+    ],
+    [
+      [1, 7],
+      [2, 7],
+      [3, 7],
+      [4, 7],
+      [5, 7],
+      [6, 7],
+    ],
+    [
+      [7, 13],
+      [7, 12],
+      [7, 11],
+      [7, 10],
+      [7, 9],
+      [7, 8],
+    ],
+    [
+      [13, 7],
+      [12, 7],
+      [11, 7],
+      [10, 7],
+      [9, 7],
+      [8, 7],
+    ],
+  ] as Array<Array<[number, number]>>;
+  const yards = Array.from({ length: 4 }, () => [
+    [0, 0],
+    [0, 1],
+    [1, 0],
+    [1, 1],
+  ]) as Array<Array<[number, number]>>;
+  const track = [[0, 0]] as Array<[number, number]>;
+
+  it("maps blue home-lane steps onto the colored final path", () => {
+    expect(
+      tokenBoardCoordinate(52, 0, 2, 52, 57, track, homeLanes, yards),
+    ).toEqual([7, 13]);
+    expect(
+      tokenBoardCoordinate(56, 0, 2, 52, 57, track, homeLanes, yards),
+    ).toEqual([7, 9]);
+    expect(
+      tokenBoardCoordinate(57, 0, 2, 52, 57, track, homeLanes, yards),
+    ).toEqual([7, 8]);
   });
 });

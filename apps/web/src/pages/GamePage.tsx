@@ -15,6 +15,7 @@ import {
   Volume2,
   VolumeX,
   WifiOff,
+  Zap,
   X,
 } from "lucide-react";
 import {
@@ -54,16 +55,24 @@ import {
   pickSmartAutoToken,
   getEarlyFinishLabel,
   buildAutoMoveContext,
-  AUTO_HUMAN_ROLL_DELAY_MS,
-  AUTO_HUMAN_MOVE_DELAY_MS,
+  getAutoHumanRollDelayMs,
+  getAutoHumanMoveDelayMs,
+  getAuthoritativeDiceForPlayer,
+  getTokenMoveAfterDiceMs,
   TOKEN_KILL_IMPACT_MS,
   TOKEN_KILL_RETURN_TOTAL_MS,
-  TOKEN_MOVE_AFTER_DICE_MS,
   TOKEN_STEP_MS,
   tokenPositionsEqual,
   waitForPlayerDiceRollFinish,
   useMultiplayerDiceRolls,
 } from "../lib/game-ui";
+import {
+  GameplayEventGate,
+  GameplayPlaybackQueue,
+  canAcceptTap,
+  playDiceReveal,
+  startStuckRecoveryWatch,
+} from "../lib/gameplay-sync";
 import { socket } from "../lib/socket";
 import type { GameRoom, RealtimeEnvelope } from "../types";
 
@@ -228,6 +237,10 @@ function moveAnimationKey(
   ].join("|");
 }
 
+function blocksTokenTap(busy: string) {
+  return busy === "leave" || busy.startsWith("move-");
+}
+
 const SOFT_GAME_ERRORS = new Set([
   "NOT_YOUR_TURN",
   "DICE_ALREADY_ROLLED",
@@ -250,10 +263,14 @@ export function GamePage() {
   const [autoDice, setAutoDice] = useState(
     () => localStorage.getItem("khan-ludo-auto-dice") === "on",
   );
-  const enableAutoDice = useCallback(() => {
+  const [simpleGameplay, setSimpleGameplay] = useState(
+    () => localStorage.getItem("khan-ludo-simple-gameplay") === "on",
+  );
+  const setAutoDiceOn = useCallback(() => {
     setAutoDice(true);
     localStorage.setItem("khan-ludo-auto-dice", "on");
   }, []);
+  const enableAutoDice = setAutoDiceOn;
   const disableAutoDice = useCallback(() => {
     setAutoDice(false);
     localStorage.setItem("khan-ludo-auto-dice", "off");
@@ -300,7 +317,21 @@ export function GamePage() {
   const refreshInFlightRef = useRef(false);
   const previousTurnRef = useRef<string | null>(null);
   const lastTimerTickRef = useRef<number | null>(null);
+  const [tokenAnimating, setTokenAnimating] = useState(false);
   const tokenAnimatingRef = useRef(false);
+  const busyRef = useRef("");
+  const tokenSpeedRef = useRef<"fast" | "normal" | "slow">("normal");
+  const lastRealtimeAtRef = useRef(0);
+  const finishRollRef = useRef<(playerId: string, dice?: number) => void>(
+    () => undefined,
+  );
+  const playbackRef = useRef(new GameplayPlaybackQueue());
+  const eventGateRef = useRef(new GameplayEventGate());
+  const diceSpeedRef = useRef<"fast" | "normal" | "slow">("normal");
+  const simpleGameplayRef = useRef(false);
+  const isRollingRef = useRef<(playerId: string) => boolean>(() => false);
+  busyRef.current = busy;
+  simpleGameplayRef.current = simpleGameplay;
 
   useEffect(() => {
     soundEngine.setEnabled(sound);
@@ -377,6 +408,14 @@ export function GamePage() {
       }, 450);
       return;
     }
+    if (Date.now() - lastRealtimeAtRef.current < 1_200) {
+      if (refreshTimerRef.current !== null) return;
+      refreshTimerRef.current = window.setTimeout(() => {
+        refreshTimerRef.current = null;
+        scheduleRefresh();
+      }, 1_200);
+      return;
+    }
     if (refreshTimerRef.current !== null) return;
     refreshTimerRef.current = window.setTimeout(() => {
       refreshTimerRef.current = null;
@@ -449,10 +488,17 @@ export function GamePage() {
     const lastAction = room.state.boardState.lastAction;
     const playerId = roll
       ? room.state.currentTurn
-      : lastAction.dice
+      : lastAction.userId && lastAction.dice
         ? lastAction.userId
-        : undefined;
-    const dice = roll?.dice ?? lastAction.dice;
+        : room.state.currentTurn &&
+            room.state.diceValue &&
+            lastAction.userId === room.state.currentTurn
+          ? room.state.currentTurn
+          : undefined;
+    const dice =
+      roll?.dice ??
+      lastAction.dice ??
+      (playerId === room.state.currentTurn ? room.state.diceValue : null);
     if (!playerId || !dice) return;
     setPlayerDice((current) =>
       current[playerId] === dice
@@ -462,8 +508,10 @@ export function GamePage() {
   }, [
     room?.state.boardState.lastAction.at,
     room?.state.boardState.lastAction.dice,
+    room?.state.boardState.lastAction.userId,
     room?.state.boardState.roll?.dice,
     room?.state.currentTurn,
+    room?.state.diceValue,
   ]);
 
   const applyActionState = useCallback((result: {
@@ -471,7 +519,9 @@ export function GamePage() {
     currentTurn: string | null;
     tokenPositions?: Record<string, number[]>;
     dice?: number;
+    stateVersion?: number;
   }) => {
+    lastRealtimeAtRef.current = Date.now();
     setRoom((current) => {
       if (!current) return current;
       const currentAction = current.state.boardState.lastAction;
@@ -479,6 +529,16 @@ export function GamePage() {
       if (actionFingerprint(currentAction) === actionFingerprint(incomingAction)) {
         return current;
       }
+      if (
+        result.stateVersion !== undefined &&
+        result.stateVersion < current.state.stateVersion
+      ) {
+        return current;
+      }
+      const nextVersion =
+        result.stateVersion !== undefined
+          ? Math.max(current.state.stateVersion, result.stateVersion)
+          : current.state.stateVersion + 1;
       return {
             ...current,
             state: {
@@ -488,7 +548,7 @@ export function GamePage() {
               diceValue: result.dice ?? current.state.diceValue,
               tokenPositions:
                 result.tokenPositions ?? current.state.tokenPositions,
-              stateVersion: current.state.stateVersion + 1,
+              stateVersion: nextVersion,
               updatedAt: new Date().toISOString(),
             },
           };
@@ -526,30 +586,81 @@ export function GamePage() {
         state: GameRoom["state"]["boardState"];
         currentTurn: string | null;
         tokenPositions: Record<string, number[]>;
+        stateVersion: number;
       }>(`/api/games/${matchId}/move`, {
         method: "POST",
         body: JSON.stringify({ tokenIndex }),
       });
+      if (isRollingRef.current(user.id) && !simpleGameplayRef.current) {
+        await waitForPlayerDiceRollFinish(
+          isRollingRef.current,
+          user.id,
+          tokenSpeedRef.current,
+        );
+      }
       applyActionState(result);
     },
     [applyActionState, matchId, user?.id],
   );
 
   const handleDiceReveal = useCallback((playerId: string, dice: number) => {
+    if (dice < 1 || dice > 6) return;
     setPlayerDice((current) => ({ ...current, [playerId]: dice }));
   }, []);
 
   const diceSpeed = room?.settings.diceSpeed ?? "normal";
-  const { startRoll, setRollResult, isRolling, rollingFace, rollProgress } =
-    useMultiplayerDiceRolls(diceSpeed, handleDiceReveal);
-  const isRollingRef = useRef(isRolling);
+  const tokenSpeed = room?.settings.tokenSpeed ?? "normal";
+  tokenSpeedRef.current = tokenSpeed;
+  diceSpeedRef.current = diceSpeed;
+  const { startRoll, setRollResult, finishRoll, isRolling, rollingFace, rollProgress } =
+    useMultiplayerDiceRolls(diceSpeed);
+  finishRollRef.current = finishRoll;
   isRollingRef.current = isRolling;
 
+  const realtimeHandlersRef = useRef({
+    userId: undefined as string | undefined,
+    applyActionState,
+    playSound,
+    startRoll,
+    setRollResult,
+    handleDiceReveal,
+    refreshNow,
+    scheduleRefresh,
+    enableAutoDice: setAutoDiceOn,
+    setRoom,
+  });
+  realtimeHandlersRef.current = {
+    userId: user?.id,
+    applyActionState,
+    playSound,
+    startRoll,
+    setRollResult,
+    handleDiceReveal,
+    refreshNow,
+    scheduleRefresh,
+    enableAutoDice: setAutoDiceOn,
+    setRoom,
+  };
+
   useEffect(() => {
+    if (!matchId) return;
+    const ensureJoined = () => {
+      if (socket.connected) {
+        socket.emit("game:join", matchId);
+      }
+    };
+    const onConnect = () => {
+      setReconnecting(false);
+      ensureJoined();
+      void load().catch(() => undefined);
+    };
+    ensureJoined();
+    socket.on("connect", onConnect);
+
     const onSnapshot = (
       event: RealtimeEnvelope<GameRoom> | GameRoom,
     ) => {
-      setRoom(
+      realtimeHandlersRef.current.setRoom(
         event &&
           typeof event === "object" &&
           "payload" in event
@@ -562,89 +673,121 @@ export function GamePage() {
     const onDice = (payload: {
       userId?: string;
       dice?: number;
+      stateVersion?: number;
       state?: GameRoom["state"]["boardState"];
       currentTurn?: string | null;
       tokenPositions?: Record<string, number[]>;
     }) => {
-      playSound("dice");
-      if (payload.userId && payload.dice) {
-        if (payload.userId === user?.id) {
-          setRollResult(payload.userId, payload.dice);
-        } else {
-          startRoll(payload.userId, payload.dice);
-        }
+      const gateKey = `dice:${payload.stateVersion ?? 0}:${payload.userId}:${payload.dice}:${payload.state?.lastAction.at ?? ""}`;
+      if (!eventGateRef.current.accept(gateKey, payload.stateVersion)) return;
+      const handlers = realtimeHandlersRef.current;
+      const actorId = payload.userId;
+      const dice = payload.dice;
+      if (!actorId || !dice) return;
+      const ownLocalRoll =
+        actorId === handlers.userId && busyRef.current === "roll";
+      handlers.playSound("dice");
+      if (payload.state && payload.tokenPositions) {
+        handlers.applyActionState({
+          state: payload.state,
+          currentTurn: payload.currentTurn ?? null,
+          tokenPositions: payload.tokenPositions,
+          ...(payload.stateVersion !== undefined
+            ? { stateVersion: payload.stateVersion }
+            : {}),
+          dice,
+        });
       }
-      if (
-        payload.state &&
-        payload.tokenPositions &&
-        payload.userId &&
-        payload.userId !== user?.id
-      ) {
-        const actorId = payload.userId;
-        const boardState = payload.state;
-        const tokenPositions = payload.tokenPositions;
-        const currentTurn = payload.currentTurn ?? null;
-        const dice = payload.dice;
-        void (async () => {
-          await waitForPlayerDiceRollFinish(isRollingRef.current, actorId);
-          applyActionState({
-            state: boardState,
-            currentTurn,
-            tokenPositions,
-            ...(dice !== undefined ? { dice } : {}),
-          });
-        })();
+      handlers.handleDiceReveal(actorId, dice);
+      if (ownLocalRoll) {
+        handlers.setRollResult(actorId, dice);
+        return;
       }
+      if (simpleGameplayRef.current) return;
+      void playDiceReveal(
+        handlers.startRoll,
+        isRollingRef.current,
+        actorId,
+        dice,
+        diceSpeedRef.current,
+        tokenSpeedRef.current,
+      );
     };
     const onMove = (payload: {
       userId?: string;
+      tokenIndex?: number;
+      stateVersion?: number;
       killedUserIds?: string[];
       reachedHome?: boolean;
       state?: GameRoom["state"]["boardState"];
       currentTurn?: string | null;
       tokenPositions?: Record<string, number[]>;
     }) => {
+      const gateKey = `move:${payload.stateVersion ?? 0}:${payload.userId}:${payload.state?.lastAction.at ?? ""}`;
+      if (!eventGateRef.current.accept(gateKey, payload.stateVersion)) return;
+      const handlers = realtimeHandlersRef.current;
+      if (
+        payload.userId === handlers.userId &&
+        busyRef.current.startsWith("move-")
+      ) {
+        return;
+      }
       if (payload.killedUserIds?.length) {
         /* Kill sound plays during board capture animation. */
       } else if (payload.reachedHome) {
-        playSound("home");
+        handlers.playSound("home");
       }
-      const applyMoveState = () => {
-        if (payload.state && payload.tokenPositions) {
-          applyActionState({
-            state: payload.state,
-            currentTurn: payload.currentTurn ?? null,
-            tokenPositions: payload.tokenPositions,
-          });
-        } else {
-          refreshNow();
-        }
-      };
-      if (payload.userId) {
-        void (async () => {
-          await waitForPlayerDiceRollFinish(isRollingRef.current, payload.userId!);
-          applyMoveState();
-        })();
-        return;
+      if (payload.state && payload.tokenPositions) {
+        handlers.applyActionState({
+          state: payload.state,
+          currentTurn: payload.currentTurn ?? null,
+          tokenPositions: payload.tokenPositions,
+          ...(payload.stateVersion !== undefined
+            ? { stateVersion: payload.stateVersion }
+            : {}),
+        });
+      } else {
+        handlers.refreshNow();
       }
-      applyMoveState();
     };
     const onTurnChange = (payload: {
       userId?: string | null;
-      autoDice?: number | null;
+      turnDeadline?: string | null;
+      turnStartedAt?: string | null;
+      stateVersion?: number;
       missedUserId?: string;
       autoPlayEnabled?: boolean;
     }) => {
-      if (payload.missedUserId === user?.id) {
-        enableAutoDice();
+      const handlers = realtimeHandlersRef.current;
+      if (payload.missedUserId === handlers.userId) {
+        handlers.enableAutoDice();
       }
-      if (payload.missedUserId && payload.autoDice) {
-        startRoll(payload.missedUserId, payload.autoDice);
-      }
-      scheduleRefresh();
+      handlers.setRoom((current) => {
+        if (!current) return current;
+        return {
+          ...current,
+          state: {
+            ...current.state,
+            currentTurn:
+              payload.userId === undefined
+                ? current.state.currentTurn
+                : payload.userId,
+            boardState: {
+              ...current.state.boardState,
+              turnDeadline:
+                payload.turnDeadline ??
+                current.state.boardState.turnDeadline,
+              turnStartedAt:
+                payload.turnStartedAt ??
+                current.state.boardState.turnStartedAt,
+            },
+          },
+        };
+      });
+      handlers.scheduleRefresh();
     };
     const onMessage = (message: GameRoom["messages"][number]) => {
-      setRoom((current) => {
+      realtimeHandlersRef.current.setRoom((current) => {
         if (!current) return current;
         if (current.messages.some((entry) => entry.id === message.id)) {
           return current;
@@ -667,44 +810,42 @@ export function GamePage() {
       });
     };
     const onGameOver = () => {
-      playSound("win");
-      refreshNow();
+      realtimeHandlersRef.current.playSound("win");
+      realtimeHandlersRef.current.refreshNow();
     };
     const onDisconnect = () => setReconnecting(true);
-    const onConnect = () => {
-      setReconnecting(false);
-      socket.emit("game:join", matchId);
-      void load().catch(() => undefined);
-    };
-    socket.on("game:state", scheduleRefresh);
+    const onState = () => realtimeHandlersRef.current.scheduleRefresh();
+
+    socket.on("game:state", onState);
     socket.on("game:state-snapshot", onSnapshot);
     socket.on("game:dice-roll", onDice);
     socket.on("game:token-move", onMove);
     socket.on("game:turn-change", onTurnChange);
-    socket.on("game:player-leave", scheduleRefresh);
-    socket.on("game:reconnect-start", scheduleRefresh);
-    socket.on("game:reconnect-success", scheduleRefresh);
-    socket.on("game:reconnect-fail", scheduleRefresh);
+    socket.on("game:player-leave", onState);
+    socket.on("game:reconnect-start", onState);
+    socket.on("game:reconnect-success", onState);
+    socket.on("game:reconnect-fail", onState);
     socket.on("game:message", onMessage);
     socket.on("game:over", onGameOver);
     socket.on("disconnect", onDisconnect);
     socket.on("connect", onConnect);
     return () => {
-      socket.off("game:state", scheduleRefresh);
+      socket.off("connect", onConnect);
+      socket.off("game:state", onState);
       socket.off("game:state-snapshot", onSnapshot);
       socket.off("game:dice-roll", onDice);
       socket.off("game:token-move", onMove);
       socket.off("game:turn-change", onTurnChange);
-      socket.off("game:player-leave", scheduleRefresh);
-      socket.off("game:reconnect-start", scheduleRefresh);
-      socket.off("game:reconnect-success", scheduleRefresh);
-      socket.off("game:reconnect-fail", scheduleRefresh);
+      socket.off("game:player-leave", onState);
+      socket.off("game:reconnect-start", onState);
+      socket.off("game:reconnect-success", onState);
+      socket.off("game:reconnect-fail", onState);
       socket.off("game:message", onMessage);
       socket.off("game:over", onGameOver);
       socket.off("disconnect", onDisconnect);
       socket.off("connect", onConnect);
     };
-  }, [applyActionState, enableAutoDice, load, matchId, playSound, refreshNow, scheduleRefresh, setRollResult, startRoll, user?.id]);
+  }, [load, matchId]);
 
   const run = async (
     key: string,
@@ -727,50 +868,95 @@ export function GamePage() {
     }
   };
 
+  useEffect(() => {
+    playbackRef.current.reset();
+    eventGateRef.current.reset();
+  }, [matchId]);
+
+  useEffect(() => {
+    if (!user?.id || simpleGameplay) return;
+    return startStuckRecoveryWatch(
+      () => isRollingRef.current(user.id),
+      () => {
+        finishRollRef.current(user.id);
+        void load().catch(() => undefined);
+      },
+      9_000,
+    );
+  }, [load, simpleGameplay, user?.id]);
+
   const roll = useCallback(() => {
-    if (!user?.id || busy === "roll") return;
+    if (!user?.id || !room) return;
+    if (room.state.currentTurn !== user.id) return;
+    if (room.state.boardState.roll) return;
+    if (busy === "roll" || busy.startsWith("move-")) return;
+    if (!canAcceptTap("roll", simpleGameplay ? 120 : 320)) return;
     soundEngine.resume();
-    startRoll(user.id);
-    void run("roll", async () => {
-      playSound("dice");
-      const startedAt = Date.now();
-      const result = await apiRequest<{
-        state: GameRoom["state"]["boardState"];
-        currentTurn: string | null;
-        dice: number;
-      }>(`/api/games/${matchId}/roll`, {
-        method: "POST",
-        body: "{}",
-      });
-      setRollResult(user.id, result.dice);
-      const animationDuration = getDiceRollDuration(
-        room?.settings.diceSpeed ?? "normal",
-      );
-      const remaining = animationDuration - (Date.now() - startedAt);
-      if (remaining > 0) {
-        await new Promise((resolve) => window.setTimeout(resolve, remaining));
-      }
-      await waitForPlayerDiceRollFinish(isRollingRef.current, user.id);
-      applyActionState(result);
-      if (!autoDice) {
-        const autoTokenIndex = getOnlyLegalTokenIndex(
-          result.state.roll?.legalTokenIndexes ?? [],
-        );
-        if (autoTokenIndex !== null) {
-          playSound("move");
-          await submitTokenMove(autoTokenIndex);
+    setBusy("roll");
+    setError("");
+    void (async () => {
+      try {
+        playSound("dice");
+        if (!simpleGameplay) {
+          startRoll(user.id);
+        }
+        const result = await apiRequest<{
+          state: GameRoom["state"]["boardState"];
+          currentTurn: string | null;
+          dice: number;
+          stateVersion: number;
+        }>(`/api/games/${matchId}/roll`, {
+          method: "POST",
+          body: "{}",
+        });
+        setRollResult(user.id, result.dice);
+        handleDiceReveal(user.id, result.dice);
+        applyActionState({
+          ...result,
+          dice: result.dice,
+          stateVersion: result.stateVersion,
+        });
+        setBusy("");
+        if (!simpleGameplay) {
+          await waitForPlayerDiceRollFinish(
+            isRollingRef.current,
+            user.id,
+            tokenSpeedRef.current,
+          );
+        }
+        if (!autoDice) {
+          const autoTokenIndex = getOnlyLegalTokenIndex(
+            result.state.roll?.legalTokenIndexes ?? [],
+          );
+          if (autoTokenIndex !== null) {
+            playSound("move");
+            await submitTokenMove(autoTokenIndex);
+          }
+        }
+      } catch (caught) {
+        if (caught instanceof ApiError && SOFT_GAME_ERRORS.has(caught.code)) {
+          void load().catch(() => undefined);
+          return;
+        }
+        setError(caught instanceof Error ? caught.message : "Action failed.");
+      } finally {
+        setBusy("");
+        if (!simpleGameplay && isRollingRef.current(user.id)) {
+          finishRollRef.current(user.id);
         }
       }
-      return result;
-    }, false);
+    })();
   }, [
     applyActionState,
     autoDice,
     busy,
+    handleDiceReveal,
+    load,
     matchId,
     playSound,
-    room?.settings.diceSpeed,
+    room,
     setRollResult,
+    simpleGameplay,
     soundEngine,
     startRoll,
     submitTokenMove,
@@ -778,11 +964,11 @@ export function GamePage() {
   ]);
   const move = useCallback(
     (tokenIndex: number) => {
-      if (autoDice) return;
+      if (!canAcceptTap(`move-${tokenIndex}`, 320)) return;
       soundEngine.resume();
       void run(`move-${tokenIndex}`, () => submitTokenMove(tokenIndex), false);
     },
-    [autoDice, soundEngine, submitTokenMove],
+    [soundEngine, submitTokenMove],
   );
   const leave = () => {
     if (
@@ -888,48 +1074,30 @@ export function GamePage() {
   const ownPlayer = room?.players.find(({ user: player }) => player.id === user?.id);
 
   useEffect(() => {
-    if (!matchId || !user?.id || autoDice) return;
     if (!ownPlayer?.participant.missCount) return;
-    void apiRequest<{ resumed: boolean }>(
-      `/api/games/${matchId}/resume-manual`,
-      { method: "POST", body: "{}" },
-    )
-      .then((result) => {
-        if (!result.resumed) return;
-        setRoom((current) => {
-          if (!current) return current;
-          return {
-            ...current,
-            players: current.players.map((entry) =>
-              entry.user.id === user.id
-                ? {
-                    ...entry,
-                    participant: { ...entry.participant, missCount: 0 },
-                  }
-                : entry,
-            ),
-          };
-        });
-      })
-      .catch(() => undefined);
-  }, [autoDice, matchId, ownPlayer?.participant.missCount, user?.id]);
+    setAutoDiceOn();
+  }, [ownPlayer?.participant.missCount, setAutoDiceOn]);
+
+  const ownMissCount = ownPlayer?.participant.missCount ?? 0;
+  const serverAutoPlay = ownMissCount > 0;
 
   const isOwnTurn =
     room?.role === "player" && room.state.currentTurn === user?.id;
   const ownRolling = Boolean(user?.id && isRolling(user.id));
   const canAutoRoll = Boolean(
     autoDice &&
+      !serverAutoPlay &&
       user?.id &&
       room?.role === "player" &&
       room.state.currentTurn === user.id &&
       room.state.boardState.phase === "active" &&
       !room.state.boardState.roll &&
       busy !== "roll" &&
-      !ownRolling &&
-      !tokenAnimatingRef.current,
+      (simpleGameplay || (!ownRolling && !tokenAnimating)),
   );
   const canAutoMove = Boolean(
     autoDice &&
+      !serverAutoPlay &&
       user?.id &&
       room?.role === "player" &&
       room.state.currentTurn === user.id &&
@@ -938,8 +1106,16 @@ export function GamePage() {
       (room.state.boardState.roll.legalTokenIndexes.length ?? 0) > 0 &&
       !busy.startsWith("move-") &&
       busy !== "roll" &&
-      !ownRolling &&
-      !tokenAnimatingRef.current,
+      (simpleGameplay || (!ownRolling && !tokenAnimating)),
+  );
+  const canManualRoll = Boolean(
+    isOwnTurn &&
+      room?.state.boardState.phase === "active" &&
+      !room?.state.boardState.roll &&
+      busy !== "roll" &&
+      !busy.startsWith("move-") &&
+      (simpleGameplay || !ownRolling) &&
+      (!autoDice || !serverAutoPlay),
   );
   const rollRef = useRef(roll);
   rollRef.current = roll;
@@ -954,12 +1130,14 @@ export function GamePage() {
     if (!canAutoRoll) return;
     const timer = window.setTimeout(() => {
       rollRef.current();
-    }, AUTO_HUMAN_ROLL_DELAY_MS);
+    }, getAutoHumanRollDelayMs(room?.settings.diceSpeed ?? "normal"));
     return () => window.clearTimeout(timer);
   }, [
     canAutoRoll,
+    room?.settings.diceSpeed,
     room?.state.currentTurn,
     room?.state.boardState.roll,
+    tokenAnimating,
   ]);
 
   useEffect(() => {
@@ -974,13 +1152,15 @@ export function GamePage() {
         () => submitTokenMoveRef.current(tokenIndex),
         false,
       );
-    }, AUTO_HUMAN_MOVE_DELAY_MS);
+    }, getAutoHumanMoveDelayMs(room.settings.tokenSpeed));
     return () => window.clearTimeout(timer);
   }, [
     canAutoMove,
     playSound,
+    room?.settings.tokenSpeed,
     room?.state.boardState.roll,
     room?.state.stateVersion,
+    tokenAnimating,
   ]);
 
   const handleStepSound = useCallback(() => {
@@ -1104,7 +1284,7 @@ export function GamePage() {
       </header>
 
       <section
-        className={`game-arena game-arena--${room.tournament.boardType}`}
+        className={`game-arena game-arena--${room.tournament.boardType}${simpleGameplay ? " game-simple-mode" : ""}`}
       >
         {room.players.map(({ participant, user: player }, index) => {
           const boardSeat = visualSeat(index, room.tournament.boardType);
@@ -1140,20 +1320,27 @@ export function GamePage() {
               }
               turnDeadline={active ? turnDeadline : null}
               turnTotalSeconds={turnTotalSeconds}
-              diceValue={
-                rolling
-                  ? rollingFace(player.id) ?? 1
-                  : playerDice[player.id] ?? null
-              }
+              diceValue={(() => {
+                const fromState = getAuthoritativeDiceForPlayer(
+                  room.state.boardState,
+                  room.state.currentTurn,
+                  player.id,
+                  room.state.diceValue,
+                );
+                const cached = playerDice[player.id] ?? null;
+                const resolved = fromState ?? cached;
+                if (rolling && !simpleGameplay && resolved === null) {
+                  return rollingFace(player.id) ?? 1;
+                }
+                if (rolling && !simpleGameplay && resolved !== null) {
+                  return resolved;
+                }
+                return resolved;
+              })()}
               rolling={rolling}
               rollProgress={rolling ? rollProgress(player.id) : 0}
-              canRoll={
-                ownDice &&
-                isOwnTurn &&
-                !room.state.boardState.roll &&
-                room.state.boardState.phase === "active" &&
-                !rolling
-              }
+              canRoll={ownDice && canManualRoll}
+              simpleGameplay={simpleGameplay}
               bubble={activeBubbles[player.id] ?? null}
               onRoll={roll}
             />
@@ -1171,6 +1358,7 @@ export function GamePage() {
           userId={user?.id}
           currentTurn={room.state.currentTurn}
           diceSpeed={room.settings.diceSpeed}
+          simpleGameplay={simpleGameplay}
           onMove={move}
           busy={busy}
           isDiceRolling={isRolling}
@@ -1179,24 +1367,51 @@ export function GamePage() {
           onKillReturnSound={handleKillReturnSound}
           onAnimatingChange={(animating) => {
             tokenAnimatingRef.current = animating;
+            setTokenAnimating(animating);
           }}
         />
         </div>
       </section>
 
       <section className="game-controls glass">
-        <button
-          className={`game-sound ${sound ? "active" : ""}`}
-          onClick={() => {
-            const next = !sound;
-            setSound(next);
-            localStorage.setItem("khan-ludo-sound", next ? "on" : "off");
-            if (next) soundEngine.resume();
-          }}
-          aria-label={bn ? "সাউন্ড" : "Sound"}
-        >
-          {sound ? <Volume2 size={17} /> : <VolumeX size={17} />}
-        </button>
+        <div className="game-controls__tools">
+          <button
+            className={`game-sound ${sound ? "active" : ""}`}
+            onClick={() => {
+              const next = !sound;
+              setSound(next);
+              localStorage.setItem("khan-ludo-sound", next ? "on" : "off");
+              if (next) soundEngine.resume();
+            }}
+            aria-label={bn ? "সাউন্ড" : "Sound"}
+          >
+            {sound ? <Volume2 size={17} /> : <VolumeX size={17} />}
+          </button>
+          <button
+            className={`game-sound game-sound--fast ${simpleGameplay ? "active" : ""}`}
+            onClick={() => {
+              const next = !simpleGameplay;
+              setSimpleGameplay(next);
+              localStorage.setItem(
+                "khan-ludo-simple-gameplay",
+                next ? "on" : "off",
+              );
+              if (next && user?.id && isRollingRef.current(user.id)) {
+                finishRollRef.current(user.id);
+              }
+            }}
+            aria-label={
+              bn ? "সাধারণ মোড (অ্যানিমেশন বন্ধ)" : "Simple mode (no animation)"
+            }
+            title={
+              bn
+                ? "অ্যানিমেশন বন্ধ — দ্রুত ও নির্ভরযোগ্য"
+                : "No animation — faster and more reliable"
+            }
+          >
+            <Zap size={17} />
+          </button>
+        </div>
         <div
           className={`game-auto-switch ${autoDice ? "is-on" : ""}`}
           role="group"
@@ -1216,10 +1431,7 @@ export function GamePage() {
             className={autoDice ? "active" : ""}
             disabled={room.role !== "player"}
             aria-pressed={autoDice}
-            onClick={() => {
-              setAutoDice(true);
-              localStorage.setItem("khan-ludo-auto-dice", "on");
-            }}
+            onClick={enableAutoDice}
           >
             {bn ? "চালু" : "ON"}
           </button>
@@ -1707,6 +1919,7 @@ const PlayerDicePod = memo(function PlayerDicePod({
   rolling,
   rollProgress,
   canRoll,
+  simpleGameplay = false,
   bubble,
   onRoll,
 }: {
@@ -1723,6 +1936,7 @@ const PlayerDicePod = memo(function PlayerDicePod({
   rolling: boolean;
   rollProgress: number;
   canRoll: boolean;
+  simpleGameplay?: boolean;
   bubble: { id: string; kind: "chat" | "emoji"; content: string } | null;
   onRoll: () => void;
 }) {
@@ -1749,7 +1963,7 @@ const PlayerDicePod = memo(function PlayerDicePod({
       <div className="game-player-pod__top">
         <button
           className={`dice-button player-dice ${rolling ? "rolling" : ""} ${canRoll ? "can-roll" : ""}`}
-          disabled={!canRoll || rolling}
+          disabled={!canRoll || (rolling && !simpleGameplay)}
           onClick={onRoll}
           aria-label={canRoll ? "Roll dice" : `${player.name} dice`}
           style={
@@ -1842,6 +2056,7 @@ const LudoBoard = memo(function LudoBoard({
   userId,
   currentTurn,
   diceSpeed,
+  simpleGameplay = false,
   onMove,
   busy,
   isDiceRolling,
@@ -1854,6 +2069,7 @@ const LudoBoard = memo(function LudoBoard({
   userId?: string | undefined;
   currentTurn: string | null;
   diceSpeed: "fast" | "normal" | "slow";
+  simpleGameplay?: boolean;
   onMove: (tokenIndex: number) => void;
   busy: string;
   isDiceRolling?: (playerId: string) => boolean;
@@ -2016,8 +2232,13 @@ const LudoBoard = memo(function LudoBoard({
     const actionKey = moveAnimationKey(room.state.stateVersion, action);
 
     if (animationVersionRef.current === room.state.stateVersion) {
+      const actionUserId = action.userId;
+      const diceStillRolling = Boolean(
+        actionUserId && (isDiceRollingRef.current?.(actionUserId) ?? false),
+      );
       if (
         !animatingRef.current &&
+        !diceStillRolling &&
         !tokenPositionsEqual(displayPositions, room.state.tokenPositions)
       ) {
         setDisplayPositions(room.state.tokenPositions);
@@ -2042,7 +2263,7 @@ const LudoBoard = memo(function LudoBoard({
       action.from !== undefined &&
       action.to !== undefined;
 
-    if (!canAnimate) {
+    if (!canAnimate || simpleGameplay) {
       if (animatingRef.current) {
         return;
       }
@@ -2088,12 +2309,13 @@ const LudoBoard = memo(function LudoBoard({
     };
 
     const waitForDiceRollToFinish = async () => {
+      if (simpleGameplay) return;
       const checkRolling = (id: string) => isDiceRollingRef.current?.(id) ?? false;
       while (checkRolling(playerId)) {
         if (cancelled) return;
         await sleep(40);
       }
-      await sleep(TOKEN_MOVE_AFTER_DICE_MS);
+      await sleep(getTokenMoveAfterDiceMs(tokenSpeedRef.current));
     };
 
     animatingActionKeyRef.current = actionKey;
@@ -2131,7 +2353,7 @@ const LudoBoard = memo(function LudoBoard({
 
     const maxDuration =
       getDiceRollDuration(diceSpeedRef.current) +
-      TOKEN_MOVE_AFTER_DICE_MS +
+      getTokenMoveAfterDiceMs(tokenSpeedRef.current) +
       estimateForwardMoveDuration(
         tokenSpeedRef.current,
         action.from!,
@@ -2241,6 +2463,7 @@ const LudoBoard = memo(function LudoBoard({
     room.state.boardState.lastAction.userId,
     room.state.stateVersion,
     onAnimatingChange,
+    simpleGameplay,
   ]);
 
   const renderedTokens = useMemo(() => {
@@ -2255,7 +2478,7 @@ const LudoBoard = memo(function LudoBoard({
         const [row, col] = tokenCoordinate(
           position,
           tokenIndex,
-          seat,
+          colorSeat,
           room.rules.homeLaneStart,
           room.rules.finishPosition,
         );
@@ -2335,6 +2558,9 @@ const LudoBoard = memo(function LudoBoard({
               player.id === userId &&
               player.id === currentTurn &&
               state.roll?.legalTokenIndexes.includes(tokenIndex);
+            const diceRolling =
+              !simpleGameplay && Boolean(isDiceRolling?.(player.id));
+            const rollReady = Boolean(state.roll);
             const trackOffsets =
               position >= 0 && stackSize > 1
                 ? STACK_OFFSETS[stackIndex % STACK_OFFSETS.length]!
@@ -2365,9 +2591,9 @@ const LudoBoard = memo(function LudoBoard({
                 data-token-index={tokenIndex}
                 disabled={
                   !legal ||
-                  Boolean(busy) ||
+                  blocksTokenTap(busy) ||
                   Boolean(movingToken) ||
-                  Boolean(isDiceRolling?.(player.id)) ||
+                  (diceRolling && !rollReady) ||
                   returningTokens.size > 0 ||
                   killedImpactTokens.size > 0
                 }
@@ -2387,25 +2613,18 @@ const LudoBoard = memo(function LudoBoard({
 function tokenCoordinate(
   position: number,
   tokenIndex: number,
-  seat: number,
+  boardSeat: number,
   homeLaneStart: number,
   finishPosition: number,
 ): [number, number] {
-  if (position < 0) return YARDS[seat]![tokenIndex]!;
+  if (position < 0) return YARDS[boardSeat]![tokenIndex]!;
   if (position >= finishPosition) {
-    return [[7, 6], [6, 7], [7, 8], [8, 7]][seat] as [number, number];
+    return HOME_LANES[boardSeat]![5]!;
   }
   if (position >= homeLaneStart) {
-    const progress = Math.min(
-      5,
-      Math.floor(
-        ((position - homeLaneStart) /
-          Math.max(1, finishPosition - homeLaneStart)) *
-          6,
-      ),
-    );
-    return HOME_LANES[seat]![progress]!;
+    const progress = Math.min(5, position - homeLaneStart);
+    return HOME_LANES[boardSeat]![progress]!;
   }
-  const offset = [0, 13, 26, 39][seat]!;
+  const offset = [0, 13, 26, 39][boardSeat]!;
   return TRACK[(offset + position) % 52]!;
 }

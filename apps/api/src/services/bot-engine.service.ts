@@ -169,6 +169,7 @@ export async function processBotTick(io: Server, now = new Date()) {
           state: result.state,
           currentTurn: result.currentTurn,
           tokenPositions: result.tokenPositions,
+          stateVersion: result.stateVersion,
           serverTime: actionAt.toISOString(),
           at: actionAt.toISOString(),
         });
@@ -178,10 +179,10 @@ export async function processBotTick(io: Server, now = new Date()) {
           turnDeadline: result.state.turnDeadline,
           turnStartedAt: result.state.turnStartedAt,
           autoPassed: result.autoPassed,
+          stateVersion: result.stateVersion,
           serverTime: actionAt.toISOString(),
           at: actionAt.toISOString(),
         });
-        emitGameState(io, turn.matchId);
         actions += 1;
         continue;
       }
@@ -207,6 +208,7 @@ export async function processBotTick(io: Server, now = new Date()) {
         state: result.state,
         currentTurn: result.currentTurn,
         tokenPositions: result.tokenPositions,
+        stateVersion: result.stateVersion,
         serverTime: actionAt.toISOString(),
         at: actionAt.toISOString(),
       });
@@ -215,6 +217,7 @@ export async function processBotTick(io: Server, now = new Date()) {
         userId: result.currentTurn,
         turnDeadline: result.state.turnDeadline,
         turnStartedAt: result.state.turnStartedAt,
+        stateVersion: result.stateVersion,
         serverTime: actionAt.toISOString(),
         at: actionAt.toISOString(),
       });
