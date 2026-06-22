@@ -10,7 +10,7 @@ set -euo pipefail
 
 REPO_DIR="${DEPLOY_REPO_PATH:-$(cd "$(dirname "$0")/.." && pwd)}"
 BRANCH="${DEPLOY_BRANCH:-main}"
-PUBLIC_API_URL="${PUBLIC_API_URL:-https://api.prizejito.com}"
+PUBLIC_API_URL="${PUBLIC_API_URL:-https://prizejito.com}"
 
 cd "$REPO_DIR"
 

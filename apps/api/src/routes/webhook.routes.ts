@@ -24,9 +24,11 @@ function verifyGitHubSignature(
 function resolveDeployScript(): string {
   const candidates = [
     config.DEPLOY_SCRIPT,
-    resolve(process.cwd(), "../../scripts/deploy-webuzo.sh"),
+    resolve(process.cwd(), "scripts/update-changed.sh"),
+    resolve(process.cwd(), "../../scripts/update-changed.sh"),
     resolve(process.cwd(), "scripts/deploy-webuzo.sh"),
-    "/home/nixbazar/prizejito/scripts/deploy-webuzo.sh",
+    "/home/nixbazar/prizejito.com/scripts/update-changed.sh",
+    "/home/nixbazar/prizejito.com/scripts/deploy-webuzo.sh",
   ].filter(Boolean) as string[];
 
   for (const candidate of candidates) {
@@ -50,6 +52,9 @@ function triggerDeploy(): void {
       DEPLOY_REPO_PATH: config.DEPLOY_REPO_PATH,
       WEB_ROOT: config.WEB_ROOT,
       DEPLOY_BRANCH: config.DEPLOY_BRANCH,
+      PUBLIC_API_URL: config.API_PUBLIC_URL,
+      PUBLIC_WEB_ORIGIN: config.WEB_ORIGIN,
+      NODE_PORT: String(config.PORT),
     },
   });
   child.unref();

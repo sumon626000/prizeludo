@@ -6,7 +6,7 @@ PID_FILE="${API_PID_FILE:-$REPO_DIR/api.pid}"
 LOG_FILE="${DEPLOY_LOG_DIR:-$REPO_DIR/logs}/api.log"
 NODE_BIN="${NODE_BIN:-$(command -v node)}"
 ENV_FILE="${DEPLOY_ENV_FILE:-$REPO_DIR/.env}"
-PUBLIC_API_URL="${PUBLIC_API_URL:-https://api.prizejito.com}"
+PUBLIC_API_URL="${PUBLIC_API_URL:-https://prizejito.com}"
 
 mkdir -p "$(dirname "$LOG_FILE")"
 cd "$REPO_DIR"

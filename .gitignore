@@ -16,6 +16,25 @@ artifacts/
 cookies.txt
 *.pid
 api.pid
+logs/
+
+# Live web files copied to domain root — never commit (build output)
+/index.html
+/assets/
+/avatars/
+/tournament-artworks/
+/runtime-config.json
+/.htaccess
+/sw.js
+/workbox-*.js
+/registerSW.js
+/manifest.webmanifest
+/offline.html
+/prizejito-logo.png
+/logo.svg
+/avatar-leaf.svg
+/tmp/
+.deploy-last-commit
 
 # Stale compiled JS copies (API source is TypeScript only)
 apps/api/src/**/*.js

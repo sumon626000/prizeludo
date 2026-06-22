@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_DIR="${DEPLOY_REPO_PATH:-/home/nixbazar/prizeludo}"
+REPO_DIR="${DEPLOY_REPO_PATH:-/home/nixbazar/prizejito.com}"
 WEB_ROOT="${WEB_ROOT:-/home/nixbazar/prizejito.com}"
 BRANCH="${DEPLOY_BRANCH:-main}"
-PUBLIC_API_URL="${PUBLIC_API_URL:-https://api.prizejito.com}"
+PUBLIC_API_URL="${PUBLIC_API_URL:-https://prizejito.com}"
 PUBLIC_WEB_ORIGIN="${PUBLIC_WEB_ORIGIN:-https://prizejito.com}"
+NODE_PORT="${NODE_PORT:-30047}"
 LOG_DIR="${DEPLOY_LOG_DIR:-$REPO_DIR/logs}"
 DEPLOY_LOG="$LOG_DIR/deploy.log"
 
@@ -30,10 +31,14 @@ npm run db:migrate
 mkdir -p "$WEB_ROOT"
 cp -a apps/web/dist/. "$WEB_ROOT"/
 
-NODE_PORT="${NODE_PORT:-4000}"
+NODE_PORT="${NODE_PORT:-30047}"
 if [[ -f "$WEB_ROOT/.htaccess" ]]; then
   sed -i "s/__NODE_PORT__/$NODE_PORT/g" "$WEB_ROOT/.htaccess"
 fi
+
+# Passenger/Webuzo: reload Node after new API build
+mkdir -p "$REPO_DIR/tmp"
+touch "$REPO_DIR/tmp/restart.txt"
 
 cat > "$WEB_ROOT/runtime-config.json" <<EOF
 {

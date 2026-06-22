@@ -1,0 +1,104 @@
+PrizeJito — Git Push → Auto Webuzo Deploy
+==========================================
+
+Goal: PC তে git push করলেই prizejito.com অটো আপডেট হবে।
+
+
+কিভাবে কাজ করে
+---------------
+  PC (Cursor)  →  git push  →  GitHub
+                                    ↓
+                            Webhook (push event)
+                                    ↓
+              https://prizejito.com/api/webhook/git-update
+                                    ↓
+                    scripts/update-changed.sh (server)
+                                    ↓
+              git pull + smart build + copy web + restart API
+                                    ↓
+                         https://prizejito.com live
+
+
+একবার সেটআপ (Webuzo SSH)
+-------------------------
+
+  cd /home/nixbazar/prizejito.com
+  git fetch origin main && git reset --hard origin/main
+  bash scripts/setup-github-auto-deploy.sh
+
+তারপর Webuzo → Node.js → prizejito → Restart
+
+
+GitHub Webhook (manual — script output দেখুন)
+---------------------------------------------
+  Repository → Settings → Webhooks → Add webhook
+
+  Payload URL:  https://prizejito.com/api/webhook/git-update
+  Content type: application/json
+  Secret:       (setup script যে secret দেয়)
+  Events:       Just the push event
+
+
+.env এ থাকা উচিত
+-----------------
+  GITHUB_WEBHOOK_SECRET=<random secret>
+  DEPLOY_SCRIPT=/home/nixbazar/prizejito.com/scripts/update-changed.sh
+  DEPLOY_REPO_PATH=/home/nixbazar/prizejito.com
+  WEB_ROOT=/home/nixbazar/prizejito.com
+  DEPLOY_BRANCH=main
+  API_PUBLIC_URL=https://prizejito.com
+  WEB_ORIGIN=https://prizejito.com
+  API_RESTART_MODE=webuzo
+
+
+দৈনন্দিন কাজ (আপনার workflow)
+-------------------------------
+  1. PC তে code edit করুন (f:\PrizeLudo)
+  2. git add .
+  3. git commit -m "your message"
+  4. git push origin main
+  5. ১–৩ মিনিট অপেক্ষা — site auto update
+
+  Server এ আর SSH দিয়ে deploy করতে হবে না!
+
+
+Deploy log দেখা
+---------------
+  tail -f /home/nixbazar/prizejito.com/logs/deploy-changed.log
+
+
+Manual deploy (fallback)
+------------------------
+  cd /home/nixbazar/prizejito.com
+  bash scripts/update-changed.sh --full
+
+
+গুরুত্বপূর্ণ rules
+------------------
+  ❌ Server এ সরাসরি code edit করবেন না
+  ❌ git add -A করে assets/index.html commit করবেন না
+  ✅ শুধু PC তে edit → push
+  ✅ .env server এ থাকবে — GitHub এ commit করবেন না
+
+
+Smart build কী করে
+------------------
+  apps/web only change  → শুধু web build
+  apps/api only change  → শুধু API build
+  drizzle migration     → DB migrate + API build
+  docs only             → skip build
+
+
+Test webhook
+------------
+  GitHub → Webhooks → Recent Deliveries → ping → 200 OK
+
+  curl -s https://prizejito.com/api/health
+
+
+সমস্যা হলে
+-----------
+  Webhook 503 → GITHUB_WEBHOOK_SECRET .env এ নেই → setup script চালান
+  Webhook 401 → GitHub secret মিলছে না
+  Push হয় কিন্তু site পুরনো → tail deploy-changed.log
+  API change load হয় না → Webuzo Node Restart (কখনও কখনও লাগে)

@@ -12,10 +12,10 @@
 #
 set -euo pipefail
 
-REPO_DIR="${DEPLOY_REPO_PATH:-/home/nixbazar/prizeludo}"
+REPO_DIR="${DEPLOY_REPO_PATH:-/home/nixbazar/prizejito.com}"
 WEB_ROOT="${WEB_ROOT:-/home/nixbazar/prizejito.com}"
 BRANCH="${DEPLOY_BRANCH:-main}"
-PUBLIC_API_URL="${PUBLIC_API_URL:-https://api.prizejito.com}"
+PUBLIC_API_URL="${PUBLIC_API_URL:-https://prizejito.com}"
 PUBLIC_WEB_ORIGIN="${PUBLIC_WEB_ORIGIN:-https://prizejito.com}"
 LOG_DIR="${DEPLOY_LOG_DIR:-$REPO_DIR/logs}"
 STATE_FILE="${DEPLOY_STATE_FILE:-$REPO_DIR/.deploy-last-commit}"
@@ -183,6 +183,10 @@ EOF
   "updatedAt": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 }
 EOF
+  NODE_PORT="${NODE_PORT:-30047}"
+  if [[ -f "$WEB_ROOT/.htaccess" ]]; then
+    sed -i "s/__NODE_PORT__/$NODE_PORT/g" "$WEB_ROOT/.htaccess"
+  fi
   echo "Web copied to $WEB_ROOT"
 fi
 
@@ -194,6 +198,8 @@ if [[ "$NEED_API" -eq 1 ]]; then
     npm run db:migrate
   fi
   bash "$REPO_DIR/scripts/webuzo-restart-api.sh"
+  mkdir -p "$REPO_DIR/tmp"
+  touch "$REPO_DIR/tmp/restart.txt"
 fi
 
 HEALTH_OK=0
