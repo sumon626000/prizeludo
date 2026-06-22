@@ -57,6 +57,19 @@ function resolveApiUrl(): string {
 
 export let API_URL = resolveApiUrl();
 
+export type RuntimeConfig = {
+  apiUrl: string;
+  webOrigin?: string;
+  apkDownloadUrl?: string;
+  updatedAt?: string;
+};
+
+let runtimeConfig: RuntimeConfig | null = null;
+
+export function getRuntimeConfig(): RuntimeConfig | null {
+  return runtimeConfig;
+}
+
 export async function initRuntimeConfig(): Promise<string> {
   if (typeof window === "undefined") {
     API_URL = resolveApiUrl();
@@ -66,15 +79,22 @@ export async function initRuntimeConfig(): Promise<string> {
   // Never use production runtime-config on localhost/LAN — always hit local API.
   if (isLocalHostname(window.location.hostname)) {
     API_URL = resolveApiUrl();
+    runtimeConfig = { apiUrl: API_URL };
     return API_URL;
   }
 
   try {
     const response = await fetch("/runtime-config.json", { cache: "no-store" });
     if (response.ok) {
-      const body = (await response.json()) as { apiUrl?: string };
+      const body = (await response.json()) as Partial<RuntimeConfig>;
       if (body.apiUrl && !/localhost|127\.0\.0\.1/.test(body.apiUrl)) {
         API_URL = normalizeUrl(body.apiUrl);
+        runtimeConfig = {
+          apiUrl: API_URL,
+          ...(body.webOrigin ? { webOrigin: body.webOrigin } : {}),
+          ...(body.apkDownloadUrl ? { apkDownloadUrl: body.apkDownloadUrl } : {}),
+          ...(body.updatedAt ? { updatedAt: body.updatedAt } : {}),
+        };
         return API_URL;
       }
     }
@@ -83,6 +103,7 @@ export async function initRuntimeConfig(): Promise<string> {
   }
 
   API_URL = resolveApiUrl();
+  runtimeConfig = { apiUrl: API_URL };
   return API_URL;
 }
 

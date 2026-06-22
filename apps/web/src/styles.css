@@ -3762,6 +3762,63 @@ button.danger {
   font-size: 0.66rem;
 }
 
+.pwa-install-prompt__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pwa-install-prompt__actions .ghost-button {
+  min-height: 31px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  font-size: 0.66rem;
+  border: 1px solid rgba(164, 255, 94, 0.28);
+  border-radius: 999px;
+  color: #d8ffe6;
+  background: rgba(164, 255, 94, 0.08);
+}
+
+.pwa-install-prompt__apk-note {
+  display: block;
+  margin-top: 6px;
+  color: rgba(224, 255, 232, 0.5);
+  font-size: 0.58rem;
+  line-height: 1.35;
+}
+
+.app-install-button {
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 16px;
+  border: 1px solid rgba(164, 255, 94, 0.28);
+  border-radius: 16px;
+  color: #e8ffe9;
+  background: rgba(164, 255, 94, 0.1);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.app-install-button--compact {
+  min-height: 42px;
+  font-size: 0.76rem;
+}
+
+.home-quick-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+}
+
+.home-install-cta {
+  width: 100%;
+}
+
 .pwa-install-prompt__close {
   position: absolute;
   top: 7px;

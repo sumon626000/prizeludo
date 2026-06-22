@@ -8,6 +8,7 @@ WEB_ROOT="${WEB_ROOT:-/home/nixbazar/prizejito.com}"
 NODE_PORT="${NODE_PORT:-30047}"
 PUBLIC_API_URL="${PUBLIC_API_URL:-https://prizejito.com}"
 PUBLIC_WEB_ORIGIN="${PUBLIC_WEB_ORIGIN:-https://prizejito.com}"
+APK_DOWNLOAD_URL="${APK_DOWNLOAD_URL:-$PUBLIC_WEB_ORIGIN/downloads/prizejito.apk}"
 
 echo "=============================================="
 echo " PrizeJito — Fix All (site + API + web files)"
@@ -56,7 +57,7 @@ if [[ -f "$WEB_ROOT/.htaccess" ]]; then
 fi
 
 cat > "$WEB_ROOT/runtime-config.json" <<EOF
-{"apiUrl":"$PUBLIC_API_URL","webOrigin":"$PUBLIC_WEB_ORIGIN"}
+{"apiUrl":"$PUBLIC_API_URL","webOrigin":"$PUBLIC_WEB_ORIGIN","apkDownloadUrl":"$APK_DOWNLOAD_URL"}
 EOF
 
 mkdir -p "$REPO_DIR/tmp"

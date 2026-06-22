@@ -1,4 +1,12 @@
 import { useEffect, useState } from "react";
+import {
+  checkApkAvailable,
+  getApkDownloadUrl,
+  isAndroidDevice,
+  isIosDevice,
+  isStandaloneApp,
+  triggerApkDownload,
+} from "../lib/app-install";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -11,23 +19,16 @@ const dismissedKey = "khan-ludo-pwa-prompt-dismissed";
 export function usePwaInstall() {
   const [installEvent, setInstallEvent] =
     useState<BeforeInstallPromptEvent | null>(null);
-  const [installed, setInstalled] = useState(false);
+  const [installed, setInstalled] = useState(() => isStandaloneApp());
   const [dismissed, setDismissed] = useState(
     () => localStorage.getItem(dismissedKey) === "true",
   );
-  const isIos =
-    /iphone|ipad|ipod/i.test(navigator.userAgent) ||
-    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const [apkAvailable, setApkAvailable] = useState(false);
+  const isIos = isIosDevice();
+  const isAndroid = isAndroidDevice();
 
   useEffect(() => {
-    const navigatorWithStandalone = navigator as Navigator & {
-      standalone?: boolean;
-    };
-    if (
-      localStorage.getItem(installedKey) === "true" ||
-      window.matchMedia?.("(display-mode: standalone)").matches ||
-      navigatorWithStandalone.standalone === true
-    ) {
+    if (isStandaloneApp()) {
       localStorage.setItem(installedKey, "true");
       setInstalled(true);
       return;
@@ -37,7 +38,7 @@ export function usePwaInstall() {
       event.preventDefault();
       setInstallEvent(event as BeforeInstallPromptEvent);
     };
-    const installed = () => {
+    const onInstalled = () => {
       localStorage.setItem(installedKey, "true");
       localStorage.removeItem(dismissedKey);
       setInstalled(true);
@@ -45,12 +46,26 @@ export function usePwaInstall() {
     };
 
     window.addEventListener("beforeinstallprompt", beforeInstall);
-    window.addEventListener("appinstalled", installed);
+    window.addEventListener("appinstalled", onInstalled);
     return () => {
       window.removeEventListener("beforeinstallprompt", beforeInstall);
-      window.removeEventListener("appinstalled", installed);
+      window.removeEventListener("appinstalled", onInstalled);
     };
   }, []);
+
+  useEffect(() => {
+    if (!isAndroid || installed) {
+      setApkAvailable(false);
+      return;
+    }
+    let cancelled = false;
+    void checkApkAvailable(getApkDownloadUrl()).then((available) => {
+      if (!cancelled) setApkAvailable(available);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [installed, isAndroid]);
 
   const install = async () => {
     if (!installEvent) return;
@@ -59,7 +74,12 @@ export function usePwaInstall() {
     if (choice.outcome === "accepted") {
       localStorage.setItem(installedKey, "true");
       setInstallEvent(null);
+      setInstalled(true);
     }
+  };
+
+  const downloadApk = () => {
+    triggerApkDownload(getApkDownloadUrl());
   };
 
   const dismiss = () => {
@@ -67,11 +87,28 @@ export function usePwaInstall() {
     setDismissed(true);
   };
 
+  const reopenPrompt = () => {
+    localStorage.removeItem(dismissedKey);
+    setDismissed(false);
+  };
+
+  const canInstall = Boolean(installEvent);
+  const canDownloadApk = isAndroid && apkAvailable;
+  const showInstallEntry =
+    !installed && (canInstall || isIos || canDownloadApk);
+
   return {
-    canInstall: Boolean(installEvent),
-    isIos,
-    visible: !installed && !dismissed && (Boolean(installEvent) || isIos),
-    install,
+    apkDownloadUrl: getApkDownloadUrl(),
+    canDownloadApk,
+    canInstall,
+    reopenPrompt,
+    showInstallEntry,
     dismiss,
+    downloadApk,
+    installed,
+    isAndroid,
+    isIos,
+    visible: showInstallEntry && !dismissed,
+    install,
   };
 }

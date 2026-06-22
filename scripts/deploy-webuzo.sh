@@ -6,6 +6,7 @@ WEB_ROOT="${WEB_ROOT:-/home/nixbazar/prizejito.com}"
 BRANCH="${DEPLOY_BRANCH:-main}"
 PUBLIC_API_URL="${PUBLIC_API_URL:-https://prizejito.com}"
 PUBLIC_WEB_ORIGIN="${PUBLIC_WEB_ORIGIN:-https://prizejito.com}"
+APK_DOWNLOAD_URL="${APK_DOWNLOAD_URL:-$PUBLIC_WEB_ORIGIN/downloads/prizejito.apk}"
 NODE_PORT="${NODE_PORT:-30047}"
 LOG_DIR="${DEPLOY_LOG_DIR:-$REPO_DIR/logs}"
 DEPLOY_LOG="$LOG_DIR/deploy.log"
@@ -44,6 +45,7 @@ cat > "$WEB_ROOT/runtime-config.json" <<EOF
 {
   "apiUrl": "$PUBLIC_API_URL",
   "webOrigin": "$PUBLIC_WEB_ORIGIN",
+  "apkDownloadUrl": "$APK_DOWNLOAD_URL",
   "updatedAt": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 }
 EOF

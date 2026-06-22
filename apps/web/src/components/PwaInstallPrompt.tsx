@@ -18,7 +18,15 @@ export function PwaInstallPrompt({
   siteName = "PrizeJito.com",
 }: PwaInstallPromptProps) {
   const { t } = useTranslation();
-  const { canInstall, dismiss, install, isIos, visible } = usePwaInstall();
+  const {
+    canDownloadApk,
+    canInstall,
+    dismiss,
+    downloadApk,
+    install,
+    isIos,
+    visible,
+  } = usePwaInstall();
 
   useEffect(() => {
     const icon = absoluteAssetUrl(logoUrl || "/prizejito-logo.png");
@@ -70,6 +78,13 @@ export function PwaInstallPrompt({
 
   if (!visible) return null;
 
+  const description =
+    isIos && !canInstall
+      ? t("iosInstallHelp")
+      : canDownloadApk && !canInstall
+        ? t("apkInstallDescription")
+        : t("installAppDescription");
+
   return (
     <aside className="pwa-install-prompt glass" aria-label={t("installApp")}>
       <button
@@ -82,19 +97,32 @@ export function PwaInstallPrompt({
       <img src={logoUrl || "/prizejito-logo.png"} alt="" />
       <div>
         <strong>{t("installKhanLudo")}</strong>
-        <p>
-          {isIos && !canInstall
-            ? t("iosInstallHelp")
-            : t("installAppDescription")}
-        </p>
-        {isIos && !canInstall ? (
-          <span className="pwa-ios-steps">
-            <Share size={15} /> {t("iosShareThenAdd")}
-          </span>
-        ) : (
-          <button className="primary-button" onClick={() => void install()}>
-            <Download size={16} /> {t("installApp")}
-          </button>
+        <p>{description}</p>
+        <div className="pwa-install-prompt__actions">
+          {isIos && !canInstall ? (
+            <span className="pwa-ios-steps">
+              <Share size={15} /> {t("iosShareThenAdd")}
+            </span>
+          ) : (
+            <>
+              {canInstall && (
+                <button className="primary-button" onClick={() => void install()}>
+                  <Download size={16} /> {t("installApp")}
+                </button>
+              )}
+              {canDownloadApk && (
+                <button
+                  className={canInstall ? "ghost-button" : "primary-button"}
+                  onClick={downloadApk}
+                >
+                  <Smartphone size={16} /> {t("downloadApk")}
+                </button>
+              )}
+            </>
+          )}
+        </div>
+        {canDownloadApk && !isIos && (
+          <small className="pwa-install-prompt__apk-note">{t("apkSideloadHelp")}</small>
         )}
       </div>
       <Smartphone className="pwa-install-prompt__phone" size={24} />

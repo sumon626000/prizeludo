@@ -6,6 +6,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { GamingIcon } from "../components/icons";
+import { AppInstallButton } from "../components/AppInstallButton";
 import type { HomeSnapshot, LeaderboardPlayer } from "../types";
 
 const liveModes = ["Time", "Time", "Quick", "Quick", "Classic", "Time", "Speed"];
@@ -267,6 +268,7 @@ export function HomePage({
             <ArrowRight size={16} />
           </span>
         </button>
+        <AppInstallButton className="home-install-cta" />
       </div>
 
       <section className="home-game-hub" aria-label="Games">
