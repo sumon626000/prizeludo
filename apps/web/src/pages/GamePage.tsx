@@ -934,15 +934,6 @@ export function GamePage() {
             tokenSpeedRef.current,
           );
         }
-        if (!autoDice) {
-          const autoTokenIndex = getOnlyLegalTokenIndex(
-            result.state.roll?.legalTokenIndexes ?? [],
-          );
-          if (autoTokenIndex !== null) {
-            playSound("move");
-            await submitTokenMove(autoTokenIndex);
-          }
-        }
       } catch (caught) {
         if (caught instanceof ApiError && SOFT_GAME_ERRORS.has(caught.code)) {
           void load().catch(() => undefined);
@@ -1105,15 +1096,17 @@ export function GamePage() {
       busy !== "roll" &&
       (simpleGameplay || (!ownRolling && !tokenAnimating)),
   );
+  const legalTokenIndexes = room?.state.boardState.roll?.legalTokenIndexes ?? [];
+  const hasForcedAutoMove = getOnlyLegalTokenIndex(legalTokenIndexes) !== null;
   const canAutoMove = Boolean(
-    autoDice &&
+    (autoDice || hasForcedAutoMove) &&
       !serverAutoPlay &&
       user?.id &&
       room?.role === "player" &&
       room.state.currentTurn === user.id &&
       room.state.boardState.phase === "active" &&
       room.state.boardState.roll &&
-      (room.state.boardState.roll.legalTokenIndexes.length ?? 0) > 0 &&
+      legalTokenIndexes.length > 0 &&
       !busy.startsWith("move-") &&
       busy !== "roll" &&
       (simpleGameplay || (!ownRolling && !tokenAnimating)),
