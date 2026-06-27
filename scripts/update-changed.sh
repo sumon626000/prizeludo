@@ -166,6 +166,10 @@ else
   fi
 fi
 
+if [[ "$NEED_WEB" -eq 1 || "$NEED_API" -eq 1 ]]; then
+  NEED_INSTALL=1
+fi
+
 if [[ "$NEED_INSTALL" -eq 1 ]]; then
   echo "npm install..."
   npm install --include=dev
