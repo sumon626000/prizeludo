@@ -91,8 +91,10 @@ if [[ "$MODE" == "full" ]]; then
   NEED_API=1
   NEED_MIGRATE=1
 elif [[ "$MODE" == "web" ]]; then
+  NEED_INSTALL=1
   NEED_WEB=1
 elif [[ "$MODE" == "api" ]]; then
+  NEED_INSTALL=1
   NEED_API=1
 else
   if [[ -z "$PREV_COMMIT" || "$PREV_COMMIT" == "$NEW_COMMIT" ]]; then
@@ -166,7 +168,7 @@ fi
 
 if [[ "$NEED_INSTALL" -eq 1 ]]; then
   echo "npm install..."
-  npm install
+  npm install --include=dev
 fi
 
 if [[ "$NEED_WEB" -eq 1 ]]; then

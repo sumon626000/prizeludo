@@ -25,7 +25,7 @@ cat > apps/web/.env.production <<EOF
 VITE_API_URL=$PUBLIC_API_URL
 EOF
 
-npm install
+npm install --include=dev
 npm run build
 npm run db:migrate
 
