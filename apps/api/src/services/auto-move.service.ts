@@ -121,5 +121,5 @@ export function buildAutoMoveContext(
   };
 }
 
-export const AUTO_HUMAN_ROLL_DELAY_MS = 520;
+export const AUTO_HUMAN_ROLL_DELAY_MS = 1200;
 export const AUTO_HUMAN_MOVE_DELAY_MS = 820;

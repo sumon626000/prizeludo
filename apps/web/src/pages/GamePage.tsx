@@ -94,6 +94,7 @@ const HOME_LANES: Array<Array<[number, number]>> = [
 const YARD_SLOT_START = 1.82;
 const YARD_SLOT_END = 3.18;
 const YARD_FAR_OFFSET = 9;
+const TOKEN_STEP_SETTLE_MS = 40;
 const YARDS: Array<Array<[number, number]>> = [
   [
     [YARD_SLOT_START, YARD_SLOT_START],
@@ -900,6 +901,7 @@ export function GamePage() {
     if (room.state.currentTurn !== user.id) return;
     if (room.state.boardState.roll) return;
     if (busy === "roll" || busy.startsWith("move-")) return;
+    if (!simpleGameplay && tokenAnimatingRef.current) return;
     if (!canAcceptTap("roll", simpleGameplay ? 120 : 320)) return;
     soundEngine.resume();
     setBusy("roll");
@@ -1117,7 +1119,7 @@ export function GamePage() {
       !room?.state.boardState.roll &&
       busy !== "roll" &&
       !busy.startsWith("move-") &&
-      (simpleGameplay || !ownRolling) &&
+      (simpleGameplay || (!ownRolling && !tokenAnimating)) &&
       (!autoDice || !serverAutoPlay),
   );
   const rollRef = useRef(roll);
@@ -2346,7 +2348,7 @@ const LudoBoard = memo(function LudoBoard({
         stepTimers.push(
           window.setTimeout(() => {
             requestAnimationFrame(() => resolve());
-          }, ms),
+          }, ms + TOKEN_STEP_SETTLE_MS),
         );
       });
 
@@ -2373,6 +2375,8 @@ const LudoBoard = memo(function LudoBoard({
         action.from!,
         steps.length,
       ) +
+      steps.length * TOKEN_STEP_SETTLE_MS +
+      returnStepCount * TOKEN_STEP_SETTLE_MS +
       (captured.length > 0
         ? TOKEN_KILL_IMPACT_MS + TOKEN_KILL_RETURN_TOTAL_MS
         : 0) +
